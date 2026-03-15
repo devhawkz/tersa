@@ -1,0 +1,310 @@
+<?php
+if (!defined('ABSPATH')) {
+	exit;
+}
+
+/**
+ * Vraća slug stranice koja čuva globalna header podešavanja za ACF Free.
+ */
+function tersa_get_header_settings_slug() {
+	return 'header-settings';
+}
+
+/**
+ * Vraća transient key za header settings.
+ */
+function tersa_get_header_settings_cache_key() {
+	return 'tersa_header_settings';
+}
+
+/**
+ * Dohvata ACF header settings sa fallback vrednostima.
+ */
+function tersa_get_header_settings() {
+	$cache_key = tersa_get_header_settings_cache_key();
+	$settings  = get_transient($cache_key);
+
+	if (false !== $settings && is_array($settings)) {
+		return wp_parse_args(
+			$settings,
+			[
+				'topbar_enabled'   => false,
+				'topbar_message'   => '',
+				'topbar_link_text' => '',
+				'topbar_link_url'  => '',
+			]
+		);
+	}
+
+	$page      = get_page_by_path(tersa_get_header_settings_slug());
+	$page_id   = $page ? (int) $page->ID : 0;
+	$get_field = function_exists('get_field');
+
+	$settings = [
+		'topbar_enabled'   => ($page_id && $get_field) ? (bool) get_field('topbar_enabled', $page_id) : false,
+		'topbar_message'   => ($page_id && $get_field) ? (string) get_field('topbar_message', $page_id) : '',
+		'topbar_link_text' => ($page_id && $get_field) ? (string) get_field('topbar_link_text', $page_id) : '',
+		'topbar_link_url'  => ($page_id && $get_field) ? (string) get_field('topbar_link_url', $page_id) : '',
+	];
+
+	set_transient($cache_key, $settings, DAY_IN_SECONDS);
+
+	return $settings;
+}
+
+/**
+ * Briše keš kada se sačuva Header Settings stranica.
+ */
+function tersa_maybe_clear_header_settings_cache($post_id, $post = null) {
+	if (wp_is_post_revision($post_id) || 'page' !== get_post_type($post_id)) {
+		return;
+	}
+
+	$post_obj = $post instanceof WP_Post ? $post : get_post($post_id);
+	if (!$post_obj instanceof WP_Post) {
+		return;
+	}
+
+	if (tersa_get_header_settings_slug() !== $post_obj->post_name) {
+		return;
+	}
+
+	delete_transient(tersa_get_header_settings_cache_key());
+}
+add_action('save_post_page', 'tersa_maybe_clear_header_settings_cache', 10, 2);
+
+/**
+ * Vraća shop/search URL.
+ */
+function tersa_get_search_url() {
+	if (class_exists('WooCommerce')) {
+		$shop_url = wc_get_page_permalink('shop');
+
+		if ($shop_url) {
+			return $shop_url;
+		}
+	}
+
+	return home_url('/');
+}
+
+/**
+ * Vraća URL wishlist stranice.
+ */
+function tersa_get_wishlist_url() {
+	if (defined('YITH_WCWL') && function_exists('YITH_WCWL')) {
+		$instance = YITH_WCWL();
+
+		if (is_object($instance) && method_exists($instance, 'get_wishlist_url')) {
+			return (string) $instance->get_wishlist_url();
+		}
+	}
+
+	return '';
+}
+
+/**
+ * Vraća broj wishlist stavki.
+ * Preferira YITH shortcode jer se najčešće osvežava preko AJAX-a.
+ * Rezultat se kešira statički — shortcode se ne izvršava dva puta po requestu.
+ */
+function tersa_get_wishlist_count() {
+	static $cached = null;
+
+	if (null !== $cached) {
+		return $cached;
+	}
+
+	$count = 0;
+
+	if (shortcode_exists('yith_wcwl_items_count')) {
+		$output = do_shortcode('[yith_wcwl_items_count]');
+		$output = wp_strip_all_tags((string) $output);
+		$output = trim($output);
+
+		if (is_numeric($output)) {
+			$count = (int) $output;
+		}
+	}
+
+	$cached = max(0, $count);
+	return $cached;
+}
+
+/**
+ * Vraća broj proizvoda u korpi.
+ * Rezultat se kešira statički — WC()->cart se ne poziva više puta po requestu.
+ */
+function tersa_get_cart_count() {
+	static $cached = null;
+
+	if (null !== $cached) {
+		return $cached;
+	}
+
+	$cached = 0;
+
+	if (class_exists('WooCommerce') && function_exists('WC')) {
+		$wc = WC();
+
+		if ($wc && isset($wc->cart) && $wc->cart) {
+			$cached = (int) $wc->cart->get_cart_contents_count();
+		}
+	}
+
+	return $cached;
+}
+
+/**
+ * Vraća markup za logo sa fallback-om.
+ */
+function tersa_get_header_logo_markup() {
+	$site_name      = get_bloginfo('name');
+	$custom_logo_id = (int) get_theme_mod('custom_logo');
+
+	if ($custom_logo_id) {
+		$logo = wp_get_attachment_image(
+			$custom_logo_id,
+			'tersa-logo',
+			false,
+			[
+				'class'   => 'site-header__logo-image',
+				'loading' => 'eager',
+				'alt'     => $site_name,
+			]
+		);
+
+		if ($logo) {
+			return $logo;
+		}
+	}
+
+	$fallback_logo_path = get_template_directory() . '/assets/img/tersa-logo.png';
+	if (file_exists($fallback_logo_path)) {
+		$fallback_logo_url = get_template_directory_uri() . '/assets/img/tersa-logo.png';
+
+		// Keširanje dimenzija po requestu — sprečava CLS (Cumulative Layout Shift)
+		$logo_size = wp_cache_get('tersa_fallback_logo_dims', 'tersa_theme');
+		if (false === $logo_size) {
+			$logo_size = function_exists('wp_getimagesize')
+				? wp_getimagesize($fallback_logo_path)
+				: @getimagesize($fallback_logo_path); // phpcs:ignore WordPress.PHP.NoSilencedErrors.Discouraged
+			wp_cache_set('tersa_fallback_logo_dims', $logo_size ?: [], 'tersa_theme');
+		}
+
+		$width_attr  = !empty($logo_size[0]) ? ' width="' . (int) $logo_size[0] . '"' : '';
+		$height_attr = !empty($logo_size[1]) ? ' height="' . (int) $logo_size[1] . '"' : '';
+
+		return sprintf(
+			'<img src="%1$s" alt="%2$s" class="site-header__logo-image" loading="eager"%3$s%4$s>',
+			esc_url($fallback_logo_url),
+			esc_attr($site_name),
+			$width_attr,
+			$height_attr
+		);
+	}
+
+	return sprintf(
+		'<span class="site-header__logo-text">%s</span>',
+		esc_html($site_name)
+	);
+}
+
+/**
+ * Renderuje primary navigaciju jednom i vraća HTML.
+ */
+function tersa_get_primary_navigation_markup() {
+	ob_start();
+	get_template_part('template-parts/global/navigation');
+	return (string) ob_get_clean();
+}
+
+/**
+ * Vraća aria label za wishlist link.
+ */
+function tersa_get_wishlist_aria_label() {
+	$count = tersa_get_wishlist_count();
+
+	return sprintf(
+		/* translators: %d: wishlist item count */
+		_n('Wishlist, %d item', 'Wishlist, %d items', $count, 'tersa-shop'),
+		$count
+	);
+}
+
+/**
+ * Vraća aria label za cart link.
+ */
+function tersa_get_cart_aria_label() {
+	$count = tersa_get_cart_count();
+
+	return sprintf(
+		/* translators: %d: cart item count */
+		_n('Cart, %d item', 'Cart, %d items', $count, 'tersa-shop'),
+		$count
+	);
+}
+
+/**
+ * Prevodi string koristeći Polylang ako je dostupan, inače vraća originalni string.
+ *
+ * @param string $string String za prevod.
+ * @return string
+ */
+function tersa_translate_string(string $string): string {
+	if (!$string) {
+		return $string;
+	}
+
+	if (function_exists('pll__')) {
+		return (string) pll__($string);
+	}
+
+	return $string;
+}
+
+/**
+ * Registruje ACF topbar stringove u Polylang String Translations.
+ * Potrebno da prevodioci mogu prevesti topbar poruku i link tekst/URL.
+ */
+function tersa_register_polylang_strings() {
+	if (!function_exists('pll_register_string')) {
+		return;
+	}
+
+	$settings = tersa_get_header_settings();
+	$group    = 'Tersa Shop Header';
+
+	if (!empty($settings['topbar_message'])) {
+		pll_register_string('topbar_message', $settings['topbar_message'], $group, true);
+	}
+
+	if (!empty($settings['topbar_link_text'])) {
+		pll_register_string('topbar_link_text', $settings['topbar_link_text'], $group);
+	}
+
+	if (!empty($settings['topbar_link_url'])) {
+		pll_register_string('topbar_link_url', $settings['topbar_link_url'], $group);
+	}
+}
+add_action('init', 'tersa_register_polylang_strings');
+
+/**
+ * Dodaje aria-haspopup i aria-expanded na menu linkove koji imaju podmeni.
+ * Radi u kombinaciji sa JS koji toggleuje aria-expanded pri otvaranju submenija.
+ *
+ * @param array    $atts  Atributi linka.
+ * @param WP_Post  $item  Menu stavka.
+ * @param stdClass $args  Argumenti wp_nav_menu.
+ * @param int      $depth Dubina u meniju.
+ * @return array
+ */
+function tersa_nav_menu_link_attributes($atts, $item, $args, $depth) {
+	if (in_array('menu-item-has-children', (array) $item->classes, true)) {
+		$atts['aria-haspopup'] = 'true';
+		$atts['aria-expanded'] = 'false';
+	}
+
+	return $atts;
+}
+add_filter('nav_menu_link_attributes', 'tersa_nav_menu_link_attributes', 10, 4);

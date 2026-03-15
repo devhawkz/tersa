@@ -110,8 +110,8 @@
     --sp-80: 5rem;
   
     /* Layout */
-    --container: 1400px;
-    --container-narrow: 1200px;
+    --container: 90rem;
+    --container-narrow: 75rem;
     --gutter: clamp(16px, 2vw, 32px);
     --section-space: clamp(56px, 8vw, 100px);
   
@@ -128,6 +128,32 @@
     /* Motion */
     --transition-fast: 0.2s ease;
     --transition-base: 0.3s ease;
+
+    /* Layout constants */
+--container-wide: 1600px;
+
+--content-measure: 70ch;
+--content-measure-wide: 85ch;
+--content-measure-narrow: 55ch;
+
+--sidebar-width-sm: 240px;
+--sidebar-width: 300px;
+--sidebar-width-lg: 320px;
+
+--summary-width-sm: 320px;
+--summary-width: 420px;
+
+--card-min: 260px;
+--product-card-min: 280px;
+--switcher-target: 320px;
+--switcher-min: 260px;
+
+--sticky-offset: 24px;
+--table-min-width: 720px;
+
+--cover-min-sm: min(60vh, 720px);
+--cover-min: min(80vh, 900px);
+--cover-min-lg: min(92vh, 980px);
   }
   
   /* =========================
@@ -255,7 +281,8 @@
   /* =========================
      Layout Helpers
      ========================= */
-  .container {
+ /*  
+   .container {
     width: min(100% - (var(--gutter) * 2), var(--container));
     margin-inline: auto;
   }
@@ -268,6 +295,7 @@
   .section {
     padding-block: var(--section-space);
   }
+  */
   
   /* =========================
      Buttons

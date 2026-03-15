@@ -7,10 +7,10 @@ require_once get_template_directory() . '/inc/enqueue.php';
 
 
 // Theme setup
-// require_once get_template_directory() . '/inc/setup.php';
+require_once get_template_directory() . '/inc/setup.php';
 
 // Helpers
-// require_once get_template_directory() . '/inc/helpers.php';
+ require_once get_template_directory() . '/inc/header-helpers.php';
 
 // WooCommerce
 // require_once get_template_directory() . '/inc/woocommerce.php';
