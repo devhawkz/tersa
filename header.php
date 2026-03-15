@@ -3,21 +3,22 @@ if (!defined('ABSPATH')) {
 	exit;
 }
 
-$wishlist_url   = tersa_get_wishlist_url();
-$wishlist_count = tersa_get_wishlist_count();
-$cart_count     = tersa_get_cart_count();
-$site_name      = get_bloginfo('name');
-$logo_markup    = tersa_get_header_logo_markup();
-$nav_markup     = tersa_get_primary_navigation_markup();
-$header_data    = tersa_get_header_settings();
+// Sva biznis logika je u helpers.php — template sadrži samo prezentaciju
+$data = tersa_get_header_template_data();
 
-$topbar_enabled   = !empty($header_data['topbar_enabled']);
-$topbar_message   = !empty($header_data['topbar_message']) ? (string) $header_data['topbar_message'] : '';
-$topbar_link_text = !empty($header_data['topbar_link_text']) ? (string) $header_data['topbar_link_text'] : '';
-$topbar_link_url  = !empty($header_data['topbar_link_url']) ? (string) $header_data['topbar_link_url'] : '';
-?>
-
-<!doctype html>
+$home_url                = $data['home_url'];
+$site_name               = $data['site_name'];
+$logo_markup             = $data['logo_markup'];
+$nav_markup              = $data['nav_markup'];
+$wishlist_url            = $data['wishlist_url'];
+$wishlist_count          = $data['wishlist_count'];
+$cart_count              = $data['cart_count'];
+$topbar_enabled          = $data['topbar_enabled'];
+$topbar_message          = $data['topbar_message'];
+$topbar_link_text        = $data['topbar_link_text'];
+$topbar_link_url         = $data['topbar_link_url'];
+$topbar_link_is_external = $data['topbar_link_is_external'];
+?><!doctype html>
 <html <?php language_attributes(); ?>>
 <head>
 	<meta charset="<?php bloginfo('charset'); ?>">
@@ -34,11 +35,15 @@ $topbar_link_url  = !empty($header_data['topbar_link_url']) ? (string) $header_d
 			<div class="container">
 				<div class="site-header__topbar-inner">
 					<p class="site-header__promo">
-						<?php echo esc_html(tersa_translate_string($topbar_message)); ?>
+						<?php echo esc_html($topbar_message); ?>
 
 						<?php if ($topbar_link_text && $topbar_link_url) : ?>
-							<a href="<?php echo esc_url(tersa_translate_string($topbar_link_url)); ?>" class="site-header__promo-link">
-								<?php echo esc_html(tersa_translate_string($topbar_link_text)); ?>
+							<a
+								href="<?php echo esc_url($topbar_link_url); ?>"
+								class="site-header__promo-link"
+								<?php if ($topbar_link_is_external) : ?>rel="noopener noreferrer"<?php endif; ?>
+							>
+								<?php echo esc_html($topbar_link_text); ?>
 							</a>
 						<?php endif; ?>
 					</p>
@@ -54,7 +59,7 @@ $topbar_link_url  = !empty($header_data['topbar_link_url']) ? (string) $header_d
 				<div class="site-header__main-inner">
 					<div class="site-header__brand">
 						<a
-							href="<?php echo esc_url(home_url('/')); ?>"
+							href="<?php echo esc_url($home_url); ?>"
 							class="site-header__logo-link"
 							aria-label="<?php echo esc_attr(sprintf(__('Go to homepage, %s', 'tersa-shop'), $site_name)); ?>"
 						>
@@ -150,28 +155,30 @@ $topbar_link_url  = !empty($header_data['topbar_link_url']) ? (string) $header_d
 			>
 				<div class="site-header__search-panel-inner">
 					<div class="site-header__search-head">
-					<h2
-						id="header-search-title"
-						class="site-header__search-title"
-						aria-live="polite"
-						data-search-label="<?php echo esc_attr(__('Search for products', 'tersa-shop')); ?>"
-					>
-						<?php echo esc_html(sprintf(__('Search for products (%d)', 'tersa-shop'), 0)); ?>
-					</h2>
+						<h2
+							id="header-search-title"
+							class="site-header__search-title"
+							aria-live="polite"
+							data-search-label="<?php echo esc_attr(__('Search for products', 'tersa-shop')); ?>"
+						>
+							<?php echo esc_html(sprintf(__('Search for products (%d)', 'tersa-shop'), 0)); ?>
+						</h2>
 
-					<button
-						type="button"
-						class="site-header__search-close"
-						aria-label="<?php esc_attr_e('Close search', 'tersa-shop'); ?>"
-						data-search-close
-					>
-						<span></span>
-						<span></span>
-					</button>
-				</div>
+						<button
+							type="button"
+							class="site-header__search-close"
+							aria-label="<?php esc_attr_e('Close search', 'tersa-shop'); ?>"
+							data-search-close
+						>
+							<span></span>
+							<span></span>
+						</button>
+					</div>
 
 					<div class="site-header__search-body">
-						<?php echo do_shortcode('[aws_search_form]'); ?>
+						<?php if (shortcode_exists('aws_search_form')) : ?>
+							<?php echo do_shortcode('[aws_search_form]'); ?>
+						<?php endif; ?>
 					</div>
 				</div>
 			</div>
@@ -183,27 +190,13 @@ $topbar_link_url  = !empty($header_data['topbar_link_url']) ? (string) $header_d
 			role="dialog"
 			aria-modal="true"
 			aria-label="<?php esc_attr_e('Mobile menu', 'tersa-shop'); ?>"
+			data-mobile-nav-label="<?php esc_attr_e('Mobile navigation', 'tersa-shop'); ?>"
 			inert>
 
-			<!-- Header panela: back dugme / logo (centar) / close dugme -->
+			<!-- Logo (centar) + close dugme (desno) -->
 			<div class="mobile-nav__header">
-				<?php /*
-				<button
-					id="mobile-nav-back"
-					type="button"
-					class="mobile-nav__back"
-					hidden
-					aria-label="<?php esc_attr_e('Go back', 'tersa-shop'); ?>"
-				>
-					<svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
-						<polyline points="15 18 9 12 15 6"></polyline>
-					</svg>
-					<span class="mobile-nav__back-label"></span>
-				</button>
-				*/ ?>
-
 				<a
-					href="<?php echo esc_url(home_url('/')); ?>"
+					href="<?php echo esc_url($home_url); ?>"
 					class="mobile-nav__logo-link"
 					aria-hidden="true"
 					tabindex="-1"
@@ -224,15 +217,8 @@ $topbar_link_url  = !empty($header_data['topbar_link_url']) ? (string) $header_d
 				</button>
 			</div>
 
-			<!-- Navigacija -->
+			<!-- Navigacija — JS klonira desktop nav pri prvom otvaranju (sprečava duplikate u HTML izvoru) -->
 			<div class="mobile-nav__body">
-				<nav
-					class="site-header__nav site-header__nav--mobile"
-					aria-label="<?php esc_attr_e('Mobile navigation', 'tersa-shop'); ?>"
-					data-submenu-label="<?php echo esc_attr(__('Open submenu for %s', 'tersa-shop')); ?>"
-				>
-					<?php echo $nav_markup; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
-				</nav>
 			</div>
 
 		</div>

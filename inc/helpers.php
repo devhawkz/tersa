@@ -290,32 +290,54 @@ function tersa_register_polylang_strings() {
 add_action('init', 'tersa_register_polylang_strings');
 
 /**
- * TODO: Podrška za podmeniije
+ * Vraća prevedeni URL topbar linka i da li je eksterni.
+ * Centralizuje detekciju eksternog linka van template fajla.
  *
- * Kada se implementiraju submeniji, treba:
- * 1. Dodati CSS za .sub-menu (pozicioniranje, show/hide, animacija)
- * 2. Odkomentarisati filter ispod koji dodaje aria atribute na parent linkove
- * 3. U header.js dodati JS koji na klik/hover toggleuje aria-expanded na parent linku
- *    i prikazuje/sakriva .sub-menu
- *
- * Primer JS logike za podmeni:
- *   document.querySelectorAll('.menu-item-has-children > a').forEach(function (link) {
- *     link.addEventListener('click', function (e) {
- *       e.preventDefault();
- *       const isOpen = link.getAttribute('aria-expanded') === 'true';
- *       link.setAttribute('aria-expanded', String(!isOpen));
- *       link.nextElementSibling?.classList.toggle('is-open', !isOpen);
- *     });
- *   });
+ * @param string $url Sirovi URL iz ACF podešavanja.
+ * @return array{ url: string, is_external: bool }
  */
-
-/*
-function tersa_nav_menu_link_attributes( $atts, $item, $args, $depth ) {
-	if ( in_array( 'menu-item-has-children', (array) $item->classes, true ) ) {
-		$atts['aria-haspopup'] = 'true';
-		$atts['aria-expanded'] = 'false';
+function tersa_get_topbar_link_data(string $url): array {
+	if (!$url) {
+		return ['url' => '', 'is_external' => false];
 	}
-	return $atts;
+
+	$translated = tersa_translate_string($url);
+	$link_host  = wp_parse_url($translated, PHP_URL_HOST);
+	$home_host  = wp_parse_url(home_url(), PHP_URL_HOST);
+
+	return [
+		'url'         => $translated,
+		'is_external' => (bool) ($link_host && $home_host && $link_host !== $home_host),
+	];
 }
-add_filter( 'nav_menu_link_attributes', 'tersa_nav_menu_link_attributes', 10, 4 );
-*/
+
+/**
+ * Priprema sve promenljive potrebne za header.php template.
+ * Centralizuje biznis logiku van template fajla — template sadrži samo prezentaciju.
+ *
+ * @return array<string, mixed>
+ */
+function tersa_get_header_template_data(): array {
+	$header_data = tersa_get_header_settings();
+	$topbar_url  = !empty($header_data['topbar_link_url']) ? (string) $header_data['topbar_link_url'] : '';
+	$link_data   = tersa_get_topbar_link_data($topbar_url);
+
+	return [
+		'home_url'               => home_url('/'),
+		'site_name'              => get_bloginfo('name'),
+		'logo_markup'            => tersa_get_header_logo_markup(),
+		'nav_markup'             => tersa_get_primary_navigation_markup(),
+		'wishlist_url'           => tersa_get_wishlist_url(),
+		'wishlist_count'         => tersa_get_wishlist_count(),
+		'cart_count'             => tersa_get_cart_count(),
+		'topbar_enabled'         => !empty($header_data['topbar_enabled']),
+		'topbar_message'         => !empty($header_data['topbar_message'])
+		                           ? tersa_translate_string((string) $header_data['topbar_message'])
+		                           : '',
+		'topbar_link_text'       => !empty($header_data['topbar_link_text'])
+		                           ? tersa_translate_string((string) $header_data['topbar_link_text'])
+		                           : '',
+		'topbar_link_url'        => $link_data['url'],
+		'topbar_link_is_external'=> $link_data['is_external'],
+	];
+}
