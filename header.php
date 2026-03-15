@@ -101,12 +101,15 @@ $topbar_link_is_external = $data['topbar_link_is_external'];
 							</a>
 						<?php endif; ?>
 
-						<?php if (class_exists('WooCommerce')) : ?>
-							<a
-								class="site-header__icon-link site-header__icon-link--cart"
-								href="<?php echo esc_url(wc_get_cart_url()); ?>"
-								aria-label="<?php echo esc_attr(tersa_get_cart_aria_label()); ?>"
-							>
+					<?php if (class_exists('WooCommerce')) : ?>
+						<a
+							class="site-header__icon-link site-header__icon-link--cart"
+							href="<?php echo esc_url(wc_get_cart_url()); ?>"
+							aria-label="<?php echo esc_attr(tersa_get_cart_aria_label()); ?>"
+							aria-expanded="false"
+							aria-controls="cart-drawer"
+							data-cart-toggle
+						>
 								<svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
 									<circle cx="9" cy="20" r="1.5"></circle>
 									<circle cx="18" cy="20" r="1.5"></circle>
@@ -138,6 +141,8 @@ $topbar_link_is_external = $data['topbar_link_is_external'];
 		</div>
 
 		<?php get_template_part('template-parts/global/search'); ?>
+
+		<?php get_template_part('template-parts/global/cart-drawer'); ?>
 
 		<?php get_template_part('template-parts/global/mobile-navigation'); ?>
 	</header>

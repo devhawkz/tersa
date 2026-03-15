@@ -12,6 +12,13 @@ document.addEventListener('DOMContentLoaded', function () {
     ? searchOverlay.querySelector('.site-header__search-panel')
     : null;
 
+  var cartToggle       = document.querySelector('[data-cart-toggle]');
+  var cartOverlay      = document.getElementById('cart-drawer');
+  var cartCloseButtons = document.querySelectorAll('[data-cart-close]');
+  var cartPanel        = cartOverlay
+    ? cartOverlay.querySelector('.site-header__cart-panel')
+    : null;
+
   // Prevedeni string se čita iz data atributa koje puni PHP — Polylang kompatibilno
   var searchLabel = searchTitle
     ? (searchTitle.dataset.searchLabel || 'Search for products')
@@ -27,7 +34,7 @@ document.addEventListener('DOMContentLoaded', function () {
   var mobileNavPopulated = false;
 
   // Kašnjenja vezana za CSS animacije — centralizovana da se ne pojavljuju kao magic numbers
-  var MOBILE_PANEL_FOCUS_DELAY   = 50;  // ms: čeka da panel postane vidljiv
+  var PANEL_FOCUS_DELAY          = 50;  // ms: čeka da panel postane vidljiv pre fokusiranja
   var MOBILE_SUBMENU_FOCUS_DELAY = 320; // ms: čeka kraj slide animacije (.3s + buffer)
 
   // =====================================================================
@@ -44,7 +51,7 @@ document.addEventListener('DOMContentLoaded', function () {
   // =====================================================================
   // Focus trap factory — vraća Tab handler koji drži fokus unutar
   // zadatog kontejnera (WCAG 2.1.1, 2.4.3).
-  // Jedan factory umesto dupliranog koda za search i mobilni meni.
+  // Jedan factory umesto dupliranog koda za search, cart i mobilni meni.
   // =====================================================================
   var FOCUSABLE_QUERY = [
     'a[href]:not([tabindex="-1"])',
@@ -94,7 +101,109 @@ document.addEventListener('DOMContentLoaded', function () {
   }
 
   var handleFocusTrap       = makeFocusTrap(searchPanel);
+  var handleCartFocusTrap   = makeFocusTrap(cartPanel);
   var handleMobileFocusTrap = makeFocusTrap(mobileNavigation);
+
+  // =====================================================================
+  // Panel utilities — smanjuju DRY u open/close logici za 3 panela
+  // =====================================================================
+
+  /**
+   * Prikazuje overlay sa CSS tranzicijom koristeći dvostruki rAF.
+   * Browser mora videti element u inicijalnom stanju (transform: translateX(100%))
+   * pre nego što is-open okine tranziciju.
+   *
+   * @param {Element}       overlay  - Overlay element koji se prikazuje
+   * @param {Function|null} [onOpen] - Callback koji se izvršava unutar rAF (npr. backdrop)
+   */
+  function revealPanel(overlay, onOpen) {
+    overlay.hidden = false;
+    requestAnimationFrame(function () {
+      requestAnimationFrame(function () {
+        overlay.classList.add('is-open');
+        if (onOpen) {
+          onOpen();
+        }
+      });
+    });
+  }
+
+  /**
+   * Čeka CSS transform tranziciju, zatim izvršava cleanup.
+   * Timeout fallback garantuje izvršavanje i kad je transition: none
+   * (prefers-reduced-motion ili stariji browseri).
+   *
+   * @param {Element|null} transitionEl - Element čiju transform tranziciju pratimo
+   * @param {Function}     onCleanup    - Callback koji se izvršava po završetku
+   */
+  function withTransitionCleanup(transitionEl, onCleanup) {
+    var done = false;
+    function finish() {
+      if (done) {
+        return;
+      }
+      done = true;
+      onCleanup();
+    }
+    if (transitionEl) {
+      transitionEl.addEventListener('transitionend', function onEnd(e) {
+        if (e.propertyName !== 'transform') {
+          return;
+        }
+        transitionEl.removeEventListener('transitionend', onEnd);
+        finish();
+      });
+    }
+    setTimeout(finish, 400);
+  }
+
+  /**
+   * Zatvara sve ostale panele pre otvaranja novog — sprečava istovremeno
+   * otvaranje više panela sa konfliktnim focus trap-ovima i overflow stanjem.
+   *
+   * @param {'search'|'cart'|'mobile'} openingPanel
+   */
+  function closeOtherPanels(openingPanel) {
+    if (openingPanel !== 'search' && searchOverlay && !searchOverlay.hidden) {
+      searchOverlay.classList.remove('is-open');
+      searchOverlay.hidden = true;
+      if (searchToggle) {
+        searchToggle.setAttribute('aria-expanded', 'false');
+        searchToggle.classList.remove('is-active');
+      }
+      document.documentElement.classList.remove('is-search-open');
+      document.body.classList.remove('is-search-open');
+      document.removeEventListener('keydown', handleFocusTrap);
+      disconnectSearchObservers();
+    }
+
+    if (openingPanel !== 'cart' && cartOverlay && !cartOverlay.hidden) {
+      cartOverlay.classList.remove('is-open');
+      cartOverlay.hidden = true;
+      if (cartToggle) {
+        cartToggle.setAttribute('aria-expanded', 'false');
+        cartToggle.classList.remove('is-active');
+      }
+      document.removeEventListener('keydown', handleCartFocusTrap);
+    }
+
+    if (openingPanel !== 'mobile' && mobileNavigation && mobileNavigation.classList.contains('is-open')) {
+      mobileNavigation.classList.remove('is-open');
+      mobileNavigation.setAttribute('inert', '');
+      if (mobileBackdrop) {
+        mobileBackdrop.classList.remove('is-open');
+      }
+      if (menuToggle) {
+        menuToggle.setAttribute('aria-expanded', 'false');
+        menuToggle.classList.remove('is-active');
+      }
+      document.removeEventListener('keydown', handleMobileFocusTrap);
+      resetMobileNav();
+    }
+
+    // Resetuj overflow — svaki panel koji se otvori postaviće ga ponovo
+    document.body.style.overflow = '';
+  }
 
   // =====================================================================
   // Desktop submenus — keyboard/click dropdown
@@ -252,6 +361,8 @@ document.addEventListener('DOMContentLoaded', function () {
       return;
     }
 
+    closeOtherPanels('mobile');
+
     // Klonira desktop nav u mobilni panel (samo pri prvom otvaranju)
     populateMobileNav();
 
@@ -277,7 +388,7 @@ document.addEventListener('DOMContentLoaded', function () {
     // Pomeri fokus na ✕ dugme unutar panela (WCAG 2.4.3)
     var closeBtn = mobileNavigation.querySelector('.mobile-nav__close');
     if (closeBtn) {
-      setTimeout(function () { closeBtn.focus(); }, MOBILE_PANEL_FOCUS_DELAY);
+      setTimeout(function () { closeBtn.focus(); }, PANEL_FOCUS_DELAY);
     }
   }
 
@@ -296,32 +407,12 @@ document.addEventListener('DOMContentLoaded', function () {
     menuToggle.setAttribute('aria-label', menuToggle.dataset.openLabel || 'Open menu');
     menuToggle.classList.remove('is-active');
 
-    // cleanup se poziva iz transitionend ILI iz timeout fallbacka
-    // (timeout je neophodan za prefers-reduced-motion gde transition: none
-    //  znači da transitionend nikad ne okine)
-    var cleanupDone = false;
-    function cleanup() {
-      if (cleanupDone) {
-        return;
-      }
-      cleanupDone = true;
+    withTransitionCleanup(mobileNavigation, function () {
       mobileNavigation.setAttribute('inert', '');
       resetMobileNav();
       document.body.style.overflow = '';
       menuToggle.focus();
-    }
-
-    mobileNavigation.addEventListener('transitionend', function onEnd(e) {
-      // Ignoriši visibility transition — čekamo samo transform
-      if (e.target !== mobileNavigation || e.propertyName !== 'transform') {
-        return;
-      }
-      mobileNavigation.removeEventListener('transitionend', onEnd);
-      cleanup();
     });
-
-    // Fallback: transitionend ne okida ako je transition:none (prefers-reduced-motion)
-    setTimeout(cleanup, 400);
   }
 
   // =====================================================================
@@ -499,15 +590,8 @@ document.addEventListener('DOMContentLoaded', function () {
       return;
     }
 
-    searchOverlay.hidden = false;
-
-    // Dvostruki rAF: browser mora da vidi element u inicijalnom stanju
-    // (transform: translateX(100%)) pre nego što is-open okine tranziciju
-    requestAnimationFrame(function () {
-      requestAnimationFrame(function () {
-        searchOverlay.classList.add('is-open');
-      });
-    });
+    closeOtherPanels('search');
+    revealPanel(searchOverlay);
 
     searchToggle.setAttribute('aria-expanded', 'true');
     searchToggle.classList.add('is-active');
@@ -554,31 +638,12 @@ document.addEventListener('DOMContentLoaded', function () {
       searchTitle.textContent = searchLabel + ' (0)';
     }
 
-    // Sakrij overlay tek nakon što tranzicija završi (fallback za prefers-reduced-motion)
-    var cleanupDone = false;
-    function cleanup() {
-      if (cleanupDone) {
-        return;
-      }
-      cleanupDone = true;
+    withTransitionCleanup(searchPanel, function () {
       searchOverlay.hidden = true;
       if (returnFocus) {
         searchToggle.focus();
       }
-    }
-
-    if (searchPanel) {
-      searchPanel.addEventListener('transitionend', function onEnd(e) {
-        if (e.propertyName !== 'transform') {
-          return;
-        }
-        searchPanel.removeEventListener('transitionend', onEnd);
-        cleanup();
-      });
-    }
-
-    // Fallback: transition:none (prefers-reduced-motion) ne okida transitionend
-    setTimeout(cleanup, 400);
+    });
   }
 
   function toggleSearch() {
@@ -590,6 +655,68 @@ document.addEventListener('DOMContentLoaded', function () {
       closeSearch();
     } else {
       openSearch();
+    }
+  }
+
+  // =====================================================================
+  // Cart drawer — open / close
+  // =====================================================================
+  function openCart() {
+    if (!cartToggle || !cartOverlay) {
+      return;
+    }
+
+    closeOtherPanels('cart');
+    revealPanel(cartOverlay);
+
+    cartToggle.setAttribute('aria-expanded', 'true');
+    cartToggle.classList.add('is-active');
+
+    document.body.style.overflow = 'hidden';
+    document.addEventListener('keydown', handleCartFocusTrap);
+
+    // Pomeri fokus na ✕ dugme unutar panela (WCAG 2.4.3)
+    var closeBtn = cartPanel ? cartPanel.querySelector('.site-header__cart-close') : null;
+    if (closeBtn) {
+      setTimeout(function () { closeBtn.focus(); }, PANEL_FOCUS_DELAY);
+    }
+  }
+
+  function closeCart(returnFocus) {
+    if (returnFocus === undefined) {
+      returnFocus = true;
+    }
+
+    if (!cartToggle || !cartOverlay) {
+      return;
+    }
+
+    cartOverlay.classList.remove('is-open');
+    cartToggle.setAttribute('aria-expanded', 'false');
+    cartToggle.classList.remove('is-active');
+
+    document.body.style.overflow = '';
+    document.removeEventListener('keydown', handleCartFocusTrap);
+
+    withTransitionCleanup(cartPanel, function () {
+      cartOverlay.hidden = true;
+      if (returnFocus) {
+        cartToggle.focus();
+      }
+    });
+  }
+
+  function toggleCart(event) {
+    event.preventDefault();
+
+    if (!cartToggle || !cartOverlay) {
+      return;
+    }
+
+    if (cartToggle.getAttribute('aria-expanded') === 'true') {
+      closeCart();
+    } else {
+      openCart();
     }
   }
 
@@ -623,6 +750,16 @@ document.addEventListener('DOMContentLoaded', function () {
     });
   }
 
+  if (cartToggle && cartOverlay) {
+    cartToggle.addEventListener('click', toggleCart);
+
+    cartCloseButtons.forEach(function (btn) {
+      btn.addEventListener('click', function () {
+        closeCart();
+      });
+    });
+  }
+
   document.addEventListener('keydown', function (event) {
     if (event.key !== 'Escape') {
       return;
@@ -645,7 +782,9 @@ document.addEventListener('DOMContentLoaded', function () {
       return;
     }
 
-    if (searchOverlay && !searchOverlay.hidden) {
+    if (cartOverlay && !cartOverlay.hidden) {
+      closeCart();
+    } else if (searchOverlay && !searchOverlay.hidden) {
       closeSearch();
     } else if (mobileNavigation && mobileNavigation.classList.contains('is-open')) {
       closeMobileMenu();
