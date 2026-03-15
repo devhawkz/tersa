@@ -422,8 +422,30 @@
     pointer-events: auto;
   }
 
+  /* =====================================================================
+     Mobilni backdrop — tamni overlay koji se fade-uje iza panela
+     ===================================================================== */
+  .site-header__mobile-backdrop {
+    position: fixed;
+    inset: 0;
+    z-index: 399;
+    background: rgba(17, 17, 17, 0.35);
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.35s ease, visibility 0.35s;
+    cursor: pointer;
+  }
+
+  .site-header__mobile-backdrop.is-open {
+    opacity: 1;
+    visibility: visible;
+  }
+
   @media (prefers-reduced-motion: reduce) {
-    .site-header__mobile-panel {
+    .site-header__mobile-panel,
+    .site-header__mobile-backdrop,
+    .site-header__search-panel,
+    .site-header__search-backdrop {
       transition: none;
     }
   }
@@ -640,6 +662,12 @@
     position: absolute;
     inset: 0;
     background: rgba(17, 17, 17, 0.12);
+    opacity: 0;
+    transition: opacity 0.3s ease;
+  }
+
+  .site-header__search-overlay.is-open .site-header__search-backdrop {
+    opacity: 1;
   }
   
   .site-header__search-panel {
@@ -651,6 +679,12 @@
     background: #f7f7f5;
     box-shadow: -10px 0 28px rgba(42, 33, 27, 0.10);
     overflow-y: auto;
+    transform: translateX(100%);
+    transition: transform 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  .site-header__search-overlay.is-open .site-header__search-panel {
+    transform: translateX(0);
   }
   
   .site-header__search-panel-inner {

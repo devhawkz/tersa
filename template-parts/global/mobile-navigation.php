@@ -8,6 +8,8 @@ $data        = tersa_get_header_template_data();
 $home_url    = $data['home_url'];
 $logo_markup = $data['logo_markup'];
 ?>
+<div class="site-header__mobile-backdrop" data-mobile-close aria-hidden="true"></div>
+
 <div
 	id="mobile-navigation"
 	class="site-header__mobile-panel"

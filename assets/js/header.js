@@ -1,7 +1,8 @@
 document.addEventListener('DOMContentLoaded', function () {
-  var menuToggle         = document.querySelector('.site-header__toggle');
-  var mobileNavigation   = document.getElementById('mobile-navigation');
-  var mobileCloseButtons = document.querySelectorAll('[data-mobile-close]');
+  var menuToggle          = document.querySelector('.site-header__toggle');
+  var mobileNavigation    = document.getElementById('mobile-navigation');
+  var mobileBackdrop      = document.querySelector('.site-header__mobile-backdrop');
+  var mobileCloseButtons  = document.querySelectorAll('[data-mobile-close]');
 
   var searchToggle       = document.querySelector('[data-search-toggle]');
   var searchOverlay      = document.getElementById('header-search-overlay');
@@ -255,7 +256,16 @@ document.addEventListener('DOMContentLoaded', function () {
     populateMobileNav();
 
     mobileNavigation.removeAttribute('inert');
-    mobileNavigation.classList.add('is-open');
+
+    // Dvostruki rAF: browser mora da primeni inicijalni transform pre tranzicije
+    requestAnimationFrame(function () {
+      requestAnimationFrame(function () {
+        mobileNavigation.classList.add('is-open');
+        if (mobileBackdrop) {
+          mobileBackdrop.classList.add('is-open');
+        }
+      });
+    });
 
     menuToggle.setAttribute('aria-expanded', 'true');
     menuToggle.setAttribute('aria-label', menuToggle.dataset.closeLabel || 'Close menu');
@@ -277,6 +287,9 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 
     mobileNavigation.classList.remove('is-open');
+    if (mobileBackdrop) {
+      mobileBackdrop.classList.remove('is-open');
+    }
     document.removeEventListener('keydown', handleMobileFocusTrap);
 
     menuToggle.setAttribute('aria-expanded', 'false');
@@ -487,6 +500,15 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 
     searchOverlay.hidden = false;
+
+    // Dvostruki rAF: browser mora da vidi element u inicijalnom stanju
+    // (transform: translateX(100%)) pre nego što is-open okine tranziciju
+    requestAnimationFrame(function () {
+      requestAnimationFrame(function () {
+        searchOverlay.classList.add('is-open');
+      });
+    });
+
     searchToggle.setAttribute('aria-expanded', 'true');
     searchToggle.classList.add('is-active');
 
@@ -518,7 +540,7 @@ document.addEventListener('DOMContentLoaded', function () {
       return;
     }
 
-    searchOverlay.hidden = true;
+    searchOverlay.classList.remove('is-open');
     searchToggle.setAttribute('aria-expanded', 'false');
     searchToggle.classList.remove('is-active');
 
@@ -532,9 +554,31 @@ document.addEventListener('DOMContentLoaded', function () {
       searchTitle.textContent = searchLabel + ' (0)';
     }
 
-    if (returnFocus) {
-      searchToggle.focus();
+    // Sakrij overlay tek nakon što tranzicija završi (fallback za prefers-reduced-motion)
+    var cleanupDone = false;
+    function cleanup() {
+      if (cleanupDone) {
+        return;
+      }
+      cleanupDone = true;
+      searchOverlay.hidden = true;
+      if (returnFocus) {
+        searchToggle.focus();
+      }
     }
+
+    if (searchPanel) {
+      searchPanel.addEventListener('transitionend', function onEnd(e) {
+        if (e.propertyName !== 'transform') {
+          return;
+        }
+        searchPanel.removeEventListener('transitionend', onEnd);
+        cleanup();
+      });
+    }
+
+    // Fallback: transition:none (prefers-reduced-motion) ne okida transitionend
+    setTimeout(cleanup, 400);
   }
 
   function toggleSearch() {
