@@ -1,27 +1,43 @@
 document.addEventListener('DOMContentLoaded', function () {
-  const menuToggle       = document.querySelector('.site-header__toggle');
-  const mobileNavigation = document.getElementById('mobile-navigation');
+  var menuToggle        = document.querySelector('.site-header__toggle');
+  var mobileNavigation  = document.getElementById('mobile-navigation');
+  var mobileNavBack     = document.getElementById('mobile-nav-back');
+  var mobileCloseButtons = document.querySelectorAll('[data-mobile-close]');
 
-  const searchToggle      = document.querySelector('[data-search-toggle]');
-  const searchOverlay     = document.getElementById('header-search-overlay');
-  const searchCloseButtons = document.querySelectorAll('[data-search-close]');
-  const searchTitle       = document.getElementById('header-search-title');
-  const searchPanel       = searchOverlay
+  var searchToggle       = document.querySelector('[data-search-toggle]');
+  var searchOverlay      = document.getElementById('header-search-overlay');
+  var searchCloseButtons = document.querySelectorAll('[data-search-close]');
+  var searchTitle        = document.getElementById('header-search-title');
+  var searchPanel        = searchOverlay
     ? searchOverlay.querySelector('.site-header__search-panel')
     : null;
 
   // Prevedeni string se čita iz data atributa koje puni PHP — Polylang kompatibilno
-  const searchLabel = searchTitle
+  var searchLabel = searchTitle
     ? (searchTitle.dataset.searchLabel || 'Search for products')
     : 'Search for products';
 
   // Čuva aktivne MutationObservere da ih možemo disconnectovati pri zatvaranju
-  const searchObservers = [];
+  var searchObservers = [];
+
+  // Stack za praćenje otvorenih mobilnih podmeni panela: [{ item, label }, ...]
+  var mobileNavStack = [];
+
+  // =====================================================================
+  // Utility: debounce
+  // =====================================================================
+  function debounce(fn, wait) {
+    var timer;
+    return function () {
+      clearTimeout(timer);
+      timer = setTimeout(fn, wait);
+    };
+  }
 
   // =====================================================================
   // Focus trap — zadržava fokus unutar search dialoga (WCAG 2.1.1, 2.4.3)
   // =====================================================================
-  const FOCUSABLE_QUERY = [
+  var FOCUSABLE_QUERY = [
     'a[href]:not([tabindex="-1"])',
     'button:not([disabled]):not([tabindex="-1"])',
     'input:not([disabled]):not([tabindex="-1"])',
@@ -35,16 +51,19 @@ document.addEventListener('DOMContentLoaded', function () {
       return;
     }
 
-    const focusable = Array.from(searchPanel.querySelectorAll(FOCUSABLE_QUERY)).filter(
-      function (el) { return el.offsetParent !== null; }
+    var focusable = Array.from(searchPanel.querySelectorAll(FOCUSABLE_QUERY)).filter(
+      function (el) {
+        var rect = el.getBoundingClientRect();
+        return rect.width > 0 || rect.height > 0;
+      }
     );
 
     if (!focusable.length) {
       return;
     }
 
-    const first = focusable[0];
-    const last  = focusable[focusable.length - 1];
+    var first = focusable[0];
+    var last  = focusable[focusable.length - 1];
 
     if (event.shiftKey) {
       if (document.activeElement === first) {
@@ -60,17 +79,151 @@ document.addEventListener('DOMContentLoaded', function () {
   }
 
   // =====================================================================
-  // Mobile menu
+  // Focus trap — zadržava fokus unutar mobilnog menija (WCAG 2.1.1, 2.4.3)
+  // =====================================================================
+  function handleMobileFocusTrap(event) {
+    if (event.key !== 'Tab' || !mobileNavigation) {
+      return;
+    }
+
+    var focusable = Array.from(mobileNavigation.querySelectorAll(FOCUSABLE_QUERY)).filter(
+      function (el) {
+        var rect = el.getBoundingClientRect();
+        return rect.width > 0 || rect.height > 0;
+      }
+    );
+
+    if (!focusable.length) {
+      return;
+    }
+
+    var first = focusable[0];
+    var last  = focusable[focusable.length - 1];
+
+    if (event.shiftKey) {
+      if (document.activeElement === first) {
+        event.preventDefault();
+        last.focus();
+      }
+    } else {
+      if (document.activeElement === last) {
+        event.preventDefault();
+        first.focus();
+      }
+    }
+  }
+
+  // =====================================================================
+  // Submenus — keyboard/click accessible dropdowns
+  // (definisano pre Escape handlera koji ih poziva)
+  // =====================================================================
+
+  /**
+   * Zatvara sve otvorene desktop podmeniije, opciono izuzimajući jedan item.
+   *
+   * @param {Element|null} exceptItem
+   */
+  function closeAllSubmenus(exceptItem) {
+    document.querySelectorAll('.site-header__nav--desktop .menu-item-has-children.is-submenu-open').forEach(function (item) {
+      if (item === exceptItem) {
+        return;
+      }
+
+      item.classList.remove('is-submenu-open');
+
+      var btn = item.querySelector(':scope > .submenu-toggle');
+      if (btn) {
+        btn.setAttribute('aria-expanded', 'false');
+      }
+    });
+  }
+
+  /**
+   * Inicijalizuje podmeniije: kreira toggle dugme za svaki menu item sa decom,
+   * attachuje event listenere i podešava aria atribute.
+   */
+  function initSubmenus() {
+    var submenuItems = document.querySelectorAll('.site-header__nav .menu-item-has-children');
+
+    submenuItems.forEach(function (item) {
+      var parentLink = item.querySelector(':scope > a');
+      if (!parentLink) {
+        return;
+      }
+
+      var nav           = parentLink.closest('.site-header__nav');
+      var labelTemplate = nav ? (nav.dataset.submenuLabel || 'Open submenu for %s') : 'Open submenu for %s';
+      var ariaLabel     = labelTemplate.replace('%s', parentLink.textContent.trim());
+
+      // Kreiraj toggle dugme sa chevron ikonom koristeći createElement
+      var btn = document.createElement('button');
+      btn.type = 'button';
+      btn.className = 'submenu-toggle';
+      btn.setAttribute('aria-expanded', 'false');
+      btn.setAttribute('aria-label', ariaLabel);
+
+      var svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+      svg.setAttribute('viewBox', '0 0 24 24');
+      svg.setAttribute('aria-hidden', 'true');
+      svg.setAttribute('focusable', 'false');
+
+      var polyline = document.createElementNS('http://www.w3.org/2000/svg', 'polyline');
+      polyline.setAttribute('points', '6 9 12 15 18 9');
+      svg.appendChild(polyline);
+      btn.appendChild(svg);
+
+      parentLink.insertAdjacentElement('afterend', btn);
+
+      btn.addEventListener('click', function (event) {
+        event.stopPropagation();
+
+        // Mobilni kontekst — push navigacija umesto dropdown-a
+        if (btn.closest('#mobile-navigation')) {
+          openMobileSubmenu(item, parentLink.textContent.trim());
+          return;
+        }
+
+        // Desktop — dropdown
+        var isOpen = btn.getAttribute('aria-expanded') === 'true';
+        closeAllSubmenus(item);
+        btn.setAttribute('aria-expanded', String(!isOpen));
+        item.classList.toggle('is-submenu-open', !isOpen);
+      });
+    });
+
+    // Click outside zatvara desktop podmeniije — samo ako postoje
+    if (submenuItems.length) {
+      document.addEventListener('click', function (event) {
+        if (!event.target.closest('.site-header__nav--desktop .menu-item-has-children')) {
+          closeAllSubmenus();
+        }
+      });
+    }
+  }
+
+  // =====================================================================
+  // Mobile menu — open / close sa CSS animacijom
   // =====================================================================
   function openMobileMenu() {
     if (!menuToggle || !mobileNavigation) {
       return;
     }
 
+    mobileNavigation.removeAttribute('inert');
+    mobileNavigation.classList.add('is-open');
+
     menuToggle.setAttribute('aria-expanded', 'true');
     menuToggle.setAttribute('aria-label', menuToggle.dataset.closeLabel || 'Close menu');
     menuToggle.classList.add('is-active');
-    mobileNavigation.hidden = false;
+
+    document.body.style.overflow = 'hidden';
+    document.addEventListener('keydown', handleMobileFocusTrap);
+
+    // Pomeri fokus na ✕ dugme unutar panela (WCAG 2.4.3)
+    var closeBtn = mobileNavigation.querySelector('.mobile-nav__close');
+    if (closeBtn) {
+      setTimeout(function () { closeBtn.focus(); }, 50);
+    }
   }
 
   function closeMobileMenu() {
@@ -78,22 +231,138 @@ document.addEventListener('DOMContentLoaded', function () {
       return;
     }
 
+    mobileNavigation.classList.remove('is-open');
+    document.removeEventListener('keydown', handleMobileFocusTrap);
+
     menuToggle.setAttribute('aria-expanded', 'false');
     menuToggle.setAttribute('aria-label', menuToggle.dataset.openLabel || 'Open menu');
     menuToggle.classList.remove('is-active');
-    mobileNavigation.hidden = true;
+
+    // cleanup se poziva iz transitionend ILI iz timeout fallbacka
+    // (timeout je neophodan za prefers-reduced-motion gde transition: none
+    //  znači da transitionend nikad ne okine)
+    var cleanupDone = false;
+    function cleanup() {
+      if (cleanupDone) {
+        return;
+      }
+      cleanupDone = true;
+      mobileNavigation.setAttribute('inert', '');
+      resetMobileNav();
+      document.body.style.overflow = '';
+      menuToggle.focus();
+    }
+
+    mobileNavigation.addEventListener('transitionend', function onEnd(e) {
+      // Ignoriši visibility transition — čekamo samo transform
+      if (e.target !== mobileNavigation || e.propertyName !== 'transform') {
+        return;
+      }
+      mobileNavigation.removeEventListener('transitionend', onEnd);
+      cleanup();
+    });
+
+    // Fallback: ako transitionend ne okine (transition:none / stari browser)
+    setTimeout(cleanup, 400);
   }
 
-  function toggleMobileMenu() {
-    if (!menuToggle || !mobileNavigation) {
+  // =====================================================================
+  // Mobile submenu — push navigacija
+  // =====================================================================
+
+  /**
+   * Ažurira back dugme na osnovu trenutnog stanja steka.
+   */
+  function updateMobileBackButton() {
+    if (!mobileNavBack) {
       return;
     }
 
-    if (menuToggle.getAttribute('aria-expanded') === 'true') {
-      closeMobileMenu();
-    } else {
-      openMobileMenu();
+    if (mobileNavStack.length === 0) {
+      mobileNavBack.hidden = true;
+      return;
     }
+/*
+    var currentLabel = mobileNavStack[mobileNavStack.length - 1].label;
+    var labelEl = mobileNavBack.querySelector('.mobile-nav__back-label');
+    if (labelEl) {
+      labelEl.textContent = currentLabel;
+    }
+*/
+    mobileNavBack.hidden = false;
+  }
+
+  /**
+   * Otvara podmeni u mobilnom meniju (push navigacija — klizi s desna).
+   *
+   * @param {Element} item  - Li element koji ima podmeni
+   * @param {string}  label - Tekst parent linka (za back dugme)
+   */
+  function openMobileSubmenu(item, label) {
+    var subMenu = item.querySelector(':scope > .sub-menu');
+    if (!subMenu) {
+      return;
+    }
+
+    // Višestruki nivoi: dodaj z-index na osnovu dubine
+    subMenu.style.zIndex = 401 + mobileNavStack.length;
+
+    item.classList.add('is-submenu-open');
+    mobileNavStack.push({ item: item, label: label });
+
+    updateMobileBackButton();
+
+    // Pomeri fokus na prvi link u sub-panelu nakon što animacija završi (WCAG 2.4.3)
+    setTimeout(function () {
+      var firstLink = subMenu.querySelector('a');
+      if (firstLink) {
+        firstLink.focus();
+      }
+    }, 320);
+  }
+
+  /**
+   * Zatvara poslednji otvoreni mobilni podmeni (jedan korak nazad).
+   */
+  function closeMobileSubmenu() {
+    if (mobileNavStack.length === 0) {
+      return;
+    }
+
+    var top = mobileNavStack.pop();
+    top.item.classList.remove('is-submenu-open');
+
+    // Resetuj z-index nakon animacije
+    var subMenu = top.item.querySelector(':scope > .sub-menu');
+    if (subMenu) {
+      subMenu.addEventListener('transitionend', function onEnd() {
+        subMenu.removeEventListener('transitionend', onEnd);
+        subMenu.style.zIndex = '';
+      });
+    }
+
+    updateMobileBackButton();
+
+    // Vrati fokus na toggle dugme koje je otvorilo submeni (WCAG 2.4.3)
+    var toggleBtn = top.item.querySelector(':scope > .submenu-toggle');
+    if (toggleBtn) {
+      toggleBtn.focus();
+    }
+  }
+
+  /**
+   * Zatvara sve mobilne podmeniije i resetuje stanje navigacije.
+   */
+  function resetMobileNav() {
+    mobileNavStack.forEach(function (entry) {
+      entry.item.classList.remove('is-submenu-open');
+      var subMenu = entry.item.querySelector(':scope > .sub-menu');
+      if (subMenu) {
+        subMenu.style.zIndex = '';
+      }
+    });
+    mobileNavStack = [];
+    updateMobileBackButton();
   }
 
   // =====================================================================
@@ -104,7 +373,7 @@ document.addEventListener('DOMContentLoaded', function () {
       return 0;
     }
 
-    const possibleSelectors = [
+    var possibleSelectors = [
       '.aws-search-result .aws_result_item',
       '.aws-search-results .aws_result_item',
       '.aws-container .aws_result_item',
@@ -112,12 +381,13 @@ document.addEventListener('DOMContentLoaded', function () {
       '.aws-container .aws-search-results li',
     ];
 
-    for (const selector of possibleSelectors) {
-      const items = searchOverlay.querySelectorAll(selector);
+    for (var i = 0; i < possibleSelectors.length; i++) {
+      var items = searchOverlay.querySelectorAll(possibleSelectors[i]);
 
       if (items.length) {
         return Array.from(items).filter(function (item) {
-          return item.offsetParent !== null;
+          var rect = item.getBoundingClientRect();
+          return rect.width > 0 || rect.height > 0;
         }).length;
       }
     }
@@ -130,18 +400,18 @@ document.addEventListener('DOMContentLoaded', function () {
       return;
     }
 
-    // Koristi prevedeni searchLabel iz data atributa — ne hard-coded engleski string
     searchTitle.textContent = searchLabel + ' (' + getAwsResultCount() + ')';
   }
 
+  var debouncedUpdateSearchTitle = debounce(updateSearchTitle, 150);
+
   // =====================================================================
-  // AWS MutationObserveri — prate promene rezultata u DOM-u
+  // AWS MutationObserveri
   // =====================================================================
   function disconnectSearchObservers() {
     searchObservers.forEach(function (obs) { obs.disconnect(); });
     searchObservers.length = 0;
 
-    // Resetuj flags da se observeri mogu ponovo priključiti pri sledećem otvaranju
     if (searchOverlay) {
       searchOverlay.querySelectorAll('[data-tersa-observed]').forEach(function (el) {
         delete el.dataset.tersaObserved;
@@ -154,23 +424,17 @@ document.addEventListener('DOMContentLoaded', function () {
       return;
     }
 
-    const awsInput = searchOverlay.querySelector(
+    var awsInput = searchOverlay.querySelector(
       '.aws-search-field, input[type="search"], input[type="text"]'
     );
 
     if (awsInput && !awsInput.dataset.tersaBound) {
       awsInput.dataset.tersaBound = 'true';
-
-      awsInput.addEventListener('input', function () {
-        setTimeout(updateSearchTitle, 120);
-      });
-
-      awsInput.addEventListener('focus', function () {
-        setTimeout(updateSearchTitle, 120);
-      });
+      awsInput.addEventListener('input', debouncedUpdateSearchTitle);
+      awsInput.addEventListener('focus', debouncedUpdateSearchTitle);
     }
 
-    const awsContainers = searchOverlay.querySelectorAll(
+    var awsContainers = searchOverlay.querySelectorAll(
       '.aws-container, .aws-search-result, .aws-search-results'
     );
 
@@ -181,7 +445,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
       container.dataset.tersaObserved = 'true';
 
-      const observer = new MutationObserver(function () {
+      var observer = new MutationObserver(function () {
         requestAnimationFrame(updateSearchTitle);
       });
 
@@ -207,11 +471,9 @@ document.addEventListener('DOMContentLoaded', function () {
 
     attachSearchObservers();
     updateSearchTitle();
-
-    // Aktiviraj focus trap unutar dialoga
     document.addEventListener('keydown', handleFocusTrap);
 
-    const searchInput = searchOverlay.querySelector(
+    var searchInput = searchOverlay.querySelector(
       '.aws-search-field, input[type="search"], input[type="text"]'
     );
 
@@ -239,7 +501,6 @@ document.addEventListener('DOMContentLoaded', function () {
     document.documentElement.classList.remove('is-search-open');
     document.body.classList.remove('is-search-open');
 
-    // Ukloni focus trap i disconnectuj observere
     document.removeEventListener('keydown', handleFocusTrap);
     disconnectSearchObservers();
 
@@ -268,7 +529,23 @@ document.addEventListener('DOMContentLoaded', function () {
   // Event listeners
   // =====================================================================
   if (menuToggle && mobileNavigation) {
-    menuToggle.addEventListener('click', toggleMobileMenu);
+    menuToggle.addEventListener('click', function () {
+      if (menuToggle.getAttribute('aria-expanded') === 'true') {
+        closeMobileMenu();
+      } else {
+        openMobileMenu();
+      }
+    });
+  }
+
+  // Close dugme unutar mobilnog panela
+  mobileCloseButtons.forEach(function (btn) {
+    btn.addEventListener('click', closeMobileMenu);
+  });
+
+  // Back dugme — korak nazad u mobilnoj navigaciji
+  if (mobileNavBack) {
+    mobileNavBack.addEventListener('click', closeMobileSubmenu);
   }
 
   if (searchToggle && searchOverlay) {
@@ -289,10 +566,32 @@ document.addEventListener('DOMContentLoaded', function () {
       return;
     }
 
+    // Mobilni podmeni ima prioritet
+    if (mobileNavStack.length > 0) {
+      closeMobileSubmenu();
+      return;
+    }
+
+    // Desktop podmeni
+    var openSubmenuItem = document.querySelector('.site-header__nav--desktop .menu-item-has-children.is-submenu-open');
+    if (openSubmenuItem) {
+      closeAllSubmenus();
+      var submenuBtn = openSubmenuItem.querySelector(':scope > .submenu-toggle');
+      if (submenuBtn) {
+        submenuBtn.focus();
+      }
+      return;
+    }
+
     if (searchOverlay && !searchOverlay.hidden) {
       closeSearch();
-    } else if (mobileNavigation && !mobileNavigation.hidden) {
+    } else if (mobileNavigation && mobileNavigation.classList.contains('is-open')) {
       closeMobileMenu();
     }
   });
+
+  // =====================================================================
+  // Init
+  // =====================================================================
+  initSubmenus();
 });

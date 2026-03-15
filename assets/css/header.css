@@ -5,7 +5,7 @@
 
    /* Topbar skroluje zajedno sa sadržajem – nije sticky, nalazi se van <header> */
   .site-header__topbar {
-    background: #000;
+    background: var(--c-accent);
     color: #fff;
   }
   
@@ -24,6 +24,7 @@
     letter-spacing: 0.08em;
     text-transform: uppercase;
     text-align: center;
+    font-weight: 700;
   }
   
   .site-header__promo-link {
@@ -124,13 +125,157 @@
     font-size: 1rem;
     font-weight: 500;
     line-height: 1.2;
+    position: relative;
   }
-  
+
+  /* Animirani underline — raste s leva na desno na hover i na aktivnoj stavci */
+  .site-header__nav--desktop .menu > li > a::after,
+  .site-header__nav--desktop ul.menu > li > a::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: 1.5px;
+    background: currentColor;
+    transform: scaleX(0);
+    transform-origin: left center;
+    transition: transform 0.28s ease;
+  }
+
+  .site-header__nav--desktop .menu > li > a:hover::after,
+  .site-header__nav--desktop ul.menu > li > a:hover::after,
+  .site-header__nav--desktop .menu > li.current-menu-item > a::after,
+  .site-header__nav--desktop .menu > li.current-menu-ancestor > a::after,
+  .site-header__nav--desktop .menu-item-has-children.is-submenu-open > a::after {
+    transform: scaleX(1);
+  }
+
   .site-header__nav--desktop .menu > li > a:hover,
   .site-header__nav--desktop ul.menu > li > a:hover {
+    color: #111;
+  }
+
+  /* =====================================================================
+     Submenu toggle dugme (chevron) — koristi se u desktop i mobilnom meniju
+     ===================================================================== */
+  .submenu-toggle {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 22px;
+    height: 22px;
+    padding: 0;
+    margin-left: 2px;
+    border: 0;
+    background: transparent;
+    color: currentColor;
+    cursor: pointer;
+    vertical-align: middle;
+    line-height: 1;
+  }
+
+  .submenu-toggle svg {
+    width: 12px;
+    height: 12px;
+    display: block;
+    stroke: currentColor;
+    fill: none;
+    stroke-width: 2.5;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    transition: transform var(--transition-fast);
+  }
+
+  .submenu-toggle[aria-expanded="true"] svg {
+    transform: rotate(180deg);
+  }
+
+  .submenu-toggle:hover {
     color: var(--c-accent);
   }
-  
+
+  /* =====================================================================
+     Desktop submenu — apsolutno pozicioniran dropdown
+     ===================================================================== */
+  .site-header__nav--desktop .sub-menu {
+    position: absolute;
+    top: calc(100% + 12px);
+    left: 50%;
+    transform: translateX(-50%) translateY(-6px);
+    min-width: 200px;
+    padding: 12px 0;
+    margin: 0;
+    list-style: none;
+    background: #fff;
+    border-radius: var(--radius-md);
+    box-shadow: 0 8px 32px rgba(42, 33, 27, 0.13);
+    z-index: 200;
+    opacity: 0;
+    visibility: hidden;
+    transition:
+      opacity 0.22s ease,
+      transform 0.22s ease,
+      visibility 0.22s ease;
+  }
+
+  /* Mali trokut koji "vezuje" dropdown za parent link */
+  .site-header__nav--desktop .sub-menu::before {
+    content: '';
+    position: absolute;
+    top: -6px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 12px;
+    height: 6px;
+    background: #fff;
+    clip-path: polygon(50% 0%, 0% 100%, 100% 100%);
+  }
+
+  .site-header__nav--desktop .menu-item-has-children.is-submenu-open > .sub-menu {
+    opacity: 1;
+    visibility: visible;
+    transform: translateX(-50%) translateY(0);
+  }
+
+  .site-header__nav--desktop .sub-menu .menu-item {
+    margin: 0;
+  }
+
+  .site-header__nav--desktop .sub-menu .menu-item a {
+    display: block;
+    padding: 9px 28px;
+    font-size: 0.9375rem;
+    font-weight: 400;
+    color: var(--c-text);
+    white-space: nowrap;
+    line-height: 1.4;
+    position: relative;
+  }
+
+  /* Tanki underline koji raste s leva na desno na hover stavki u dropdown-u */
+  .site-header__nav--desktop .sub-menu .menu-item a::after {
+    content: '';
+    position: absolute;
+    bottom: 5px;
+    left: 28px;
+    right: 28px;
+    height: 1px;
+    background: var(--c-text);
+    transform: scaleX(0);
+    transform-origin: left center;
+    transition: transform 0.22s ease;
+  }
+
+  .site-header__nav--desktop .sub-menu .menu-item a:hover::after,
+  .site-header__nav--desktop .sub-menu .menu-item a:focus-visible::after {
+    transform: scaleX(1);
+  }
+
+  .site-header__nav--desktop .sub-menu .menu-item a:focus-visible {
+    outline: none;
+  }
+
   .site-header__actions {
     display: flex;
     align-items: center;
@@ -182,7 +327,7 @@
     height: 22px;
     padding: 0 6px;
     border-radius: 999px;
-    background: #000;
+    background: var(--c-accent);
     color: #fff;
     display: inline-flex;
     align-items: center;
@@ -244,39 +389,228 @@
     transform: translateY(-8px) rotate(-45deg);
   }
   
+  /* =====================================================================
+     Mobilni panel — full-screen overlay koji klizi s desna
+     ===================================================================== */
+
+  /* inert atribut (JS) kontroliše pristup za AT i interakciju;
+     visibility + transform kontrolišu vizuelno stanje i animaciju */
   .site-header__mobile-panel {
-    background: #f7f7f5;
-    border-top: 1px solid var(--c-border);
+    display: flex;
+    flex-direction: column;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 400;
+    background: #fff;
+    overflow: hidden;
+    transform: translateX(100%);
+    visibility: hidden;
+    pointer-events: none;
+    transition: transform 0.35s cubic-bezier(0.4, 0, 0.2, 1),
+                visibility 0.35s;
+    /* CSS varijabla za visinu headera panela — koriste je sub-menije */
+    --mobile-nav-header-h: 68px;
   }
-  
+
+  .site-header__mobile-panel.is-open {
+    transform: translateX(0);
+    background: #F7F7F5;
+    visibility: visible;
+    pointer-events: auto;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .site-header__mobile-panel {
+      transition: none;
+    }
+  }
+
+  /* =====================================================================
+     Mobilni nav header — logo (centar) + back (levo) + close (desno)
+     ===================================================================== */
+  .mobile-nav__header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    height: var(--mobile-nav-header-h);
+    padding: 0 8px;
+    border-bottom: 1px solid var(--c-border);
+    flex-shrink: 0;
+    position: relative;
+  }
+
+  .mobile-nav__logo-link {
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    align-items: center;
+    line-height: 0;
+  }
+
+  .mobile-nav__logo-link .site-header__logo-image,
+  .mobile-nav__logo-link img {
+    max-height: 34px;
+    max-width: 120px;
+    width: auto;
+    height: auto;
+  }
+
+  .mobile-nav__back {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    border: 0;
+    background: transparent;
+    padding: 10px 8px;
+    font-size: 0.875rem;
+    font-weight: 500;
+    color: var(--c-text);
+    cursor: pointer;
+    z-index: 1;
+    white-space: nowrap;
+    max-width: 40%;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .mobile-nav__back svg {
+    width: 18px;
+    height: 18px;
+    stroke: currentColor;
+    fill: none;
+    stroke-width: 2;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    flex-shrink: 0;
+  }
+
+  .mobile-nav__close {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+    border: 0;
+    background: transparent;
+    color: var(--c-text);
+    cursor: pointer;
+    padding: 0;
+    z-index: 1;
+    flex-shrink: 0;
+  }
+
+  .mobile-nav__close svg {
+    width: 22px;
+    height: 22px;
+    stroke: currentColor;
+    fill: none;
+    stroke-width: 2;
+    stroke-linecap: round;
+  }
+
+  /* Scrollabilni wrapper za mobilnu navigaciju */
+  .mobile-nav__body {
+    flex: 1;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  /* =====================================================================
+     Mobilna navigacija — menu items
+     ===================================================================== */
   .site-header__nav--mobile {
-    padding: 16px 0 24px;
+    padding: 0;
   }
-  
+
   .site-header__nav--mobile .menu,
   .site-header__nav--mobile ul.menu {
-    display: grid;
-    gap: 8px;
+    display: block;
+    margin: 0;
+    padding: 0;
   }
-  
+
   .site-header__nav--mobile .menu li,
   .site-header__nav--mobile ul.menu li {
     margin: 0;
+    display: flex;
+    align-items: stretch;
+    border-bottom: 1px solid var(--c-line);
   }
-  
+
   .site-header__nav--mobile .menu a,
   .site-header__nav--mobile ul.menu a {
-    display: block;
-    padding: 12px 0;
+    flex: 1;
+    display: flex;
+    align-items: center;
+    padding: 18px 24px;
     color: #111;
     font-size: 1rem;
     font-weight: 500;
-    border-bottom: 1px solid rgba(17, 17, 17, 0.08);
+    line-height: 1.2;
+    border-bottom: 0;
   }
-  
+
   .site-header__nav--mobile .menu a:hover,
   .site-header__nav--mobile ul.menu a:hover {
     color: var(--c-accent);
+  }
+
+  .site-header__nav--mobile .current-menu-item > a,
+  .site-header__nav--mobile .current-menu-ancestor > a {
+    color: var(--c-accent);
+  }
+
+  /* Submenu toggle u mobilnom — desna strelica, tap target pune visine */
+  .site-header__nav--mobile .submenu-toggle {
+    width: 56px;
+    height: auto;
+    border-left: 1px solid var(--c-line);
+    border-radius: 0;
+    margin: 0;
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .site-header__nav--mobile .submenu-toggle svg {
+    transform: rotate(-90deg);
+    width: 14px;
+    height: 14px;
+  }
+
+  /* =====================================================================
+     Mobilni podmeni — full-screen panel koji klizi s desna
+     Push navigacija: svaki nivo dolazi kao novi panel
+     ===================================================================== */
+  .site-header__nav--mobile .sub-menu {
+    position: fixed;
+    top: var(--mobile-nav-header-h);
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 401;
+    background: #f7f7f5;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    transform: translateX(100%);
+    transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  .site-header__nav--mobile .menu-item-has-children.is-submenu-open > .sub-menu {
+    transform: translateX(0);
+  }
+
+  /* Sub-podmeni (drugi nivo) dobija viši z-index od roditelja */
+  .site-header__nav--mobile .sub-menu .sub-menu {
+    z-index: 402;
   }
   
   .site-header__search {

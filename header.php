@@ -15,7 +15,9 @@ $topbar_enabled   = !empty($header_data['topbar_enabled']);
 $topbar_message   = !empty($header_data['topbar_message']) ? (string) $header_data['topbar_message'] : '';
 $topbar_link_text = !empty($header_data['topbar_link_text']) ? (string) $header_data['topbar_link_text'] : '';
 $topbar_link_url  = !empty($header_data['topbar_link_url']) ? (string) $header_data['topbar_link_url'] : '';
-?><!doctype html>
+?>
+
+<!doctype html>
 <html <?php language_attributes(); ?>>
 <head>
 	<meta charset="<?php bloginfo('charset'); ?>">
@@ -60,7 +62,11 @@ $topbar_link_url  = !empty($header_data['topbar_link_url']) ? (string) $header_d
 						</a>
 					</div>
 
-					<nav class="site-header__nav site-header__nav--desktop" aria-label="<?php esc_attr_e('Primary navigation', 'tersa-shop'); ?>">
+					<nav
+						class="site-header__nav site-header__nav--desktop"
+						aria-label="<?php esc_attr_e('Primary navigation', 'tersa-shop'); ?>"
+						data-submenu-label="<?php echo esc_attr(__('Open submenu for %s', 'tersa-shop')); ?>"
+					>
 						<?php echo $nav_markup; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
 					</nav>
 
@@ -153,16 +159,16 @@ $topbar_link_url  = !empty($header_data['topbar_link_url']) ? (string) $header_d
 						<?php echo esc_html(sprintf(__('Search for products (%d)', 'tersa-shop'), 0)); ?>
 					</h2>
 
-						<button
-							type="button"
-							class="site-header__search-close"
-							aria-label="<?php esc_attr_e('Close search', 'tersa-shop'); ?>"
-							data-search-close
-						>
-							<span></span>
-							<span></span>
-						</button>
-					</div>
+					<button
+						type="button"
+						class="site-header__search-close"
+						aria-label="<?php esc_attr_e('Close search', 'tersa-shop'); ?>"
+						data-search-close
+					>
+						<span></span>
+						<span></span>
+					</button>
+				</div>
 
 					<div class="site-header__search-body">
 						<?php echo do_shortcode('[aws_search_form]'); ?>
@@ -171,11 +177,63 @@ $topbar_link_url  = !empty($header_data['topbar_link_url']) ? (string) $header_d
 			</div>
 		</div>
 
-		<div id="mobile-navigation" class="site-header__mobile-panel" hidden>
-			<div class="container">
-				<nav class="site-header__nav site-header__nav--mobile" aria-label="<?php esc_attr_e('Mobile navigation', 'tersa-shop'); ?>">
+		<div
+			id="mobile-navigation"
+			class="site-header__mobile-panel"
+			role="dialog"
+			aria-modal="true"
+			aria-label="<?php esc_attr_e('Mobile menu', 'tersa-shop'); ?>"
+			inert>
+
+			<!-- Header panela: back dugme / logo (centar) / close dugme -->
+			<div class="mobile-nav__header">
+				<?php /*
+				<button
+					id="mobile-nav-back"
+					type="button"
+					class="mobile-nav__back"
+					hidden
+					aria-label="<?php esc_attr_e('Go back', 'tersa-shop'); ?>"
+				>
+					<svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+						<polyline points="15 18 9 12 15 6"></polyline>
+					</svg>
+					<span class="mobile-nav__back-label"></span>
+				</button>
+				*/ ?>
+
+				<a
+					href="<?php echo esc_url(home_url('/')); ?>"
+					class="mobile-nav__logo-link"
+					aria-hidden="true"
+					tabindex="-1"
+				>
+					<?php echo $logo_markup; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
+				</a>
+
+				<button
+					type="button"
+					class="mobile-nav__close"
+					aria-label="<?php esc_attr_e('Close menu', 'tersa-shop'); ?>"
+					data-mobile-close
+				>
+					<svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+						<line x1="18" y1="6" x2="6" y2="18"></line>
+						<line x1="6" y1="6" x2="18" y2="18"></line>
+					</svg>
+				</button>
+			</div>
+
+			<!-- Navigacija -->
+			<div class="mobile-nav__body">
+				<nav
+					class="site-header__nav site-header__nav--mobile"
+					aria-label="<?php esc_attr_e('Mobile navigation', 'tersa-shop'); ?>"
+					data-submenu-label="<?php echo esc_attr(__('Open submenu for %s', 'tersa-shop')); ?>"
+				>
 					<?php echo $nav_markup; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
 				</nav>
 			</div>
+
 		</div>
 	</header>
