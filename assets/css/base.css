@@ -1,0 +1,401 @@
+/* =========================================================
+   TERSA DESIGN SYSTEM / BASE
+   File: assets/css/base.css
+   ========================================================= */
+
+/* =========================
+   Local Fonts
+   ========================= */
+   @font-face {
+    font-family: 'Playfair Display';
+    src: url('../fonts/PlayfairDisplay-Bold.woff2') format('woff2');
+    font-weight: 700;
+    font-style: normal;
+    font-display: swap;
+  }
+  
+  @font-face {
+    font-family: 'Inter';
+    src: url('../fonts/Inter_28pt-Regular.woff2') format('woff2');
+    font-weight: 400;
+    font-style: normal;
+    font-display: swap;
+  }
+  
+  @font-face {
+    font-family: 'Inter';
+    src: url('../fonts/Inter_28pt-Medium.woff2') format('woff2');
+    font-weight: 500;
+    font-style: normal;
+    font-display: swap;
+  }
+  
+  @font-face {
+    font-family: 'Inter';
+    src: url('../fonts/Inter_28pt-SemiBold.woff2') format('woff2');
+    font-weight: 600;
+    font-style: normal;
+    font-display: swap;
+  }
+  
+  @font-face {
+    font-family: 'Inter';
+    src: url('../fonts/Inter_18pt-Bold.woff2') format('woff2');
+    font-weight: 700;
+    font-style: normal;
+    font-display: swap;
+  }
+  
+  /* =========================
+     CSS Reset / Base Tokens
+     ========================= */
+  :root {
+    /* Brand colors */
+    --c-primary: #3A2618;
+    --c-primary-2: #8A6448;
+    --c-accent: #516E52;
+    --c-accent-hover: #68896A;
+  
+    /* Neutrals */
+    --c-bg: #F7F3EE;
+    --c-surface: #FFFFFF;
+    --c-surface-alt: #F2ECE4;
+    --c-text: #2A211B;
+    --c-text-soft: #74675C;
+    --c-border: #DED4C8;
+    --c-line: rgba(58, 38, 24, 0.12);
+  
+    /* Feedback */
+    --c-success: #2F6B3D;
+    --c-danger: #9F3A32;
+    --c-warning: #A56A1F;
+  
+    /* Typography */
+    --font-heading: 'Playfair Display', Georgia, serif;
+    --font-body: 'Inter', Arial, Helvetica, sans-serif;
+  
+    /* Font sizes */
+    --fs-12: 0.75rem;
+    --fs-14: 0.875rem;
+    --fs-16: 1rem;
+    --fs-18: 1.125rem;
+    --fs-20: 1.25rem;
+    --fs-24: 1.5rem;
+    --fs-30: 1.875rem;
+    --fs-40: 2.5rem;
+    --fs-52: 3.25rem;
+  
+    /* Line height */
+    --lh-tight: 1.1;
+    --lh-heading: 1.2;
+    --lh-body: 1.65;
+  
+    /* Weights */
+    --fw-400: 400;
+    --fw-500: 500;
+    --fw-600: 600;
+    --fw-700: 700;
+  
+    /* Spacing */
+    --sp-4: 0.25rem;
+    --sp-8: 0.5rem;
+    --sp-12: 0.75rem;
+    --sp-16: 1rem;
+    --sp-20: 1.25rem;
+    --sp-24: 1.5rem;
+    --sp-32: 2rem;
+    --sp-40: 2.5rem;
+    --sp-48: 3rem;
+    --sp-64: 4rem;
+    --sp-80: 5rem;
+  
+    /* Layout */
+    --container: 1400px;
+    --container-narrow: 1200px;
+    --gutter: clamp(16px, 2vw, 32px);
+    --section-space: clamp(56px, 8vw, 100px);
+  
+    /* Radius */
+    --radius-sm: 6px;
+    --radius-md: 10px;
+    --radius-lg: 16px;
+    --radius-xl: 24px;
+  
+    /* Shadows */
+    --shadow-sm: 0 4px 14px rgba(42, 33, 27, 0.06);
+    --shadow-md: 0 10px 30px rgba(42, 33, 27, 0.10);
+  
+    /* Motion */
+    --transition-fast: 0.2s ease;
+    --transition-base: 0.3s ease;
+  }
+  
+  /* =========================
+     Global Reset
+     ========================= */
+  *,
+  *::before,
+  *::after {
+    box-sizing: border-box;
+  }
+  
+  html {
+    font-size: 16px;
+    scroll-behavior: smooth;
+  }
+  
+  body {
+    margin: 0;
+    font-family: var(--font-body);
+    font-size: var(--fs-16);
+    line-height: var(--lh-body);
+    color: var(--c-text);
+    background-color: var(--c-bg);
+    text-rendering: optimizeLegibility;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+  
+  img,
+  picture,
+  svg {
+    display: block;
+    max-width: 100%;
+    height: auto;
+  }
+  
+  button,
+  input,
+  select,
+  textarea {
+    font: inherit;
+    color: inherit;
+  }
+  
+  a {
+    color: inherit;
+    text-decoration: none;
+    transition: color var(--transition-fast), opacity var(--transition-fast);
+  }
+  
+  a:hover {
+    color: var(--c-accent);
+  }
+  
+  ul,
+  ol {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+  
+  p {
+    margin: 0 0 var(--sp-16);
+    color: var(--c-text-soft);
+  }
+  
+  p:last-child {
+    margin-bottom: 0;
+  }
+  
+  /* =========================
+     Headings
+     ========================= */
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
+    margin: 0 0 var(--sp-16);
+    color: var(--c-primary);
+    font-family: var(--font-heading);
+    font-weight: var(--fw-700);
+    line-height: var(--lh-heading);
+    letter-spacing: -0.02em;
+  }
+  
+  h1 {
+    font-size: clamp(2.5rem, 5vw, 4.5rem);
+  }
+  
+  h2 {
+    font-size: clamp(2rem, 4vw, 3.25rem);
+  }
+  
+  h3 {
+    font-size: clamp(1.5rem, 2.5vw, 2.25rem);
+  }
+  
+  h4 {
+    font-size: clamp(1.25rem, 2vw, 1.5rem);
+  }
+  
+  h5 {
+    font-size: 1.125rem;
+  }
+  
+  h6 {
+    font-size: 1rem;
+  }
+  
+  /* =========================
+     Text Helpers
+     ========================= */
+  .text-xs { font-size: var(--fs-12); }
+  .text-sm { font-size: var(--fs-14); }
+  .text-base { font-size: var(--fs-16); }
+  .text-lg { font-size: var(--fs-18); }
+  .text-xl { font-size: var(--fs-20); }
+  
+  .text-primary { color: var(--c-primary); }
+  .text-accent { color: var(--c-accent); }
+  .text-muted { color: var(--c-text-soft); }
+  
+  /* =========================
+     Layout Helpers
+     ========================= */
+  .container {
+    width: min(100% - (var(--gutter) * 2), var(--container));
+    margin-inline: auto;
+  }
+  
+  .container--narrow {
+    width: min(100% - (var(--gutter) * 2), var(--container-narrow));
+    margin-inline: auto;
+  }
+  
+  .section {
+    padding-block: var(--section-space);
+  }
+  
+  /* =========================
+     Buttons
+     ========================= */
+  .btn,
+  button.button,
+  a.button,
+  input[type="submit"],
+  input[type="button"] {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--sp-8);
+    min-height: 52px;
+    padding: 0 var(--sp-24);
+    border: 1px solid transparent;
+    border-radius: 999px;
+    font-family: var(--font-body);
+    font-size: var(--fs-14);
+    font-weight: var(--fw-600);
+    letter-spacing: 0.02em;
+    text-transform: uppercase;
+    cursor: pointer;
+    transition:
+      background-color var(--transition-base),
+      border-color var(--transition-base),
+      color var(--transition-base),
+      transform var(--transition-fast),
+      box-shadow var(--transition-base);
+  }
+  
+  .btn--primary,
+  button.button,
+  a.button,
+  input[type="submit"] {
+    background-color: var(--c-accent);
+    color: #fff;
+    box-shadow: var(--shadow-sm);
+  }
+  
+  .btn--primary:hover,
+  button.button:hover,
+  a.button:hover,
+  input[type="submit"]:hover {
+    background-color: var(--c-accent-hover);
+    color: #fff;
+    transform: translateY(-1px);
+  }
+  
+  .btn--secondary {
+    background-color: transparent;
+    color: var(--c-primary);
+    border-color: var(--c-primary);
+  }
+  
+  .btn--secondary:hover {
+    background-color: var(--c-primary);
+    color: #fff;
+  }
+  
+  /* =========================
+     Form Elements
+     ========================= */
+  input[type="text"],
+  input[type="email"],
+  input[type="tel"],
+  input[type="number"],
+  input[type="password"],
+  input[type="search"],
+  textarea,
+  select {
+    width: 100%;
+    min-height: 52px;
+    padding: 0 var(--sp-16);
+    border: 1px solid var(--c-border);
+    border-radius: var(--radius-md);
+    background: var(--c-surface);
+    color: var(--c-text);
+    transition: border-color var(--transition-fast), box-shadow var(--transition-fast);
+  }
+  
+  textarea {
+    min-height: 140px;
+    padding-top: var(--sp-16);
+    resize: vertical;
+  }
+  
+  input:focus,
+  textarea:focus,
+  select:focus {
+    outline: none;
+    border-color: var(--c-accent);
+    box-shadow: 0 0 0 4px rgba(81, 110, 82, 0.12);
+  }
+  
+  /* =========================
+     Cards / Surfaces
+     ========================= */
+  .card {
+    background: var(--c-surface);
+    border: 1px solid var(--c-line);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-sm);
+  }
+  
+  /* =========================
+     WooCommerce basics
+     ========================= */
+  .price {
+    color: var(--c-primary);
+    font-weight: var(--fw-700);
+    font-size: var(--fs-20);
+  }
+  
+  .woocommerce-message,
+  .woocommerce-info,
+  .woocommerce-error {
+    margin-bottom: var(--sp-20);
+    padding: var(--sp-16) var(--sp-20);
+    border-radius: var(--radius-md);
+    border: 1px solid var(--c-border);
+    background: var(--c-surface);
+  }
+  
+  .woocommerce-message {
+    border-color: rgba(47, 107, 61, 0.25);
+  }
+  
+  .woocommerce-error {
+    border-color: rgba(159, 58, 50, 0.25);
+  }
