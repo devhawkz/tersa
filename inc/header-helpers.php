@@ -5,22 +5,31 @@ if (!defined('ABSPATH')) {
 
 /**
  * Vraća slug stranice koja čuva globalna header podešavanja za ACF Free.
+ * Implementirano kao funkcija (ne konstanta) da bi child tema mogla da je override-uje.
+ *
+ * @return string
  */
-function tersa_get_header_settings_slug() {
+function tersa_get_header_settings_slug(): string {
 	return 'header-settings';
 }
 
 /**
  * Vraća transient key za header settings.
+ * Implementirano kao funkcija (ne konstanta) da bi child tema mogla da je override-uje.
+ *
+ * @return string
  */
-function tersa_get_header_settings_cache_key() {
+function tersa_get_header_settings_cache_key(): string {
 	return 'tersa_header_settings';
 }
 
 /**
  * Dohvata ACF header settings sa fallback vrednostima.
+ * Rezultat se kešira transientom na jedan dan — uklanjaj pri promeni stranice.
+ *
+ * @return array<string, mixed>
  */
-function tersa_get_header_settings() {
+function tersa_get_header_settings(): array {
 	$cache_key = tersa_get_header_settings_cache_key();
 	$settings  = get_transient($cache_key);
 
@@ -54,8 +63,12 @@ function tersa_get_header_settings() {
 
 /**
  * Briše keš kada se sačuva Header Settings stranica.
+ *
+ * @param int          $post_id
+ * @param WP_Post|null $post
+ * @return void
  */
-function tersa_maybe_clear_header_settings_cache($post_id, $post = null) {
+function tersa_maybe_clear_header_settings_cache(int $post_id, $post = null): void {
 	if (wp_is_post_revision($post_id) || 'page' !== get_post_type($post_id)) {
 		return;
 	}
@@ -75,8 +88,10 @@ add_action('save_post_page', 'tersa_maybe_clear_header_settings_cache', 10, 2);
 
 /**
  * Vraća shop/search URL.
+ *
+ * @return string
  */
-function tersa_get_search_url() {
+function tersa_get_search_url(): string {
 	if (class_exists('WooCommerce')) {
 		$shop_url = wc_get_page_permalink('shop');
 
@@ -90,8 +105,10 @@ function tersa_get_search_url() {
 
 /**
  * Vraća URL wishlist stranice.
+ *
+ * @return string
  */
-function tersa_get_wishlist_url() {
+function tersa_get_wishlist_url(): string {
 	if (defined('YITH_WCWL') && function_exists('YITH_WCWL')) {
 		$instance = YITH_WCWL();
 
@@ -107,8 +124,10 @@ function tersa_get_wishlist_url() {
  * Vraća broj wishlist stavki.
  * Preferira YITH shortcode jer se najčešće osvežava preko AJAX-a.
  * Rezultat se kešira statički — shortcode se ne izvršava dva puta po requestu.
+ *
+ * @return int
  */
-function tersa_get_wishlist_count() {
+function tersa_get_wishlist_count(): int {
 	static $cached = null;
 
 	if (null !== $cached) {
@@ -134,8 +153,10 @@ function tersa_get_wishlist_count() {
 /**
  * Vraća broj proizvoda u korpi.
  * Rezultat se kešira statički — WC()->cart se ne poziva više puta po requestu.
+ *
+ * @return int
  */
-function tersa_get_cart_count() {
+function tersa_get_cart_count(): int {
 	static $cached = null;
 
 	if (null !== $cached) {
@@ -157,8 +178,10 @@ function tersa_get_cart_count() {
 
 /**
  * Vraća markup za logo sa fallback-om.
+ *
+ * @return string
  */
-function tersa_get_header_logo_markup() {
+function tersa_get_header_logo_markup(): string {
 	$site_name      = get_bloginfo('name');
 	$custom_logo_id = (int) get_theme_mod('custom_logo');
 
@@ -211,18 +234,11 @@ function tersa_get_header_logo_markup() {
 }
 
 /**
- * Renderuje primary navigaciju jednom i vraća HTML.
- */
-function tersa_get_primary_navigation_markup() {
-	ob_start();
-	get_template_part('template-parts/global/navigation');
-	return (string) ob_get_clean();
-}
-
-/**
  * Vraća aria label za wishlist link.
+ *
+ * @return string
  */
-function tersa_get_wishlist_aria_label() {
+function tersa_get_wishlist_aria_label(): string {
 	$count = tersa_get_wishlist_count();
 
 	return sprintf(
@@ -234,8 +250,10 @@ function tersa_get_wishlist_aria_label() {
 
 /**
  * Vraća aria label za cart link.
+ *
+ * @return string
  */
-function tersa_get_cart_aria_label() {
+function tersa_get_cart_aria_label(): string {
 	$count = tersa_get_cart_count();
 
 	return sprintf(
@@ -266,8 +284,10 @@ function tersa_translate_string(string $string): string {
 /**
  * Registruje ACF topbar stringove u Polylang String Translations.
  * Potrebno da prevodioci mogu prevesti topbar poruku i link tekst/URL.
+ *
+ * @return void
  */
-function tersa_register_polylang_strings() {
+function tersa_register_polylang_strings(): void {
 	if (!function_exists('pll_register_string')) {
 		return;
 	}
@@ -290,21 +310,91 @@ function tersa_register_polylang_strings() {
 add_action('init', 'tersa_register_polylang_strings');
 
 /**
- * Dodaje aria-haspopup i aria-expanded na menu linkove koji imaju podmeni.
- * Radi u kombinaciji sa JS koji toggleuje aria-expanded pri otvaranju submenija.
+ * Dodaje rel="noopener noreferrer" na eksterne linkove u primarnoj navigaciji.
+ * Koristi se kao filter u navigation.php oko wp_nav_menu() poziva.
+ * WordPress automatski dodaje rel na target="_blank" linkove (WP 5.1+),
+ * ali ne i na eksterne linkove koji se otvaraju u istoj kartici.
  *
- * @param array    $atts  Atributi linka.
- * @param WP_Post  $item  Menu stavka.
- * @param stdClass $args  Argumenti wp_nav_menu.
- * @param int      $depth Dubina u meniju.
- * @return array
+ * @param array<string, string> $atts
+ * @param \WP_Post              $item
+ * @param \stdClass             $args
+ * @param int                   $depth
+ * @return array<string, string>
  */
-function tersa_nav_menu_link_attributes($atts, $item, $args, $depth) {
-	if (in_array('menu-item-has-children', (array) $item->classes, true)) {
-		$atts['aria-haspopup'] = 'true';
-		$atts['aria-expanded'] = 'false';
+function tersa_nav_link_external_rel(array $atts, $item, $args, $depth): array {
+	if (empty($atts['href'])) {
+		return $atts;
+	}
+
+	$link_host = wp_parse_url($atts['href'], PHP_URL_HOST);
+	$home_host = wp_parse_url(home_url(), PHP_URL_HOST);
+
+	if ($link_host && $home_host && $link_host !== $home_host) {
+		// Sačuvaj postojeći rel ako postoji (npr. rel="nofollow" dodat ručno)
+		$existing    = !empty($atts['rel']) ? rtrim((string) $atts['rel']) . ' ' : '';
+		$atts['rel'] = $existing . 'noopener noreferrer';
 	}
 
 	return $atts;
 }
-add_filter('nav_menu_link_attributes', 'tersa_nav_menu_link_attributes', 10, 4);
+
+/**
+ * Vraća prevedeni URL topbar linka i da li je eksterni.
+ * Centralizuje detekciju eksternog linka van template fajla.
+ *
+ * @param string $url Sirovi URL iz ACF podešavanja.
+ * @return array{ url: string, is_external: bool }
+ */
+function tersa_get_topbar_link_data(string $url): array {
+	if (!$url) {
+		return ['url' => '', 'is_external' => false];
+	}
+
+	$translated = tersa_translate_string($url);
+	$link_host  = wp_parse_url($translated, PHP_URL_HOST);
+	$home_host  = wp_parse_url(home_url(), PHP_URL_HOST);
+
+	return [
+		'url'         => $translated,
+		'is_external' => (bool) ($link_host && $home_host && $link_host !== $home_host),
+	];
+}
+
+/**
+ * Priprema sve promenljive potrebne za header.php template.
+ * Centralizuje biznis logiku van template fajla — template sadrži samo prezentaciju.
+ * Rezultat se kešira statički — funkcija je skupa (nav markup, logo, settings, count).
+ *
+ * @return array<string, mixed>
+ */
+function tersa_get_header_template_data(): array {
+	static $cached = null;
+
+	if (null !== $cached) {
+		return $cached;
+	}
+
+	$header_data = tersa_get_header_settings();
+	$topbar_url  = !empty($header_data['topbar_link_url']) ? (string) $header_data['topbar_link_url'] : '';
+	$link_data   = tersa_get_topbar_link_data($topbar_url);
+
+	$cached = [
+		'home_url'               => home_url('/'),
+		'site_name'              => get_bloginfo('name'),
+		'logo_markup'            => tersa_get_header_logo_markup(),
+		'wishlist_url'           => tersa_get_wishlist_url(),
+		'wishlist_count'         => tersa_get_wishlist_count(),
+		'cart_count'             => tersa_get_cart_count(),
+		'topbar_enabled'         => !empty($header_data['topbar_enabled']),
+		'topbar_message'         => !empty($header_data['topbar_message'])
+		                           ? tersa_translate_string((string) $header_data['topbar_message'])
+		                           : '',
+		'topbar_link_text'       => !empty($header_data['topbar_link_text'])
+		                           ? tersa_translate_string((string) $header_data['topbar_link_text'])
+		                           : '',
+		'topbar_link_url'        => $link_data['url'],
+		'topbar_link_is_external'=> $link_data['is_external'],
+	];
+
+	return $cached;
+}

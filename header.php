@@ -9,7 +9,6 @@ $data = tersa_get_header_template_data();
 $home_url                = $data['home_url'];
 $site_name               = $data['site_name'];
 $logo_markup             = $data['logo_markup'];
-$nav_markup              = $data['nav_markup'];
 $wishlist_url            = $data['wishlist_url'];
 $wishlist_count          = $data['wishlist_count'];
 $cart_count              = $data['cart_count'];
@@ -67,13 +66,7 @@ $topbar_link_is_external = $data['topbar_link_is_external'];
 						</a>
 					</div>
 
-					<nav
-						class="site-header__nav site-header__nav--desktop"
-						aria-label="<?php esc_attr_e('Primary navigation', 'tersa-shop'); ?>"
-						data-submenu-label="<?php echo esc_attr(__('Open submenu for %s', 'tersa-shop')); ?>"
-					>
-						<?php echo $nav_markup; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
-					</nav>
+					<?php get_template_part('template-parts/global/navigation'); ?>
 
 					<div class="site-header__actions" role="group" aria-label="<?php esc_attr_e('Header actions', 'tersa-shop'); ?>">
 						<div class="site-header__search">
@@ -144,82 +137,7 @@ $topbar_link_is_external = $data['topbar_link_is_external'];
 			</div>
 		</div>
 
-		<div id="header-search-overlay" class="site-header__search-overlay" hidden>
-			<div class="site-header__search-backdrop" data-search-close></div>
+		<?php get_template_part('template-parts/global/search'); ?>
 
-			<div
-				class="site-header__search-panel"
-				role="dialog"
-				aria-modal="true"
-				aria-labelledby="header-search-title"
-			>
-				<div class="site-header__search-panel-inner">
-					<div class="site-header__search-head">
-						<h2
-							id="header-search-title"
-							class="site-header__search-title"
-							aria-live="polite"
-							data-search-label="<?php echo esc_attr(__('Search for products', 'tersa-shop')); ?>"
-						>
-							<?php echo esc_html(sprintf(__('Search for products (%d)', 'tersa-shop'), 0)); ?>
-						</h2>
-
-						<button
-							type="button"
-							class="site-header__search-close"
-							aria-label="<?php esc_attr_e('Close search', 'tersa-shop'); ?>"
-							data-search-close
-						>
-							<span></span>
-							<span></span>
-						</button>
-					</div>
-
-					<div class="site-header__search-body">
-						<?php if (shortcode_exists('aws_search_form')) : ?>
-							<?php echo do_shortcode('[aws_search_form]'); ?>
-						<?php endif; ?>
-					</div>
-				</div>
-			</div>
-		</div>
-
-		<div
-			id="mobile-navigation"
-			class="site-header__mobile-panel"
-			role="dialog"
-			aria-modal="true"
-			aria-label="<?php esc_attr_e('Mobile menu', 'tersa-shop'); ?>"
-			data-mobile-nav-label="<?php esc_attr_e('Mobile navigation', 'tersa-shop'); ?>"
-			inert>
-
-			<!-- Logo (centar) + close dugme (desno) -->
-			<div class="mobile-nav__header">
-				<a
-					href="<?php echo esc_url($home_url); ?>"
-					class="mobile-nav__logo-link"
-					aria-hidden="true"
-					tabindex="-1"
-				>
-					<?php echo $logo_markup; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
-				</a>
-
-				<button
-					type="button"
-					class="mobile-nav__close"
-					aria-label="<?php esc_attr_e('Close menu', 'tersa-shop'); ?>"
-					data-mobile-close
-				>
-					<svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
-						<line x1="18" y1="6" x2="6" y2="18"></line>
-						<line x1="6" y1="6" x2="18" y2="18"></line>
-					</svg>
-				</button>
-			</div>
-
-			<!-- Navigacija — JS klonira desktop nav pri prvom otvaranju (sprečava duplikate u HTML izvoru) -->
-			<div class="mobile-nav__body">
-			</div>
-
-		</div>
+		<?php get_template_part('template-parts/global/mobile-navigation'); ?>
 	</header>
