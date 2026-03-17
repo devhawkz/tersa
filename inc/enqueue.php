@@ -11,9 +11,9 @@ function tersa_enqueue_assets() {
 	wp_enqueue_style('tersa-base', $theme_uri . '/assets/css/base.css', [], $theme_version);
 	wp_enqueue_style('tersa-layout', $theme_uri . '/assets/css/layout.css', ['tersa-base'], $theme_version);
 	wp_enqueue_style('tersa-header', $theme_uri . '/assets/css/header.css', ['tersa-base'], $theme_version);
-	/*
+	
 	wp_enqueue_style('tersa-footer', $theme_uri . '/assets/css/footer.css', ['tersa-base'], $theme_version);
-
+/*
 	if (is_front_page()) {
 		wp_enqueue_style('tersa-home', $theme_uri . '/assets/css/home.css', ['tersa-base', 'tersa-layout'], $theme_version);
 	}

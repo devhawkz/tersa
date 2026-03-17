@@ -42,7 +42,10 @@ function tersa_theme_setup() {
 	add_image_size('tersa-logo', 370, 104);
 
 	register_nav_menus([
-		'primary' => __('Primary menu', 'tersa-shop'),
+		'primary'         => __('Primary menu', 'tersa-shop'),
+		'footer_about'    => __('Footer About menu', 'tersa-shop'),
+		'footer_services' => __('Footer Services menu', 'tersa-shop'),
+		'footer_legal'    => __('Footer Legal menu', 'tersa-shop'),
 	]);
 }
 add_action('after_setup_theme', 'tersa_theme_setup');

@@ -18,9 +18,9 @@ if (!defined('ABSPATH')) {
 					id="header-search-title"
 					class="site-header__search-title"
 					aria-live="polite"
-					data-search-label="<?php echo esc_attr(__('Search for products', 'tersa-shop')); ?>"
+					data-search-label="<?php echo esc_attr(__('Rezultati pretrage', 'tersa-shop')); ?>"
 				>
-					<?php echo esc_html(sprintf(__('Search for products (%d)', 'tersa-shop'), 0)); ?>
+					<?php echo esc_html(sprintf(__('Rezultati pretrage (%d)', 'tersa-shop'), 0)); ?>
 				</h2>
 
 				<button

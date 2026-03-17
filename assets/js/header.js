@@ -21,8 +21,8 @@ document.addEventListener('DOMContentLoaded', function () {
 
   // Prevedeni string se čita iz data atributa koje puni PHP — Polylang kompatibilno
   var searchLabel = searchTitle
-    ? (searchTitle.dataset.searchLabel || 'Search for products')
-    : 'Search for products';
+    ? (searchTitle.dataset.searchLabel || 'Rezultati pretrage')
+    : 'Rezultati pretrage';
 
   // Čuva aktivne MutationObservere da ih možemo disconnectovati pri zatvaranju
   var searchObservers = [];
@@ -552,6 +552,10 @@ document.addEventListener('DOMContentLoaded', function () {
 
     if (awsInput && !awsInput.dataset.tersaBound) {
       awsInput.dataset.tersaBound = 'true';
+
+      // Postavi prevedeni placeholder za search input
+      awsInput.placeholder = 'Pretraži ...';
+
       awsInput.addEventListener('input', debouncedUpdateSearchTitle);
       awsInput.addEventListener('focus', debouncedUpdateSearchTitle);
     }

@@ -19,7 +19,7 @@ if (!class_exists('WooCommerce')) {
 		<div class="site-header__cart-panel-inner">
 			<div class="site-header__cart-head">
 				<h2 id="cart-drawer-title" class="site-header__cart-title">
-					<?php esc_html_e('Your cart', 'tersa-shop'); ?>
+					<?php esc_html_e('Moja košarica', 'tersa-shop'); ?>
 				</h2>
 
 				<button
