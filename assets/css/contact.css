@@ -52,16 +52,22 @@
   
   .contact-hero__media {
     position: relative;
-    min-height: clamp(360px, 46vw, 620px);
+    min-height: clamp(360px, 46vw, 720px);
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
   }
-  
-  .contact-hero__image {
-    width: 100%;
-    max-height: 50rem;
-    min-height: inherit;
-    object-fit: cover;
+
+  .contact-hero__media--parallax {
+    background-attachment: fixed;
   }
- 
+
+  @media (prefers-reduced-motion: reduce), (max-width: 1023px) {
+    .contact-hero__media--parallax {
+      background-attachment: scroll;
+    }
+  }
+
   .contact-hero__overlay {
     position: absolute;
     inset: 0;

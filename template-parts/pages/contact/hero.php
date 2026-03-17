@@ -31,14 +31,12 @@ if (!is_string($hero_title) || trim($hero_title) === '') {
 ?>
 
 <section class="contact-hero" aria-labelledby="contact-hero-title">
-	<div class="contact-hero__media">
-		<img
-			src="<?php echo esc_url($hero_image_url); ?>"
-			alt=""
-			class="contact-hero__image"
-			loading="eager"
-			decoding="async"
-		>
+	<div
+		class="contact-hero__media contact-hero__media--parallax"
+		style="background-image: url(<?php echo esc_url($hero_image_url); ?>);"
+		role="img"
+		aria-label=""
+	>
 		<div class="contact-hero__overlay"></div>
 	</div>
 
