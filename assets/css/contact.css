@@ -1,0 +1,338 @@
+/* =========================================================
+   TERSA CONTACT PAGE
+   File: assets/css/contact.css
+   ========================================================= */
+
+   .contact-page {
+    padding-bottom: 0;
+  }
+  
+  /* =========================
+     Breadcrumbs
+     ========================= */
+  .tersa-breadcrumbs {
+    padding-top: clamp(18px, 3vw, 28px);
+    padding-bottom: clamp(18px, 3vw, 28px);
+  }
+  
+  .tersa-breadcrumbs__list {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.5rem;
+    color: var(--c-text-soft);
+    font-size: var(--fs-14);
+  }
+  
+  .tersa-breadcrumbs__item a {
+    color: inherit;
+    text-decoration: none;
+  }
+  
+  .tersa-breadcrumbs__item a:hover {
+    color: var(--c-text);
+  }
+  
+  .tersa-breadcrumbs__item.is-current {
+    color: var(--c-text);
+    font-weight: var(--fw-500);
+  }
+  
+  .tersa-breadcrumbs__separator {
+    opacity: 0.6;
+  }
+  
+  /* =========================
+     Hero
+     ========================= */
+  .contact-hero {
+    position: relative;
+    overflow: hidden;
+  }
+  
+  .contact-hero__media {
+    position: relative;
+    min-height: clamp(360px, 46vw, 620px);
+  }
+  
+  .contact-hero__image {
+    width: 100%;
+    max-height: 50rem;
+    min-height: inherit;
+    object-fit: cover;
+  }
+ 
+  .contact-hero__overlay {
+    position: absolute;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.45);
+  }
+  
+  .contact-hero__inner {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  
+  .contact-hero__content {
+    width: min(100%, 980px);
+    text-align: center;
+  }
+  
+  .contact-hero__title {
+    margin: 0;
+    color: #fff;
+    font-family: var(--font-body);
+    font-size: clamp(2.25rem, 5vw, 4.5rem);
+    font-weight: 400;
+    line-height: 1.08;
+    letter-spacing: -0.03em;
+  }
+  
+  /* =========================
+     Card
+     ========================= */
+  .contact-section {
+    position: relative;
+    z-index: 2;
+    margin-top: clamp(-120px, -8vw, -72px);
+    padding-bottom: clamp(26px, 8vw, 56px);
+  }
+  
+  .contact-card {
+    background: var(--c-surface);
+    border-radius: 0;
+    box-shadow: 0 18px 50px rgba(42, 33, 27, 0.08);
+    border: 1px solid rgba(58, 38, 24, 0.08);
+  }
+  
+  .contact-card__grid {
+    display: grid;
+    grid-template-columns: minmax(280px, 0.95fr) minmax(420px, 1.45fr);
+    gap: clamp(40px, 5vw, 96px);
+    padding: clamp(32px, 5vw, 80px);
+  }
+  
+  .contact-card__heading {
+    margin: 0 0 32px;
+    font-family: var(--font-body);
+    font-size: clamp(2rem, 2.8vw, 3rem);
+    font-weight: 700;
+    line-height: 1.05;
+    color: #000;
+  }
+  
+  .contact-card__info {
+    display: flex;
+    flex-direction: column;
+    gap: 36px;
+  }
+  
+  .contact-card__block {
+    display: grid;
+    gap: 10px;
+  }
+  
+  .contact-card__label {
+    margin: 0;
+    font-family: var(--font-body);
+    font-size: clamp(1.5rem, 2vw, 2rem);
+    font-weight: 700;
+    line-height: 1.15;
+    color: #000;
+  }
+  
+  .contact-card__block p {
+    color: #8a8a8a;
+    font-size: clamp(1.05rem, 1.4vw, 1.25rem);
+    line-height: 1.55;
+  }
+  
+  .contact-card__block a {
+    color: #111;
+    font-weight: 500;
+  }
+  
+  .contact-card__block a:hover {
+    color: var(--c-accent);
+  }
+  
+  .contact-card__form {
+    min-width: 0;
+  }
+  
+  .contact-card__form-wrap .wpcf7 {
+    width: 100%;
+  }
+  
+  .contact-card__form-wrap .wpcf7 form {
+    display: grid;
+    gap: 18px;
+    margin: 0;
+  }
+  
+  .contact-card__form-row {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 18px;
+  }
+  
+  .contact-card__form-wrap .wpcf7-form-control-wrap {
+    display: block;
+    width: 100%;
+  }
+  
+  .contact-card__form-wrap input[type="text"],
+  .contact-card__form-wrap input[type="email"],
+  .contact-card__form-wrap textarea {
+    width: 100%;
+    min-height: 74px;
+    padding: 0 22px;
+    border: 1px solid #1c1c1c;
+    border-radius: 0;
+    background: #fff;
+    color: #111;
+    box-shadow: none;
+  }
+  
+  .contact-card__form-wrap textarea {
+    min-height: 190px;
+    padding-top: 20px;
+  }
+  
+  .contact-card__form-wrap input::placeholder,
+  .contact-card__form-wrap textarea::placeholder {
+    color: #8d8d8d;
+    opacity: 1;
+  }
+  
+  .contact-card__form-wrap input:focus,
+  .contact-card__form-wrap textarea:focus {
+    border-color: #111;
+    box-shadow: 0 0 0 3px rgba(17, 17, 17, 0.08);
+  }
+  
+  .contact-card__form-wrap .wpcf7-submit {
+    width: 100%;
+    min-height: 72px;
+    border: 1px solid #000;
+    border-radius: 0;
+    background: #000;
+    color: #fff;
+    font-size: 0.95rem;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    cursor: pointer;
+  }
+  
+  .contact-card__form-wrap .wpcf7-submit:hover {
+    background: #111;
+    color: #fff;
+  }
+  
+  .contact-card__form-wrap .wpcf7-spinner {
+    display: none;
+  }
+  
+  .contact-card__form-wrap .wpcf7-response-output {
+    margin: 12px 0 0;
+    padding: 12px 14px;
+    border-radius: 0;
+  }
+  
+  /* =========================
+     Map
+     ========================= */
+  .contact-map-section {
+    padding-bottom: 0;
+  }
+  
+  .contact-map {
+    width: 100%;
+    min-height: clamp(420px, 48vw, 760px);
+  }
+  
+  .contact-map iframe,
+  .contact-map .wp-block-embed,
+  .contact-map .wp-block-embed__wrapper,
+  .contact-map > div {
+    width: 100%;
+    min-height: inherit;
+  }
+  
+  .contact-map iframe {
+    border: 0;
+    display: block;
+  }
+  
+  /* =========================
+     Mobile
+     ========================= */
+  @media (max-width: 980px) {
+    .contact-card__grid {
+      grid-template-columns: 1fr;
+      gap: 48px;
+    }
+  
+    .contact-card__heading,
+    .contact-card__label,
+    .contact-card__info,
+    .contact-card__block,
+    .contact-card__block p,
+    .contact-card__form {
+      text-align: center;
+    }
+  }
+  
+  @media (max-width: 720px) {
+    .contact-hero__media {
+      min-height: 300px;
+    }
+  
+    .contact-section {
+      margin-top: 0;
+      padding-top: 0;
+    }
+  
+    .contact-card {
+      border-radius: 0;
+      box-shadow: none;
+      border-left: 0;
+      border-right: 0;
+    }
+  
+    .contact-card__grid {
+      padding: 32px 20px 40px;
+      gap: 40px;
+    }
+  
+    .contact-card__heading {
+      margin-bottom: 24px;
+    }
+  
+    .contact-card__form-row {
+      grid-template-columns: 1fr;
+      gap: 14px;
+    }
+  
+    .contact-card__form-wrap input[type="text"],
+    .contact-card__form-wrap input[type="email"],
+    .contact-card__form-wrap textarea {
+      min-height: 64px;
+    }
+  
+    .contact-card__form-wrap textarea {
+      min-height: 180px;
+    }
+  
+    .contact-card__form-wrap .wpcf7-submit {
+      min-height: 64px;
+    }
+  
+    .contact-map {
+      min-height: 420px;
+    }
+  }

@@ -12,7 +12,15 @@ function tersa_enqueue_assets() {
 	wp_enqueue_style('tersa-header', $theme_uri . '/assets/css/header.css', ['tersa-base'], $theme_version);
 	wp_enqueue_style('tersa-footer', $theme_uri . '/assets/css/footer.css', ['tersa-base'], $theme_version);
 
-
+	//contact page style
+	if (is_page_template('page-templates/template-contact.php')) {
+		wp_enqueue_style(
+			'tersa-contact',
+			$theme_uri . '/assets/css/contact.css',
+			['tersa-base', 'tersa-layout'],
+			$theme_version
+		);
+	}
 	/*
 	if (is_front_page()) {
 		wp_enqueue_style('tersa-home', $theme_uri . '/assets/css/home.css', ['tersa-base', 'tersa-layout'], $theme_version);

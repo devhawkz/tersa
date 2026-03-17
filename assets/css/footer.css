@@ -9,7 +9,7 @@
       linear-gradient(180deg, #191b1f 0%, #14161a 100%);
     color: rgba(255, 255, 255, 0.78);
     border-top: 1px solid rgba(255, 255, 255, 0.08);
-    margin-top: 40px;
+   /* margin-top: 40px; */
   }
   
   .site-footer a {
