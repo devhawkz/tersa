@@ -226,9 +226,10 @@
   .site-footer__bottom-inner {
     min-height: 82px;
     display: grid;
-    grid-template-columns: 1fr auto auto;
+    grid-template-columns: 1fr 1fr 1fr;
     gap: 24px;
     align-items: center;
+    justify-items: stretch;
   }
   
   .site-footer__legal-menu {
@@ -261,6 +262,7 @@
     margin: 0;
     padding: 0;
     list-style: none;
+    justify-content: flex-end;
   }
   
   .site-footer__payment-badge {
