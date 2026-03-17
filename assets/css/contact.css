@@ -58,6 +58,10 @@
     background-repeat: no-repeat;
   }
 
+  .contact-hero__media--no-image {
+    background-color: var(--c-text, #2a211b);
+  }
+
   .contact-hero__media--parallax {
     background-attachment: fixed;
   }

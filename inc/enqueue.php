@@ -21,6 +21,16 @@ function tersa_enqueue_assets() {
 			$theme_version
 		);
 	}
+
+	//about page style
+	if (is_page_template('page-templates/template-about.php')) {
+		wp_enqueue_style(
+			'tersa-about',
+			$theme_uri . '/assets/css/about.css',
+			['tersa-base', 'tersa-layout'],
+			$theme_version
+		);
+	}
 	/*
 	if (is_front_page()) {
 		wp_enqueue_style('tersa-home', $theme_uri . '/assets/css/home.css', ['tersa-base', 'tersa-layout'], $theme_version);
