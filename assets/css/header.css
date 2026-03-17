@@ -3,8 +3,10 @@
    File: assets/css/header.css
    ========================================================= */
 
-   /* Topbar skroluje zajedno sa sadržajem – nije sticky, nalazi se van <header> */
-  .site-header__topbar {
+/* =========================
+   Topbar
+   ========================= */
+   .site-header__topbar {
     background: var(--c-accent);
     color: #fff;
   }
@@ -39,14 +41,16 @@
     opacity: 0.88;
   }
   
-  /* <header> je sticky – uvek vidljiv pri skrolovanju; topbar je van headera i skroluje */
+  /* =========================
+     Main Header
+     ========================= */
   .site-header {
     position: sticky;
     top: 0;
     z-index: 100;
     background: #f7f7f5;
   }
-
+  
   .site-header__main {
     background: #f7f7f5;
     border-bottom: 1px solid #eee6d9;
@@ -95,6 +99,9 @@
     color: #111;
   }
   
+  /* =========================
+     Desktop Navigation
+     ========================= */
   .site-header__nav--desktop {
     display: flex;
     justify-content: center;
@@ -127,8 +134,7 @@
     line-height: 1.2;
     position: relative;
   }
-
-  /* Animirani underline — raste s leva na desno na hover i na aktivnoj stavci */
+  
   .site-header__nav--desktop .menu > li > a::after,
   .site-header__nav--desktop ul.menu > li > a::after {
     content: '';
@@ -142,7 +148,7 @@
     transform-origin: left center;
     transition: transform 0.28s ease;
   }
-
+  
   .site-header__nav--desktop .menu > li > a:hover::after,
   .site-header__nav--desktop ul.menu > li > a:hover::after,
   .site-header__nav--desktop .menu > li.current-menu-item > a::after,
@@ -150,15 +156,15 @@
   .site-header__nav--desktop .menu-item-has-children.is-submenu-open > a::after {
     transform: scaleX(1);
   }
-
+  
   .site-header__nav--desktop .menu > li > a:hover,
   .site-header__nav--desktop ul.menu > li > a:hover {
     color: #111;
   }
-
-  /* =====================================================================
-     Submenu toggle dugme (chevron) — koristi se u desktop i mobilnom meniju
-     ===================================================================== */
+  
+  /* =========================
+     Submenu Toggle
+     ========================= */
   .submenu-toggle {
     display: inline-flex;
     align-items: center;
@@ -174,7 +180,7 @@
     vertical-align: middle;
     line-height: 1;
   }
-
+  
   .submenu-toggle svg {
     width: 12px;
     height: 12px;
@@ -186,18 +192,18 @@
     stroke-linejoin: round;
     transition: transform var(--transition-fast);
   }
-
+  
   .submenu-toggle[aria-expanded="true"] svg {
     transform: rotate(180deg);
   }
-
+  
   .submenu-toggle:hover {
     color: var(--c-accent);
   }
-
-  /* =====================================================================
-     Desktop submenu — apsolutno pozicioniran dropdown
-     ===================================================================== */
+  
+  /* =========================
+     Desktop Submenu
+     ========================= */
   .site-header__nav--desktop .sub-menu {
     position: absolute;
     top: calc(100% + 12px);
@@ -218,8 +224,7 @@
       transform 0.22s ease,
       visibility 0.22s ease;
   }
-
-  /* Mali trokut koji "vezuje" dropdown za parent link */
+  
   .site-header__nav--desktop .sub-menu::before {
     content: '';
     position: absolute;
@@ -231,17 +236,17 @@
     background: #fff;
     clip-path: polygon(50% 0%, 0% 100%, 100% 100%);
   }
-
+  
   .site-header__nav--desktop .menu-item-has-children.is-submenu-open > .sub-menu {
     opacity: 1;
     visibility: visible;
     transform: translateX(-50%) translateY(0);
   }
-
+  
   .site-header__nav--desktop .sub-menu .menu-item {
     margin: 0;
   }
-
+  
   .site-header__nav--desktop .sub-menu .menu-item a {
     display: block;
     padding: 9px 28px;
@@ -252,8 +257,7 @@
     line-height: 1.4;
     position: relative;
   }
-
-  /* Tanki underline koji raste s leva na desno na hover stavki u dropdown-u */
+  
   .site-header__nav--desktop .sub-menu .menu-item a::after {
     content: '';
     position: absolute;
@@ -266,16 +270,19 @@
     transform-origin: left center;
     transition: transform 0.22s ease;
   }
-
+  
   .site-header__nav--desktop .sub-menu .menu-item a:hover::after,
   .site-header__nav--desktop .sub-menu .menu-item a:focus-visible::after {
     transform: scaleX(1);
   }
-
+  
   .site-header__nav--desktop .sub-menu .menu-item a:focus-visible {
     outline: none;
   }
-
+  
+  /* =========================
+     Header Actions
+     ========================= */
   .site-header__actions {
     display: flex;
     align-items: center;
@@ -354,6 +361,9 @@
     text-decoration: none;
   }
   
+  /* =========================
+     Mobile Toggle
+     ========================= */
   .site-header__toggle {
     display: none;
     width: 42px;
@@ -389,42 +399,31 @@
     transform: translateY(-8px) rotate(-45deg);
   }
   
-  /* =====================================================================
-     Mobilni panel — full-screen overlay koji klizi s desna
-     ===================================================================== */
-
-  /* inert atribut (JS) kontroliše pristup za AT i interakciju;
-     visibility + transform kontrolišu vizuelno stanje i animaciju */
+  /* =========================
+     Mobile Navigation Panel
+     ========================= */
   .site-header__mobile-panel {
     display: flex;
     flex-direction: column;
     position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
+    inset: 0;
     z-index: 400;
     background: #fff;
     overflow: hidden;
     transform: translateX(100%);
     visibility: hidden;
     pointer-events: none;
-    transition: transform 0.35s cubic-bezier(0.4, 0, 0.2, 1),
-                visibility 0.35s;
-    /* CSS varijabla za visinu headera panela — koriste je sub-menije */
+    transition: transform 0.35s cubic-bezier(0.4, 0, 0.2, 1), visibility 0.35s;
     --mobile-nav-header-h: 68px;
   }
-
+  
   .site-header__mobile-panel.is-open {
     transform: translateX(0);
-    background: #F7F7F5;
+    background: #f7f7f5;
     visibility: visible;
     pointer-events: auto;
   }
-
-  /* =====================================================================
-     Mobilni backdrop — tamni overlay koji se fade-uje iza panela
-     ===================================================================== */
+  
   .site-header__mobile-backdrop {
     position: fixed;
     inset: 0;
@@ -435,26 +434,12 @@
     transition: opacity 0.35s ease, visibility 0.35s;
     cursor: pointer;
   }
-
+  
   .site-header__mobile-backdrop.is-open {
     opacity: 1;
     visibility: visible;
   }
-
-  @media (prefers-reduced-motion: reduce) {
-    .site-header__mobile-panel,
-    .site-header__mobile-backdrop,
-    .site-header__search-panel,
-    .site-header__search-backdrop,
-    .site-header__cart-panel,
-    .site-header__cart-backdrop {
-      transition: none;
-    }
-  }
-
-  /* =====================================================================
-     Mobilni nav header — logo (centar) + back (levo) + close (desno)
-     ===================================================================== */
+  
   .mobile-nav__header {
     display: flex;
     align-items: center;
@@ -465,7 +450,7 @@
     flex-shrink: 0;
     position: relative;
   }
-
+  
   .mobile-nav__logo-link {
     position: absolute;
     left: 50%;
@@ -474,7 +459,7 @@
     align-items: center;
     line-height: 0;
   }
-
+  
   .mobile-nav__logo-link .site-header__logo-image,
   .mobile-nav__logo-link img {
     max-height: 34px;
@@ -482,7 +467,7 @@
     width: auto;
     height: auto;
   }
-
+  
   .mobile-nav__back {
     display: inline-flex;
     align-items: center;
@@ -500,7 +485,7 @@
     overflow: hidden;
     text-overflow: ellipsis;
   }
-
+  
   .mobile-nav__back svg {
     width: 18px;
     height: 18px;
@@ -511,7 +496,7 @@
     stroke-linejoin: round;
     flex-shrink: 0;
   }
-
+  
   .mobile-nav__close {
     display: inline-flex;
     align-items: center;
@@ -526,7 +511,7 @@
     z-index: 1;
     flex-shrink: 0;
   }
-
+  
   .mobile-nav__close svg {
     width: 22px;
     height: 22px;
@@ -535,28 +520,24 @@
     stroke-width: 2;
     stroke-linecap: round;
   }
-
-  /* Scrollabilni wrapper za mobilnu navigaciju */
+  
   .mobile-nav__body {
     flex: 1;
     overflow-y: auto;
     -webkit-overflow-scrolling: touch;
   }
-
-  /* =====================================================================
-     Mobilna navigacija — menu items
-     ===================================================================== */
+  
   .site-header__nav--mobile {
     padding: 0;
   }
-
+  
   .site-header__nav--mobile .menu,
   .site-header__nav--mobile ul.menu {
     display: block;
     margin: 0;
     padding: 0;
   }
-
+  
   .site-header__nav--mobile .menu li,
   .site-header__nav--mobile ul.menu li {
     margin: 0;
@@ -564,7 +545,7 @@
     align-items: stretch;
     border-bottom: 1px solid var(--c-line);
   }
-
+  
   .site-header__nav--mobile .menu a,
   .site-header__nav--mobile ul.menu a {
     flex: 1;
@@ -577,18 +558,17 @@
     line-height: 1.2;
     border-bottom: 0;
   }
-
+  
   .site-header__nav--mobile .menu a:hover,
   .site-header__nav--mobile ul.menu a:hover {
     color: var(--c-accent);
   }
-
+  
   .site-header__nav--mobile .current-menu-item > a,
   .site-header__nav--mobile .current-menu-ancestor > a {
     color: var(--c-accent);
   }
-
-  /* Submenu toggle u mobilnom — desna strelica, tap target pune visine */
+  
   .site-header__nav--mobile .submenu-toggle {
     width: 56px;
     height: auto;
@@ -600,17 +580,13 @@
     align-items: center;
     justify-content: center;
   }
-
+  
   .site-header__nav--mobile .submenu-toggle svg {
     transform: rotate(-90deg);
     width: 14px;
     height: 14px;
   }
-
-  /* =====================================================================
-     Mobilni podmeni — full-screen panel koji klizi s desna
-     Push navigacija: svaki nivo dolazi kao novi panel
-     ===================================================================== */
+  
   .site-header__nav--mobile .sub-menu {
     position: fixed;
     top: var(--mobile-nav-header-h);
@@ -627,16 +603,18 @@
     transform: translateX(100%);
     transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   }
-
+  
   .site-header__nav--mobile .menu-item-has-children.is-submenu-open > .sub-menu {
     transform: translateX(0);
   }
-
-  /* Sub-podmeni (drugi nivo) dobija viši z-index od roditelja */
+  
   .site-header__nav--mobile .sub-menu .sub-menu {
     z-index: 402;
   }
   
+  /* =========================
+     Search Overlay
+     ========================= */
   .site-header__search {
     display: flex;
     align-items: center;
@@ -667,7 +645,7 @@
     opacity: 0;
     transition: opacity 0.3s ease;
   }
-
+  
   .site-header__search-overlay.is-open .site-header__search-backdrop {
     opacity: 1;
   }
@@ -684,7 +662,7 @@
     transform: translateX(100%);
     transition: transform 0.35s cubic-bezier(0.4, 0, 0.2, 1);
   }
-
+  
   .site-header__search-overlay.is-open .site-header__search-panel {
     transform: translateX(0);
   }
@@ -800,20 +778,20 @@
   body.is-search-open {
     overflow: hidden;
   }
-
-  /* =====================================================================
-     Cart drawer — isti pattern kao search overlay
-     ===================================================================== */
+  
+  /* =========================
+     Cart Drawer
+     ========================= */
   .site-header__cart-overlay[hidden] {
     display: none;
   }
-
+  
   .site-header__cart-overlay {
     position: fixed;
     inset: 0;
     z-index: 300;
   }
-
+  
   .site-header__cart-backdrop {
     position: absolute;
     inset: 0;
@@ -822,11 +800,11 @@
     transition: opacity 0.3s ease;
     cursor: pointer;
   }
-
+  
   .site-header__cart-overlay.is-open .site-header__cart-backdrop {
     opacity: 1;
   }
-
+  
   .site-header__cart-panel {
     position: absolute;
     top: 0;
@@ -840,28 +818,28 @@
     transform: translateX(100%);
     transition: transform 0.35s cubic-bezier(0.4, 0, 0.2, 1);
   }
-
+  
   .site-header__cart-overlay.is-open .site-header__cart-panel {
     transform: translateX(0);
   }
-
+  
   .site-header__cart-panel-inner {
     display: flex;
     flex-direction: column;
     flex: 1;
     min-height: 0;
   }
-
+  
   .site-header__cart-head {
     display: flex;
     align-items: center;
     justify-content: space-between;
     gap: 20px;
-    padding: 88px 32px 24px;
+    padding: 40px 32px 24px;
     border-bottom: 1px solid var(--c-border);
     flex-shrink: 0;
   }
-
+  
   .site-header__cart-title {
     margin: 0;
     font-family: var(--font-body);
@@ -870,14 +848,14 @@
     line-height: 1.2;
     color: #111;
   }
-
+  
   .site-header__cart-body {
     flex: 1;
     overflow-y: auto;
     -webkit-overflow-scrolling: touch;
     padding: 32px;
   }
-
+  
   .site-header__cart-close {
     position: relative;
     width: 36px;
@@ -888,7 +866,7 @@
     cursor: pointer;
     padding: 0;
   }
-
+  
   .site-header__cart-close span {
     position: absolute;
     top: 50%;
@@ -898,51 +876,220 @@
     background: #111;
     transform-origin: center;
   }
-
+  
   .site-header__cart-close span:first-child {
     transform: translate(-50%, -50%) rotate(45deg);
   }
-
+  
   .site-header__cart-close span:last-child {
     transform: translate(-50%, -50%) rotate(-45deg);
   }
-
-  /* WooCommerce mini cart reset unutar drawera */
+  
+  .site-header__cart-body .woocommerce-mini-cart,
+  .site-header__cart-body .woocommerce-mini-cart.cart_list,
   .site-header__cart-body .cart_list {
     list-style: none;
     margin: 0;
     padding: 0;
   }
-
-  .site-header__cart-body .woocommerce-mini-cart__buttons {
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
-    margin-top: 24px;
-  }
-
-  .site-header__cart-body .woocommerce-mini-cart__buttons a {
-    display: block;
-    text-align: center;
-    padding: 14px 24px;
-    font-size: 0.9375rem;
-    font-weight: 600;
-    text-decoration: none;
-    border-radius: var(--radius-sm, 4px);
-  }
-
-  .site-header__cart-body .woocommerce-mini-cart__buttons .button:first-child {
-    background: transparent;
-    border: 1.5px solid #111;
-    color: #111;
-  }
-
-  .site-header__cart-body .woocommerce-mini-cart__buttons .checkout {
-    background: var(--c-accent);
-    color: #fff;
-    border: 1.5px solid var(--c-accent);
+  
+  .site-header__cart-body .tersa-mini-cart__item {
+    position: relative;
+    display: grid !important;
+    grid-template-columns: 128px minmax(0, 1fr) !important;
+    gap: 28px !important;
+    align-items: start !important;
+    padding: 0 0 36px !important;
+    margin: 0 0 0 !important;
+    border-bottom: 0 !important;
   }
   
+  .site-header__cart-body .tersa-mini-cart__item > .remove {
+    position: absolute !important;
+    top: 29px !important;
+    right: 0 !important;
+    left: auto !important;
+    width: 28px;
+    height: 28px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 28px;
+    line-height: 1;
+    text-decoration: none;
+    color: #111 !important;
+    background: transparent;
+    border: 0;
+  }
+
+  .site-header__cart-body .tersa-mini-cart__item > .remove:hover{
+    background-color: var(--c-danger) !important;
+    border-radius: 0;
+  }
+  
+  .site-header__cart-body .tersa-mini-cart__thumb {
+    grid-column: 1;
+    grid-row: 1;
+    align-self: start;
+    justify-self: start;
+    line-height: 0;
+  }
+  
+  .site-header__cart-body .tersa-mini-cart__thumb a {
+    display: block;
+    line-height: 0;
+  }
+  
+  .site-header__cart-body .tersa-mini-cart__thumb img {
+    display: block !important;
+    width: 128px !important;
+    height: 148px !important;
+    margin: 0 !important;
+    float: none !important;
+    object-fit: cover !important;
+    box-shadow: none !important;
+  }
+  
+  .site-header__cart-body .tersa-mini-cart__content {
+    grid-column: 2;
+    grid-row: 1;
+    min-width: 0;
+    padding-right: 42px;
+    padding-top: 30px;
+    text-align: left;
+    justify-self: stretch;
+    align-self: start;
+  }
+  
+  .site-header__cart-body .tersa-mini-cart__title-wrap {
+    margin: 0 0 18px;
+  }
+  
+  .site-header__cart-body .tersa-mini-cart__title {
+    display: block;
+    color: #111;
+    font-size: 1.125rem;
+    font-weight: 500;
+    line-height: 1.35;
+    text-decoration: none;
+    text-align: left;
+  }
+  
+  .site-header__cart-body .tersa-mini-cart__meta {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    flex-wrap: wrap;
+    justify-content: flex-start;
+  }
+  
+  .site-header__cart-body .tersa-mini-cart__qty {
+    display: inline-flex;
+    align-items: center;
+    background: #ecebe7;
+    min-height: 40px;
+  }
+  
+  .site-header__cart-body .tersa-mini-cart__qty.is-loading {
+    opacity: 0.6;
+    pointer-events: none;
+  }
+  
+  .site-header__cart-body .tersa-mini-cart__qty-btn {
+    width: 40px;
+    height: 40px;
+    border: 0;
+    background: transparent;
+    color: #111;
+    font-size: 1.5rem;
+    line-height: 1;
+    cursor: pointer;
+  }
+  
+  .site-header__cart-body .tersa-mini-cart__qty-value {
+    min-width: 28px;
+    text-align: center;
+    font-size: 1rem;
+    font-weight: 500;
+    color: #111;
+  }
+  
+  .site-header__cart-body .tersa-mini-cart__price {
+    font-size: 1rem;
+    font-weight: 500;
+    color: #111;
+  }
+  
+  .site-header__cart-body .woocommerce-mini-cart__total,
+  .site-header__cart-body .widget_shopping_cart .total {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    margin: 8px 0 28px;
+    padding: 0;
+    border-top: 0;
+    font-size: 1rem;
+    color: #111;
+  }
+  
+  .site-header__cart-body .woocommerce-mini-cart__total strong,
+  .site-header__cart-body .widget_shopping_cart .total strong {
+    font-size: 1.125rem;
+    font-weight: 700;
+    color: #111;
+  }
+  
+  .site-header__cart-body .woocommerce-mini-cart__total .amount,
+  .site-header__cart-body .widget_shopping_cart .total .amount {
+    font-size: 1.125rem;
+    font-weight: 700;
+    color: #111;
+  }
+  
+  .site-header__cart-body .woocommerce-mini-cart__buttons,
+  .site-header__cart-body .widget_shopping_cart .buttons {
+    display: grid;
+    gap: 16px;
+    margin: 0;
+  }
+  
+  .site-header__cart-body .woocommerce-mini-cart__buttons .button,
+  .site-header__cart-body .widget_shopping_cart .buttons .button {
+    width: 100%;
+    min-height: 56px;
+    border-radius: 0;
+    font-size: 0.95rem;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    box-shadow: none;
+  }
+  
+  .site-header__cart-body .woocommerce-mini-cart__buttons .wc-forward:first-child,
+  .site-header__cart-body .widget_shopping_cart .buttons .wc-forward:first-child {
+    background: transparent;
+    color: #111;
+    border: 2px solid #111;
+  }
+  
+  .site-header__cart-body .woocommerce-mini-cart__buttons .checkout,
+  .site-header__cart-body .woocommerce-mini-cart__buttons .wc-forward.checkout,
+  .site-header__cart-body .widget_shopping_cart .buttons .checkout,
+  .site-header__cart-body .widget_shopping_cart .buttons .wc-forward.checkout {
+    background: #000;
+    color: #fff;
+    border: 2px solid #000;
+  }
+  
+  .site-header__cart-body .woocommerce-mini-cart__empty-message {
+    margin: 0;
+    color: #111;
+  }
+  
+  /* =========================
+     Responsive
+     ========================= */
   @media (max-width: 1100px) {
     .site-header__nav--desktop {
       display: none;
@@ -1002,14 +1149,6 @@
     .site-header__search-panel-inner {
       padding: 56px 24px 32px;
     }
-
-    .site-header__cart-head {
-      padding: 56px 20px 20px;
-    }
-
-    .site-header__cart-body {
-      padding: 20px;
-    }
   
     .site-header__search-head {
       margin-bottom: 28px;
@@ -1044,6 +1183,26 @@
   
     .site-header__search-close span {
       width: 22px;
+    }
+  
+    .site-header__cart-head {
+      padding: 32px 20px 20px;
+    }
+  
+    .site-header__cart-body {
+      padding: 20px;
+    }
+  
+    .site-header__cart-body .tersa-mini-cart__item {
+      grid-template-columns: 108px minmax(0, 1fr) !important;
+      gap: 20px !important;
+      padding-bottom: 28px !important;
+      margin-bottom: 28px !important;
+    }
+  
+    .site-header__cart-body .tersa-mini-cart__thumb img {
+      width: 108px !important;
+      height: 126px !important;
     }
   }
   
@@ -1082,5 +1241,24 @@
       min-width: 20px;
       height: 20px;
       font-size: 0.7rem;
+    }
+  
+    .site-header__cart-body .tersa-mini-cart__item {
+      grid-template-columns: 96px minmax(0, 1fr) !important;
+      gap: 18px !important;
+    }
+  
+    .site-header__cart-body .tersa-mini-cart__thumb img {
+      width: 96px !important;
+      height: 112px !important;
+    }
+  
+    .site-header__cart-body .tersa-mini-cart__title {
+      font-size: 1rem;
+    }
+  
+    .site-header__cart-body .woocommerce-mini-cart__buttons .button,
+    .site-header__cart-body .widget_shopping_cart .buttons .button {
+      min-height: 52px;
     }
   }

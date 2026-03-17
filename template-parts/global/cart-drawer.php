@@ -34,13 +34,8 @@ if (!class_exists('WooCommerce')) {
 			</div>
 
 			<div class="site-header__cart-body">
-				<!--
-					.widget_shopping_cart_content je obavezan class —
-					WooCommerce AJAX fragmenti ciljaju tačno ovaj selektor
-					da osveže sadržaj korpe bez reload-a stranice.
-				-->
 				<div class="widget_shopping_cart_content">
-					<?php if (function_exists('woocommerce_mini_cart')) { woocommerce_mini_cart(); } ?>
+					<?php woocommerce_mini_cart(); ?>
 				</div>
 			</div>
 		</div>
