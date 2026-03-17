@@ -20,7 +20,7 @@ if (!defined('ABSPATH')) {
 					aria-live="polite"
 					data-search-label="<?php echo esc_attr(__('Rezultati pretrage', 'tersa-shop')); ?>"
 				>
-					<?php echo esc_html(sprintf(__('Rezultati pretrage (%d)', 'tersa-shop'), 0)); ?>
+					<?php echo esc_html(__('Rezultati pretrage', 'tersa-shop')); ?>
 				</h2>
 
 				<button

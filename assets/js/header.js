@@ -447,7 +447,8 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 
     var baseLabel = searchTitle.getAttribute('data-search-label') || 'Rezultati pretrage';
-    searchTitle.textContent = baseLabel + ' (' + getAwsResultCount() + ')';
+    var count = getAwsResultCount();
+    searchTitle.textContent = count > 0 ? baseLabel + ' (' + count + ')' : baseLabel;
   }
 
   var debouncedUpdateSearchTitle = debounce(updateSearchTitle, 150);
