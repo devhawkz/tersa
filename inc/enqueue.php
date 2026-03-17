@@ -38,8 +38,8 @@ function tersa_enqueue_assets() {
 	wp_enqueue_script('tersa-header-js', $theme_uri . '/assets/js/header.js', [], $theme_version, true);
 
 	wp_localize_script('tersa-header-js', 'tersaCartDrawer', [
-	'	ajaxUrl' => admin_url('admin-ajax.php'),
-	'	nonce'   => wp_create_nonce('tersa_cart_nonce'),
+		'ajaxUrl' => admin_url('admin-ajax.php'),
+		'nonce'   => wp_create_nonce('tersa_cart_nonce'),
 	]);
 }
 add_action('wp_enqueue_scripts', 'tersa_enqueue_assets');
