@@ -5,7 +5,11 @@ if (!defined('ABSPATH')) {
 
 get_header();
 ?>
-
+<style>
+	.site-main {
+		padding: 50px 0;
+	}
+</style>
 <main id="content" class="site-main" role="main">
 	<div class="container">
 		<?php

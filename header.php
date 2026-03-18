@@ -95,9 +95,11 @@ $topbar_link_is_external = $data['topbar_link_is_external'];
 									<path d="M12 20.5l-1.35-1.22C5.4 14.52 2 11.44 2 7.72 2 4.64 4.42 2.25 7.5 2.25c1.74 0 3.41.81 4.5 2.09 1.09-1.28 2.76-2.09 4.5-2.09 3.08 0 5.5 2.39 5.5 5.47 0 3.72-3.4 6.8-8.65 11.56L12 20.5z"></path>
 								</svg>
 
+								<!--
 								<span class="site-header__badge site-header__badge--wishlist" aria-hidden="true">
 									<?php echo esc_html($wishlist_count); ?>
 								</span>
+								-->
 							</a>
 						<?php endif; ?>
 

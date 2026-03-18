@@ -221,13 +221,18 @@ $legal_fallback = [
 
 					<p class="site-footer__copyright">
 						<?php
-						echo esc_html(
-							sprintf(
-								/* translators: %s: current year */
-								__('© %s Tersa d.o.o., sva prava pridržana', 'tersa-shop'),
-								date_i18n('Y')
-							)
+						$copyright_text = sprintf(
+							/* translators: %s: current year */
+							__('© %s Tersa d.o.o., sva prava pridržana', 'tersa-shop'),
+							date_i18n('Y')
 						);
+
+						$company_link = sprintf(
+							'<a href="%s">Tersa d.o.o.</a>',
+							esc_url('http://tersa.local/')
+						);
+
+						echo wp_kses_post(str_replace('Tersa d.o.o.', $company_link, $copyright_text));
 						?>
 					</p>
 
