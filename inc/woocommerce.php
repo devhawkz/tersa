@@ -21,7 +21,7 @@ add_filter('gettext', function ($translated, $text, $domain) {
 			case 'View cart':
 				return 'Pogledaj košaricu';
 			case '%s in stock':
-				$hr = '%s komna stanju';
+				$hr = '%s kom na stanju';
 				return function_exists('pll__') ? pll__($hr) : $hr;
 			case 'in stock':
 				$hr = 'na stanju';
