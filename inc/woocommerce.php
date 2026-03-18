@@ -15,12 +15,40 @@ add_filter('gettext', function ($translated, $text, $domain) {
 			return 'Međuzbir';
 		case 'Checkout':
 			return 'Blagajna';
+		case 'Add to cart':
+			// Ako Polylang već ima prevod, koristi ga; inače fallback na HR/BS/Ceo prevod koji želiš.
+			if ($translated !== $text) {
+				return $translated;
+			}
+			return 'Dodaj u košaricu';
 		case 'View cart':
 			return 'Pogledaj košaricu';
 		default:
 			return $translated;
 	}
 }, 10, 3);
+
+// Sakrij poruke/link “View cart” kod AJAX dodavanja u košaricu (na karticama proizvoda).
+add_filter(
+	'wc_add_to_cart_message_html',
+	function ($message, $products, $show_qty) {
+		$is_ajax = false;
+		if (function_exists('wp_doing_ajax')) {
+			$is_ajax = wp_doing_ajax();
+		}
+
+		$is_xhr = !empty($_SERVER['HTTP_X_REQUESTED_WITH']) && strtolower((string) $_SERVER['HTTP_X_REQUESTED_WITH']) === 'xmlhttprequest';
+		$is_wc_ajax = isset($_REQUEST['wc-ajax']) && in_array((string) $_REQUEST['wc-ajax'], ['add_to_cart', 'add_to_cart_form'], true);
+
+		if ($is_ajax || $is_xhr || $is_wc_ajax) {
+			return '';
+		}
+
+		return $message;
+	},
+	999,
+	3
+);
 
 function tersa_get_cart_drawer_fragments() {
 	ob_start();
@@ -65,3 +93,12 @@ function tersa_ajax_update_mini_cart_qty() {
 }
 add_action('wp_ajax_tersa_update_mini_cart_qty', 'tersa_ajax_update_mini_cart_qty');
 add_action('wp_ajax_nopriv_tersa_update_mini_cart_qty', 'tersa_ajax_update_mini_cart_qty');
+
+// Dodatni endpoint za osvežavanje badge-a/mini-cart-a posle AJAX “Add to cart”.
+function tersa_ajax_get_cart_drawer_fragments() {
+	check_ajax_referer('tersa_cart_nonce', 'nonce');
+
+	tersa_get_cart_drawer_fragments();
+}
+add_action('wp_ajax_tersa_get_cart_drawer_fragments', 'tersa_ajax_get_cart_drawer_fragments');
+add_action('wp_ajax_nopriv_tersa_get_cart_drawer_fragments', 'tersa_ajax_get_cart_drawer_fragments');

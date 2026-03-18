@@ -31,11 +31,24 @@ function tersa_enqueue_assets() {
 			$theme_version
 		);
 	}
-	/*
+	
 	if (is_front_page()) {
-		wp_enqueue_style('tersa-home', $theme_uri . '/assets/css/home.css', ['tersa-base', 'tersa-layout'], $theme_version);
+		wp_enqueue_style(
+			'tersa-home',
+			$theme_uri . '/assets/css/home.css',
+			['tersa-base', 'tersa-layout'],
+			$theme_version
+		);
+	
+		wp_enqueue_script(
+			'tersa-home',
+			$theme_uri . '/assets/js/home.js',
+			[],
+			$theme_version,
+			true
+		);
 	}
-
+/*
 	if (function_exists('is_shop') && (is_shop() || is_product_category())) {
 		wp_enqueue_style('tersa-shop', $theme_uri . '/assets/css/shop.css', ['tersa-base', 'tersa-layout'], $theme_version);
 	}

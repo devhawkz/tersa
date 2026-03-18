@@ -639,8 +639,78 @@ document.addEventListener('DOMContentLoaded', function () {
     });
   }
 
+  var isRefreshingCartDrawer = false;
+  function removeWooNotices() {
+    // WooCommerce JS client-side ubacuje <a class="added_to_cart wc-forward"> odmah posle dugmeta.
+    document.querySelectorAll('a.added_to_cart.wc-forward, a.added_to_cart.wc_forward').forEach(function (el) {
+      el.remove();
+    });
+
+    // WooCommerce server-side notice wrapper.
+    document.querySelectorAll('.woocommerce-notices-wrapper .woocommerce-message, .woocommerce-notices-wrapper .woocommerce-info, .woocommerce-notices-wrapper .woocommerce-success, .woocommerce-notices-wrapper .woocommerce-error, .woocommerce-notices-wrapper .is-success').forEach(function (el) {
+      el.remove();
+    });
+
+    document.querySelectorAll('.woocommerce-notices-wrapper').forEach(function (wrapper) {
+      if (!wrapper.querySelector('.woocommerce-message, .woocommerce-info, .woocommerce-success, .woocommerce-error')) {
+        wrapper.innerHTML = '';
+      }
+    });
+  }
+
+  function refreshCartDrawerAndBadge() {
+    if (!window.tersaCartDrawer || isRefreshingCartDrawer) {
+      return;
+    }
+
+    isRefreshingCartDrawer = true;
+    removeWooNotices();
+
+    var body = new URLSearchParams();
+    body.append('action', 'tersa_get_cart_drawer_fragments');
+    body.append('nonce', window.tersaCartDrawer.nonce);
+
+    fetch(window.tersaCartDrawer.ajaxUrl, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8'
+      },
+      body: body.toString()
+    })
+      .then(function (response) {
+        return response.json();
+      })
+      .then(function (data) {
+        if (!data || !data.success) {
+          return;
+        }
+
+        updateCartDrawerContent(data.data.mini_cart_html, data.data.cart_count);
+
+        // Ukloni eventualni notice koji se pojavi kasnije u istom tick-u.
+        setTimeout(removeWooNotices, 50);
+      })
+      .catch(function (error) {
+        console.error(error);
+      })
+      .finally(function () {
+        isRefreshingCartDrawer = false;
+      });
+  }
+
   function bindMiniCartQtyActions() {
     document.addEventListener('click', function (event) {
+      // Klik na "trash" (remove) u cart drawer-u:
+      // WooCommerce često radi uklanjanje async, ali badge nije uvek odmah osvežen.
+      if (window.tersaCartDrawer) {
+        var removeLink = event.target.closest('#cart-drawer .remove_from_cart_button');
+        if (removeLink) {
+          // Malo kašnjenja da WooCommerce prvo izvrši promenu košarice.
+          setTimeout(refreshCartDrawerAndBadge, 250);
+          return;
+        }
+      }
+
       var button = event.target.closest('.tersa-mini-cart__qty-btn');
       if (!button || !window.tersaCartDrawer) {
         return;
@@ -696,6 +766,31 @@ document.addEventListener('DOMContentLoaded', function () {
         .finally(function () {
           qtyWrap.classList.remove('is-loading');
         });
+    });
+
+    // Promena količine preko input/select u cart drawer-u (ako imate selector varijantu):
+    // Samo osvežimo fragmente + badge kad WooCommerce završi sa ažuriranjem.
+    document.addEventListener('change', function (event) {
+      if (!window.tersaCartDrawer) {
+        return;
+      }
+
+      var target = event.target;
+      if (!target) {
+        return;
+      }
+
+      var qtyWrap = target.closest('#cart-drawer .tersa-mini-cart__qty');
+      if (!qtyWrap) {
+        return;
+      }
+
+      if (!qtyWrap.getAttribute('data-cart-item-key')) {
+        return;
+      }
+
+      // Osvežavanje posle promene da bi se badge count uskladio sa pravim stanjem košarice.
+      setTimeout(refreshCartDrawerAndBadge, 250);
     });
   }
 
@@ -774,5 +869,36 @@ document.addEventListener('DOMContentLoaded', function () {
 
   initDesktopSubmenus();
   initMobileSubmenus();
+
+  // WooCommerce fireuje `added_to_cart` event posle AJAX add-to-cart klika.
+  if (window.jQuery) {
+    window.jQuery(document.body).on('added_to_cart', function () {
+      // Odmah ukloni šta god je već tu, ali WC JS dodaje link malo kasnije pa ponovi čišćenje.
+      removeWooNotices();
+      setTimeout(removeWooNotices, 0);
+      setTimeout(removeWooNotices, 200);
+      refreshCartDrawerAndBadge();
+    });
+
+    // WC event koji se okida kada WC JS završi ažuriranje dugmeta (posle inserted 'added_to_cart' anchor).
+    window.jQuery(document.body).on('wc_cart_button_updated', function () {
+      removeWooNotices();
+    });
+
+    // Osveži drawer + badge posle uklanjanja iz košarice ili ažuriranja totals-a.
+    // Ovo obuhvata i slučaj kada količinu menjate preko input/selecta u drawer-u.
+    window.jQuery(document.body).on('removed_from_cart updated_cart_totals wc_fragments_loaded wc_fragments_refreshed updated_wc_div', function () {
+      removeWooNotices();
+      refreshCartDrawerAndBadge();
+    });
+  } else {
+    document.body.addEventListener('added_to_cart', function () {
+      removeWooNotices();
+      setTimeout(removeWooNotices, 0);
+      setTimeout(removeWooNotices, 200);
+      refreshCartDrawerAndBadge();
+    });
+  }
+
   bindMiniCartQtyActions();
 });
