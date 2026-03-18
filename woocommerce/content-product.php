@@ -109,7 +109,7 @@ if (is_array($product_tag_names) && !empty($product_tag_names)) {
 
 if ($product->is_on_sale()) {
 	$badges[] = [
-		'label'   => function_exists('pll__') ? pll__('On sale') : __('On sale', 'tersa-shop'),
+		'label'   => function_exists('pll__') ? pll__('Na sniženju') : __('Na sniženju', 'tersa-shop'),
 		'primary' => false,
 	];
 }

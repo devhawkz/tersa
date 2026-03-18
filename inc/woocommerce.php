@@ -161,6 +161,7 @@ add_action('init', function () {
 	pll_register_string('tersa_product_tab_opis', 'Opis', 'Tersa – proizvod (accordion)', ['multiline' => false]);
 	pll_register_string('tersa_product_tab_dodatne', 'Dodatne informacije', 'Tersa – proizvod (accordion)', ['multiline' => false]);
 	pll_register_string('tersa_product_tab_recenzije', 'Recenzije', 'Tersa – proizvod (accordion)', ['multiline' => false]);
+	pll_register_string('tersa_badge_na_akciji', 'Na akciji', 'Tersa – proizvod (badge)', ['multiline' => false]);
 	pll_register_string('tersa_stock_na_stanju', '%s na stanju', 'Tersa – proizvod (stanje)', ['multiline' => false]);
 	pll_register_string('tersa_stock_na_stanju_simple', 'na stanju', 'Tersa – proizvod (stanje)', ['multiline' => false]);
 	pll_register_string('tersa_add_to_wishlist', 'Dodaj na listu želja', 'Tersa – wishlist', ['multiline' => false]);
@@ -294,6 +295,29 @@ function tersa_modify_archive_query(WP_Query $query) {
 		'pa_pattern',
 	];
 
+	// Na stranici kategorije proizvoda uvek uključi trenutnu kategoriju u tax_query
+	// (WC ponekad ne postavi tax_query pre našeg hooka).
+	$current_term = get_queried_object();
+	if (
+		$current_term instanceof WP_Term
+		&& $current_term->taxonomy === 'product_cat'
+	) {
+		$has_product_cat_in_query = false;
+		foreach ($tax_query as $clause) {
+			if (is_array($clause) && isset($clause['taxonomy']) && $clause['taxonomy'] === 'product_cat') {
+				$has_product_cat_in_query = true;
+				break;
+			}
+		}
+		if (!$has_product_cat_in_query) {
+			$tax_query[] = [
+				'taxonomy' => 'product_cat',
+				'field'    => 'term_id',
+				'terms'    => [$current_term->term_id],
+			];
+		}
+	}
+
 	foreach ($filter_taxonomies as $taxonomy) {
 		if (!taxonomy_exists($taxonomy)) {
 			continue;
@@ -374,4 +398,4 @@ function tersa_modify_archive_query(WP_Query $query) {
 	$query->set('meta_query', $meta_query);
 }
 
-
+add_action('pre_get_posts', 'tersa_modify_archive_query', 20);
