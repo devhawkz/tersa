@@ -26,6 +26,15 @@ add_filter('gettext', function ($translated, $text, $domain) {
 			case 'in stock':
 				$hr = 'na stanju';
 				return function_exists('pll__') ? pll__($hr) : $hr;
+			case 'Weight':
+				$hr = 'Težina';
+				return function_exists('pll__') ? pll__($hr) : $hr;
+			case 'Dimensions':
+				$hr = 'Dimenzije';
+				return function_exists('pll__') ? pll__($hr) : $hr;
+			case 'Additional information':
+				$hr = 'Dodatne informacije';
+				return function_exists('pll__') ? pll__($hr) : $hr;
 			default:
 				return $translated;
 		}
@@ -127,10 +136,12 @@ add_action('wp_ajax_nopriv_tersa_get_cart_drawer_fragments', 'tersa_ajax_get_car
  * Product tabs (accordion) — naslovi na hrvatskom kao izvor za Polylang.
  */
 add_filter('woocommerce_product_tabs', function ($tabs) {
+	// Ukloni Reviews tab.
+	unset($tabs['reviews']);
+
 	$hr_titles = [
 		'description'            => 'Opis',
 		'additional_information'  => 'Dodatne informacije',
-		'reviews'                 => 'Recenzije',
 	];
 	foreach ($hr_titles as $key => $title) {
 		if (isset($tabs[$key]['title'])) {
@@ -155,6 +166,8 @@ add_action('init', function () {
 	pll_register_string('tersa_add_to_wishlist', 'Dodaj na listu želja', 'Tersa – wishlist', ['multiline' => false]);
 	pll_register_string('tersa_browse_wishlist', 'Pregledaj listu želja', 'Tersa – wishlist', ['multiline' => false]);
 	pll_register_string('tersa_added_to_wishlist', 'Dodano na listu želja', 'Tersa – wishlist', ['multiline' => false]);
+	pll_register_string('tersa_product_weight', 'Težina', 'Tersa – proizvod (dodatne informacije)', ['multiline' => false]);
+	pll_register_string('tersa_product_dimensions', 'Dimenzije', 'Tersa – proizvod (dodatne informacije)', ['multiline' => false]);
 }, 20);
 
 /**
