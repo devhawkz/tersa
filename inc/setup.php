@@ -31,6 +31,8 @@ function tersa_theme_setup() {
 		'flex-width'  => true,
 	]);
 
+	
+
 	// WooCommerce podrška — uklanja "Your theme does not support WooCommerce" poruku
 	add_theme_support('woocommerce');
 	add_theme_support('wc-product-gallery-zoom');
@@ -40,6 +42,8 @@ function tersa_theme_setup() {
 	// Custom image size za logo (2× za Retina prikaz)
 	// Nakon dodavanja, treba pokrenuti regeneraciju thumbnailova ako je logo već uploadovan.
 	add_image_size('tersa-logo', 370, 104);
+	
+	
 
 	register_nav_menus([
 		'primary'         => __('Primary menu', 'tersa-shop'),
