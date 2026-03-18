@@ -4,28 +4,48 @@ if (!defined('ABSPATH')) {
 }
 
 add_filter('gettext', function ($translated, $text, $domain) {
-	if ($domain !== 'woocommerce') {
-		return $translated;
+	// WooCommerce
+	if ($domain === 'woocommerce') {
+		switch ($text) {
+			case 'No products in the cart.':
+				return 'Trenutno nema proizvoda u košarici.';
+			case 'Subtotal':
+				return 'Međuzbir';
+			case 'Checkout':
+				return 'Blagajna';
+			case 'Add to cart':
+				if ($translated !== $text) {
+					return $translated;
+				}
+				return 'Dodaj u košaricu';
+			case 'View cart':
+				return 'Pogledaj košaricu';
+			case '%s in stock':
+				$hr = '%s komna stanju';
+				return function_exists('pll__') ? pll__($hr) : $hr;
+			case 'in stock':
+				$hr = 'na stanju';
+				return function_exists('pll__') ? pll__($hr) : $hr;
+			default:
+				return $translated;
+		}
 	}
 
-	switch ($text) {
-		case 'No products in the cart.':
-			return 'Trenutno nema proizvoda u košarici.';
-		case 'Subtotal':
-			return 'Međuzbir';
-		case 'Checkout':
-			return 'Blagajna';
-		case 'Add to cart':
-			// Ako Polylang već ima prevod, koristi ga; inače fallback na HR/BS/Ceo prevod koji želiš.
-			if ($translated !== $text) {
-				return $translated;
-			}
-			return 'Dodaj u košaricu';
-		case 'View cart':
-			return 'Pogledaj košaricu';
-		default:
-			return $translated;
+	// YITH Wishlist — product page (bilo koji domain)
+	if ($text === 'Add to wishlist') {
+		$hr = 'Dodaj na listu želja';
+		return function_exists('pll__') ? pll__($hr) : $hr;
 	}
+	if ($text === 'Browse wishlist') {
+		$hr = 'Pregledaj listu želja';
+		return function_exists('pll__') ? pll__($hr) : $hr;
+	}
+	if ($text === 'Added to wishlist' || $text === 'Product added to the wishlist') {
+		$hr = 'Dodano na listu želja';
+		return function_exists('pll__') ? pll__($hr) : $hr;
+	}
+
+	return $translated;
 }, 10, 3);
 
 // Sakrij poruke/link “View cart” kod AJAX dodavanja u košaricu (na karticama proizvoda).
@@ -103,7 +123,39 @@ function tersa_ajax_get_cart_drawer_fragments() {
 add_action('wp_ajax_tersa_get_cart_drawer_fragments', 'tersa_ajax_get_cart_drawer_fragments');
 add_action('wp_ajax_nopriv_tersa_get_cart_drawer_fragments', 'tersa_ajax_get_cart_drawer_fragments');
 
+/**
+ * Product tabs (accordion) — naslovi na hrvatskom kao izvor za Polylang.
+ */
+add_filter('woocommerce_product_tabs', function ($tabs) {
+	$hr_titles = [
+		'description'            => 'Opis',
+		'additional_information'  => 'Dodatne informacije',
+		'reviews'                 => 'Recenzije',
+	];
+	foreach ($hr_titles as $key => $title) {
+		if (isset($tabs[$key]['title'])) {
+			$tabs[$key]['title'] = $title;
+		}
+	}
+	return $tabs;
+}, 20);
 
+/**
+ * Registracija accordion stringova u Polylang (Languages → String translations).
+ */
+add_action('init', function () {
+	if (!function_exists('pll_register_string')) {
+		return;
+	}
+	pll_register_string('tersa_product_tab_opis', 'Opis', 'Tersa – proizvod (accordion)', ['multiline' => false]);
+	pll_register_string('tersa_product_tab_dodatne', 'Dodatne informacije', 'Tersa – proizvod (accordion)', ['multiline' => false]);
+	pll_register_string('tersa_product_tab_recenzije', 'Recenzije', 'Tersa – proizvod (accordion)', ['multiline' => false]);
+	pll_register_string('tersa_stock_na_stanju', '%s na stanju', 'Tersa – proizvod (stanje)', ['multiline' => false]);
+	pll_register_string('tersa_stock_na_stanju_simple', 'na stanju', 'Tersa – proizvod (stanje)', ['multiline' => false]);
+	pll_register_string('tersa_add_to_wishlist', 'Dodaj na listu želja', 'Tersa – wishlist', ['multiline' => false]);
+	pll_register_string('tersa_browse_wishlist', 'Pregledaj listu želja', 'Tersa – wishlist', ['multiline' => false]);
+	pll_register_string('tersa_added_to_wishlist', 'Dodano na listu želja', 'Tersa – wishlist', ['multiline' => false]);
+}, 20);
 
 /**
  * Shop archive cleanup
@@ -308,3 +360,5 @@ function tersa_modify_archive_query(WP_Query $query) {
 	$query->set('tax_query', $tax_query);
 	$query->set('meta_query', $meta_query);
 }
+
+

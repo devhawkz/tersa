@@ -73,15 +73,24 @@ function tersa_enqueue_assets() {
 			true
 		);
 	}
-/*
-	if (function_exists('is_shop') && (is_shop() || is_product_category())) {
-		wp_enqueue_style('tersa-shop', $theme_uri . '/assets/css/shop.css', ['tersa-base', 'tersa-layout'], $theme_version);
-	}
 
 	if (function_exists('is_product') && is_product()) {
-		wp_enqueue_style('tersa-product', $theme_uri . '/assets/css/product.css', ['tersa-base', 'tersa-layout'], $theme_version);
+		wp_enqueue_style(
+			'tersa-product',
+			$theme_uri . '/assets/css/product.css',
+			['tersa-base', 'tersa-layout'],
+			$theme_version
+		);
+	
+		wp_enqueue_script(
+			'tersa-product',
+			$theme_uri . '/assets/js/product.js',
+			[],
+			$theme_version,
+			true
+		);
 	}
-
+/*
 	if (function_exists('is_cart') && is_cart()) {
 		wp_enqueue_style('tersa-cart', $theme_uri . '/assets/css/cart.css', ['tersa-base', 'tersa-layout'], $theme_version);
 	}
