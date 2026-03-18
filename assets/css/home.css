@@ -1312,3 +1312,171 @@
       transition: none;
     }
   }
+
+  /************************************************************
+    PROMO COUNTDOWN
+  ************************************************************/
+  .home-promo-countdown {
+   
+    overflow: hidden;
+  }
+  
+  .home-promo-countdown__inner {
+    width: min(100%, 1600px);
+    margin: 0 auto;
+    padding: clamp(32px, 4vw, 56px) clamp(20px, 4vw, 48px) 0;
+    display: grid;
+    grid-template-columns: minmax(320px, 0.9fr) minmax(360px, 1.1fr);
+    align-items: end;
+    gap: clamp(24px, 4vw, 56px);
+    background-color: #f1dfcb;
+  }
+  
+  .home-promo-countdown__content {
+    padding: clamp(12px, 2vw, 24px) 0 clamp(36px, 4vw, 48px);
+    align-self: center;
+  }
+  
+  .home-promo-countdown__eyebrow {
+    margin: 0 0 22px;
+    font-family: var(--f-body);
+    font-size: clamp(18px, 1.1vw, 26px);
+    line-height: 1.2;
+    font-weight: 400;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    color: #111111;
+  }
+  
+  .home-promo-countdown__title {
+    margin: 0;
+    font-family: var(--f-body);
+    font-size: clamp(52px, 6vw, 72px);
+    line-height: 0.96;
+    font-weight: 400;
+    letter-spacing: -0.045em;
+    color: #000000;
+    text-wrap: balance;
+  }
+  
+  .home-promo-countdown__timer {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 18px;
+    margin-top: 42px;
+  }
+  
+  .home-promo-countdown__unit {
+    width: clamp(110px, 8vw, 130px);
+    height: clamp(110px, 8vw, 130px);
+    border-radius: 50%;
+    background-color: rgba(255, 255, 255, 0.72);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 12px;
+    text-align: center;
+  }
+  
+  .home-promo-countdown__value {
+    display: block;
+    font-family: var(--f-body);
+    font-size: clamp(10px, 2.6vw, 32px);
+    line-height: 1;
+    font-weight: 800;
+    color: #000000;
+  }
+  
+  .home-promo-countdown__label {
+    display: block;
+    margin-top: 8px;
+    font-family: var(--f-body);
+    font-size: clamp(16px, 1vw, 24px);
+    line-height: 1.1;
+    font-weight: 400;
+    color: #111111;
+  }
+  
+  .home-promo-countdown__media {
+    display: flex;
+    justify-content: flex-end;
+    align-items: end;
+    min-width: 0;
+  }
+  
+  .home-promo-countdown__image {
+    display: block;
+    width: 100%;
+    max-width: 960px;
+    height: auto;
+    object-fit: contain;
+  }
+  
+  @media (max-width: 1024px) {
+    .home-promo-countdown__inner {
+      grid-template-columns: 1fr;
+      align-items: start;
+      gap: 22px;
+      padding-top: 34px;
+    }
+  
+    .home-promo-countdown__content {
+      padding-bottom: 0;
+      text-align: center;
+    }
+  
+    .home-promo-countdown__timer {
+      justify-content: center;
+    }
+  
+    .home-promo-countdown__media {
+      justify-content: center;
+    }
+  
+    .home-promo-countdown__image {
+      max-width: 760px;
+    }
+  }
+  
+  @media (max-width: 767px) {
+    .home-promo-countdown__inner {
+      padding-inline: 18px;
+      padding-top: 28px;
+      gap: 18px;
+    }
+  
+    .home-promo-countdown__eyebrow {
+      margin-bottom: 18px;
+      font-size: 16px;
+    }
+  
+    .home-promo-countdown__title {
+      font-size: clamp(42px, 12vw, 70px);
+      line-height: 1;
+    }
+  
+    .home-promo-countdown__timer {
+      gap: 12px;
+      margin-top: 28px;
+    }
+  
+    .home-promo-countdown__unit {
+      width: 92px;
+      height: 92px;
+      padding: 10px;
+    }
+  
+    .home-promo-countdown__value {
+      font-size: 28px;
+    }
+  
+    .home-promo-countdown__label {
+      margin-top: 6px;
+      font-size: 14px;
+    }
+  
+    .home-promo-countdown__image {
+      max-width: 100%;
+    }
+  }

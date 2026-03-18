@@ -73,4 +73,47 @@ document.addEventListener('DOMContentLoaded', () => {
         setActiveSlide(nextIndex);
       });
     });
+
+
+
+    const countdowns = document.querySelectorAll('.js-home-promo-countdown');
+
+    if (countdowns.length) {
+      const updateCountdown = (container) => {
+        const endValue = container.getAttribute('data-end');
+
+        if (!endValue) {
+          return;
+        }
+
+        const endDate = new Date(endValue).getTime();
+
+        if (Number.isNaN(endDate)) {
+          return;
+        }
+
+        const now = Date.now();
+        const diff = Math.max(0, endDate - now);
+
+        const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+        const hours = Math.floor((diff / (1000 * 60 * 60)) % 24);
+        const minutes = Math.floor((diff / (1000 * 60)) % 60);
+        const seconds = Math.floor((diff / 1000) % 60);
+
+        const daysEl = container.querySelector('[data-unit="days"]');
+        const hoursEl = container.querySelector('[data-unit="hours"]');
+        const minutesEl = container.querySelector('[data-unit="minutes"]');
+        const secondsEl = container.querySelector('[data-unit="seconds"]');
+
+        if (daysEl) daysEl.textContent = String(days);
+        if (hoursEl) hoursEl.textContent = String(hours).padStart(2, '0');
+        if (minutesEl) minutesEl.textContent = String(minutes).padStart(2, '0');
+        if (secondsEl) secondsEl.textContent = String(seconds).padStart(2, '0');
+      };
+
+      countdowns.forEach((countdown) => {
+        updateCountdown(countdown);
+        window.setInterval(() => updateCountdown(countdown), 1000);
+      });
+    }
   });
