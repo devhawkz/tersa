@@ -399,3 +399,56 @@ function tersa_modify_archive_query(WP_Query $query) {
 }
 
 add_action('pre_get_posts', 'tersa_modify_archive_query', 20);
+
+/**
+ * Per-request in-memory cache za yith_wcwl_add_to_wishlist shortcode.
+ *
+ * YITH interno poziva data store query() dva puta po proizvodu tokom jednog
+ * shortcode rendera, što stvara duplicate queries u Query Monitoru.
+ * Cache sprema HTML output prvog rendera i vraća ga za sve naknadne pozive
+ * s istim product_id i user_id unutar istog page loada, bez ijednog dodatnog
+ * DB upita.
+ *
+ * Koristi helper s pass-by-reference static varijablom kako bi oba filtera
+ * dijelila isti cache prostor.
+ */
+function &tersa_wishlist_shortcode_cache(): array {
+	static $cache = [];
+	return $cache;
+}
+
+add_filter('pre_do_shortcode_tag', function ($output, $tag, $atts) {
+	if ($tag !== 'yith_wcwl_add_to_wishlist' || is_admin()) {
+		return $output;
+	}
+
+	$product_id = isset($atts['product_id']) ? (int) $atts['product_id'] : 0;
+	if ($product_id <= 0) {
+		return $output;
+	}
+
+	$cache = &tersa_wishlist_shortcode_cache();
+	$key   = get_current_user_id() . '_' . $product_id;
+
+	return isset($cache[$key]) ? $cache[$key] : $output;
+}, 10, 3);
+
+add_filter('do_shortcode_tag', function ($output, $tag, $atts) {
+	if ($tag !== 'yith_wcwl_add_to_wishlist' || is_admin()) {
+		return $output;
+	}
+
+	$product_id = isset($atts['product_id']) ? (int) $atts['product_id'] : 0;
+	if ($product_id <= 0) {
+		return $output;
+	}
+
+	$cache = &tersa_wishlist_shortcode_cache();
+	$key   = get_current_user_id() . '_' . $product_id;
+
+	if (!isset($cache[$key])) {
+		$cache[$key] = $output;
+	}
+
+	return $output;
+}, 10, 3);

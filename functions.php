@@ -20,7 +20,7 @@ require_once get_template_directory() . '/inc/woocommerce.php';
 // require_once get_template_directory() . '/inc/schema.php';
 
 // Performance
-// require_once get_template_directory() . '/inc/performance.php';
+require_once get_template_directory() . '/inc/performance.php';
 
 // Security
 // require_once get_template_directory() . '/inc/security.php';
