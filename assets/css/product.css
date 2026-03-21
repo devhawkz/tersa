@@ -636,6 +636,7 @@
     color: #000000;
   }
 
+
   .product-related .home-bestsellers__wishlist a i {
     font-size: 16px;
   }
@@ -643,42 +644,48 @@
   .product-related .home-bestsellers__wishlist a svg {
     width: 18px;
     height: 18px;
+    margin: 0 auto;
   }
 
   .product-related .home-bestsellers__wishlist a span {
     display: none;
   }
 
-  /* Cart dugme — bijela boja, crni tekst, isti izgled kao u bestsellers */
+
   .product-related .home-bestsellers__cart-button.button,
   .product-related a.home-bestsellers__cart-button {
     display: inline-flex;
-    width: 100%;
+    background-color: var(--c-accent);
     align-items: center;
     justify-content: center;
-    min-height: 54px;
-    padding: 14px 18px;
-    border: 0;
-    border-radius: 0;
-    background: #ffffff;
-    color: #000000;
-    font-size: 15px;
-    line-height: 1;
-    font-weight: 800;
-    letter-spacing: 0.08em;
+    gap: var(--sp-8);
+    min-height: 52px;
+    padding: 0 var(--sp-24);
+    border: 1px solid transparent;
+    border-radius: 999px;
+    color: #ffffff;
+    font-family: var(--font-body);
+    font-size: var(--fs-14);
+    font-weight: var(--fw-600);
+    letter-spacing: 0.02em;
     text-transform: uppercase;
-    text-decoration: none;
-    box-shadow: 0 10px 24px rgba(0, 0, 0, 0.08);
-    transition: background-color 0.2s ease, color 0.2s ease;
+    cursor: pointer;
+    transition: background-color var(--c-accent),
+      border-color var(--transition-base),
+      color var(--transition-base),
+      transform var(--transition-fast),
+      box-shadow var(--transition-base);
   }
 
+  
   .product-related .home-bestsellers__cart-button.button:hover,
   .product-related .home-bestsellers__cart-button.button:focus-visible,
   .product-related a.home-bestsellers__cart-button:hover,
   .product-related a.home-bestsellers__cart-button:focus-visible {
-    background-color: #000000;
+    background-color: var(--c-accent-hover);
     color: #ffffff;
   }
+  
 
   @media (max-width: 767px) {
     .product-related {
@@ -704,3 +711,5 @@
       pointer-events: auto;
     }
   }
+
+  
