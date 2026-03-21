@@ -35,6 +35,70 @@ add_filter('gettext', function ($translated, $text, $domain) {
 			case 'Additional information':
 				$hr = 'Dodatne informacije';
 				return function_exists('pll__') ? pll__($hr) : $hr;
+			case 'Reviews (%d)':
+				$hr = 'Recenzije (%d)';
+				return function_exists('pll__') ? pll__($hr) : $hr;
+			// Recenzije / komentari na proizvodu (single-product-reviews.php)
+			case 'Reviews':
+				$hr = 'Recenzije';
+				return function_exists('pll__') ? pll__($hr) : $hr;
+			case 'There are no reviews yet.':
+				$hr = 'Još nema recenzija.';
+				return function_exists('pll__') ? pll__($hr) : $hr;
+			case 'Add a review':
+				$hr = 'Dodaj recenziju';
+				return function_exists('pll__') ? pll__($hr) : $hr;
+			case 'Be the first to review &ldquo;%s&rdquo;':
+				$hr = 'Budite prvi koji će recenzirati &ldquo;%s&rdquo;';
+				return function_exists('pll__') ? pll__($hr) : $hr;
+			case 'Leave a Reply to %s':
+				$hr = 'Odgovor na %s';
+				return function_exists('pll__') ? pll__($hr) : $hr;
+			case 'Submit':
+				$hr = 'Pošalji';
+				return function_exists('pll__') ? pll__($hr) : $hr;
+			case 'Name':
+				$hr = 'Ime';
+				return function_exists('pll__') ? pll__($hr) : $hr;
+			case 'Email':
+				$hr = 'E-pošta';
+				return function_exists('pll__') ? pll__($hr) : $hr;
+			case 'You must be %1$slogged in%2$s to post a review.':
+				$hr = 'Morate biti %1$s prijavljeni%2$s kako biste objavili recenziju.';
+				return function_exists('pll__') ? pll__($hr) : $hr;
+			case 'Your rating':
+				$hr = 'Vaša ocjena';
+				return function_exists('pll__') ? pll__($hr) : $hr;
+			case 'Rate&hellip;':
+				$hr = 'Ocjena&hellip;';
+				return function_exists('pll__') ? pll__($hr) : $hr;
+			case 'Perfect':
+				$hr = 'Izvrsno';
+				return function_exists('pll__') ? pll__($hr) : $hr;
+			case 'Good':
+				$hr = 'Dobro';
+				return function_exists('pll__') ? pll__($hr) : $hr;
+			case 'Average':
+				$hr = 'Prosječno';
+				return function_exists('pll__') ? pll__($hr) : $hr;
+			case 'Not that bad':
+				$hr = 'Nije loše';
+				return function_exists('pll__') ? pll__($hr) : $hr;
+			case 'Very poor':
+				$hr = 'Vrlo loše';
+				return function_exists('pll__') ? pll__($hr) : $hr;
+			case 'Your review':
+				$hr = 'Vaša recenzija';
+				return function_exists('pll__') ? pll__($hr) : $hr;
+			case 'Only logged in customers who have purchased this product may leave a review.':
+				$hr = 'Samo prijavljeni kupci koji su kupili ovaj proizvod mogu ostaviti recenziju.';
+				return function_exists('pll__') ? pll__($hr) : $hr;
+			case 'Your review is awaiting approval':
+				$hr = 'Vaša recenzija čeka odobrenje';
+				return function_exists('pll__') ? pll__($hr) : $hr;
+			case 'verified owner':
+				$hr = 'potvrđeni kupac';
+				return function_exists('pll__') ? pll__($hr) : $hr;
 			default:
 				return $translated;
 		}
@@ -56,6 +120,35 @@ add_filter('gettext', function ($translated, $text, $domain) {
 
 	return $translated;
 }, 10, 3);
+
+/**
+ * Hrvatski množina za naslov recenzija: „%d recenzija/e za …“ (WooCommerce _n).
+ */
+add_filter(
+	'ngettext',
+	function ($translation, $single, $plural, $number, $domain) {
+		if ($domain !== 'woocommerce') {
+			return $translation;
+		}
+		if ($single !== '%1$s review for %2$s' || $plural !== '%1$s reviews for %2$s') {
+			return $translation;
+		}
+		$n      = (int) $number;
+		$mod10  = $n % 10;
+		$mod100 = $n % 100;
+		if ($mod10 === 1 && $mod100 !== 11) {
+			$hr = '%1$s komentara za %2$s';
+		} elseif ($mod10 >= 2 && $mod10 <= 4 && ($mod100 < 10 || $mod100 >= 20)) {
+			$hr = '%1$s komentara za %2$s';
+		} else {
+			$hr = '%1$s recenzija za %2$s';
+		}
+
+		return function_exists('pll__') ? pll__($hr) : $hr;
+	},
+	10,
+	5
+);
 
 // Sakrij poruke/link “View cart” kod AJAX dodavanja u košaricu (na karticama proizvoda).
 add_filter(
@@ -136,18 +229,26 @@ add_action('wp_ajax_nopriv_tersa_get_cart_drawer_fragments', 'tersa_ajax_get_car
  * Product tabs (accordion) — naslovi na hrvatskom kao izvor za Polylang.
  */
 add_filter('woocommerce_product_tabs', function ($tabs) {
-	// Ukloni Reviews tab.
-	unset($tabs['reviews']);
+	global $product;
 
 	$hr_titles = [
 		'description'            => 'Opis',
-		'additional_information'  => 'Dodatne informacije',
+		'additional_information' => 'Dodatne informacije',
 	];
 	foreach ($hr_titles as $key => $title) {
 		if (isset($tabs[$key]['title'])) {
 			$tabs[$key]['title'] = $title;
 		}
 	}
+
+	if (isset($tabs['reviews']) && $product instanceof WC_Product) {
+		$count = (int) $product->get_review_count();
+		$tabs['reviews']['title'] = sprintf(
+			function_exists('pll__') ? pll__('Recenzije (%d)') : __('Recenzije (%d)', 'tersa-shop'),
+			$count
+		);
+	}
+
 	return $tabs;
 }, 20);
 
@@ -160,7 +261,35 @@ add_action('init', function () {
 	}
 	pll_register_string('tersa_product_tab_opis', 'Opis', 'Tersa – proizvod (accordion)', ['multiline' => false]);
 	pll_register_string('tersa_product_tab_dodatne', 'Dodatne informacije', 'Tersa – proizvod (accordion)', ['multiline' => false]);
-	pll_register_string('tersa_product_tab_recenzije', 'Recenzije', 'Tersa – proizvod (accordion)', ['multiline' => false]);
+	pll_register_string('tersa_product_tab_recenzije', 'Recenzije (%d)', 'Tersa – proizvod (accordion)', ['multiline' => false]);
+	pll_register_string('tersa_product_aria_badges', 'Označke proizvoda', 'Tersa – proizvod (pristupačnost)', ['multiline' => false]);
+	pll_register_string('tersa_product_aria_open_image', 'Otvori sliku proizvoda', 'Tersa – proizvod (pristupačnost)', ['multiline' => false]);
+	pll_register_string('tersa_product_aria_open_gallery', 'Otvori galeriju slika', 'Tersa – proizvod (pristupačnost)', ['multiline' => false]);
+	pll_register_string('tersa_product_aria_thumbs', 'Minijature u galeriji', 'Tersa – proizvod (pristupačnost)', ['multiline' => false]);
+	pll_register_string('tersa_product_aria_show_image', 'Prikaži sliku %d', 'Tersa – proizvod (pristupačnost)', ['multiline' => false]);
+	pll_register_string('tersa_product_aria_nav', 'Navigacija', 'Tersa – proizvod (pristupačnost)', ['multiline' => false]);
+	pll_register_string('tersa_wc_reviews_none', 'Još nema recenzija.', 'Tersa – WooCommerce (recenzije)', ['multiline' => false]);
+	pll_register_string('tersa_wc_add_review', 'Dodaj recenziju', 'Tersa – WooCommerce (recenzije)', ['multiline' => false]);
+	pll_register_string('tersa_wc_first_review', 'Budite prvi koji će recenzirati &ldquo;%s&rdquo;', 'Tersa – WooCommerce (recenzije)', ['multiline' => false]);
+	pll_register_string('tersa_wc_reply_to', 'Odgovor na %s', 'Tersa – WooCommerce (recenzije)', ['multiline' => false]);
+	pll_register_string('tersa_wc_submit', 'Pošalji', 'Tersa – WooCommerce (recenzije)', ['multiline' => false]);
+	pll_register_string('tersa_wc_name', 'Ime', 'Tersa – WooCommerce (recenzije)', ['multiline' => false]);
+	pll_register_string('tersa_wc_email', 'E-pošta', 'Tersa – WooCommerce (recenzije)', ['multiline' => false]);
+	pll_register_string('tersa_wc_must_login_review', 'Morate biti %1$s prijavljeni%2$s kako biste objavili recenziju.', 'Tersa – WooCommerce (recenzije)', ['multiline' => false]);
+	pll_register_string('tersa_wc_your_rating', 'Vaša ocjena', 'Tersa – WooCommerce (recenzije)', ['multiline' => false]);
+	pll_register_string('tersa_wc_rate_ellipsis', 'Ocjena&hellip;', 'Tersa – WooCommerce (recenzije)', ['multiline' => false]);
+	pll_register_string('tersa_wc_rating_perfect', 'Izvrsno', 'Tersa – WooCommerce (recenzije)', ['multiline' => false]);
+	pll_register_string('tersa_wc_rating_good', 'Dobro', 'Tersa – WooCommerce (recenzije)', ['multiline' => false]);
+	pll_register_string('tersa_wc_rating_average', 'Prosječno', 'Tersa – WooCommerce (recenzije)', ['multiline' => false]);
+	pll_register_string('tersa_wc_rating_not_bad', 'Nije loše', 'Tersa – WooCommerce (recenzije)', ['multiline' => false]);
+	pll_register_string('tersa_wc_rating_poor', 'Vrlo loše', 'Tersa – WooCommerce (recenzije)', ['multiline' => false]);
+	pll_register_string('tersa_wc_your_review', 'Vaša recenzija', 'Tersa – WooCommerce (recenzije)', ['multiline' => false]);
+	pll_register_string('tersa_wc_verified_only', 'Samo prijavljeni kupci koji su kupili ovaj proizvod mogu ostaviti recenziju.', 'Tersa – WooCommerce (recenzije)', ['multiline' => false]);
+	pll_register_string('tersa_wc_review_awaiting', 'Vaša recenzija čeka odobrenje', 'Tersa – WooCommerce (recenzije)', ['multiline' => false]);
+	pll_register_string('tersa_wc_verified_owner', 'potvrđeni kupac', 'Tersa – WooCommerce (recenzije)', ['multiline' => false]);
+	pll_register_string('tersa_wc_reviews_title_1', '%1$s recenzija za %2$s', 'Tersa – WooCommerce (recenzije)', ['multiline' => false]);
+	pll_register_string('tersa_wc_reviews_title_2', '%1$s recenzije za %2$s', 'Tersa – WooCommerce (recenzije)', ['multiline' => false]);
+	pll_register_string('tersa_wc_reviews_heading', 'Recenzije', 'Tersa – WooCommerce (recenzije)', ['multiline' => false]);
 	pll_register_string('tersa_badge_na_akciji', 'Na akciji', 'Tersa – proizvod (badge)', ['multiline' => false]);
 	pll_register_string('tersa_stock_na_stanju', '%s na stanju', 'Tersa – proizvod (stanje)', ['multiline' => false]);
 	pll_register_string('tersa_stock_na_stanju_simple', 'na stanju', 'Tersa – proizvod (stanje)', ['multiline' => false]);

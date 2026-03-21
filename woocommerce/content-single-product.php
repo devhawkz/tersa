@@ -86,7 +86,7 @@ if ($product->is_on_sale()) {
 			<div class="product-single__gallery">
 				<div class="product-single__main-media">
 					<?php if (!empty($badge_items)) : ?>
-						<div class="product-single__badges" aria-label="<?php echo esc_attr__('Product badges', 'tersa-shop'); ?>">
+						<div class="product-single__badges" aria-label="<?php echo esc_attr(function_exists('pll__') ? pll__('Označke proizvoda') : __('Označke proizvoda', 'tersa-shop')); ?>">
 							<?php foreach ($badge_items as $badge) : ?>
 								<span class="product-single__badge<?php echo !empty($badge['primary']) ? ' product-single__badge--primary' : ''; ?>">
 									<?php echo esc_html($badge['label']); ?>
@@ -99,7 +99,7 @@ if ($product->is_on_sale()) {
 						<a
 							class="product-single__main-image-link"
 							href="<?php echo esc_url(wp_get_attachment_image_url($main_image_id, 'full')); ?>"
-							aria-label="<?php echo esc_attr__('Open product image', 'tersa-shop'); ?>"
+							aria-label="<?php echo esc_attr(function_exists('pll__') ? pll__('Otvori sliku proizvoda') : __('Otvori sliku proizvoda', 'tersa-shop')); ?>"
 						>
 							<?php
 							echo wp_get_attachment_image(
@@ -119,7 +119,7 @@ if ($product->is_on_sale()) {
 						<button
 							class="product-single__zoom-button"
 							type="button"
-							aria-label="<?php echo esc_attr__('Open image gallery', 'tersa-shop'); ?>"
+							aria-label="<?php echo esc_attr(function_exists('pll__') ? pll__('Otvori galeriju slika') : __('Otvori galeriju slika', 'tersa-shop')); ?>"
 							data-image-target="<?php echo esc_attr((string) $main_image_id); ?>"
 						>
 							<span aria-hidden="true">⌕</span>
@@ -128,7 +128,7 @@ if ($product->is_on_sale()) {
 				</div>
 
 				<?php if (count($attachment_ids) > 1) : ?>
-					<div class="product-single__thumbs" role="list" aria-label="<?php echo esc_attr__('Product gallery thumbnails', 'tersa-shop'); ?>">
+					<div class="product-single__thumbs" role="list" aria-label="<?php echo esc_attr(function_exists('pll__') ? pll__('Minijature u galeriji') : __('Minijature u galeriji', 'tersa-shop')); ?>">
 						<?php foreach ($attachment_ids as $index => $attachment_id) : ?>
 							<?php
 							$thumb_url = wp_get_attachment_image_url($attachment_id, 'medium');
@@ -144,7 +144,7 @@ if ($product->is_on_sale()) {
 								data-full-image="<?php echo esc_url($full_url); ?>"
 								data-large-image="<?php echo esc_url(wp_get_attachment_image_url($attachment_id, 'large')); ?>"
 								data-image-id="<?php echo esc_attr((string) $attachment_id); ?>"
-								aria-label="<?php echo esc_attr(sprintf(__('Show image %d', 'tersa-shop'), $index + 1)); ?>"
+								aria-label="<?php echo esc_attr(sprintf(function_exists('pll__') ? pll__('Prikaži sliku %d') : __('Prikaži sliku %d', 'tersa-shop'), $index + 1)); ?>"
 								aria-pressed="<?php echo $index === 0 ? 'true' : 'false'; ?>"
 							>
 								<?php
@@ -169,7 +169,7 @@ if ($product->is_on_sale()) {
 
 		<div class="product-single__summary-column">
 			<div class="product-single__summary">
-				<nav class="product-single__breadcrumbs" aria-label="<?php echo esc_attr__('Breadcrumb', 'tersa-shop'); ?>">
+				<nav class="product-single__breadcrumbs" aria-label="<?php echo esc_attr(function_exists('pll__') ? pll__('Navigacija') : __('Navigacija', 'tersa-shop')); ?>">
 					<?php
 					woocommerce_breadcrumb([
 						'delimiter'   => ' / ',
@@ -277,7 +277,18 @@ if ($product->is_on_sale()) {
 							?>
 							<?php
 							$tab_title_raw = wp_strip_all_tags($tab['title']);
-							$tab_title     = function_exists('pll__') ? pll__($tab_title_raw) : $tab_title_raw;
+							if (function_exists('pll__')) {
+								if ($tab_key === 'reviews' && $product instanceof WC_Product) {
+									$tab_title = sprintf(
+										pll__('Recenzije (%d)'),
+										(int) $product->get_review_count()
+									);
+								} else {
+									$tab_title = pll__($tab_title_raw);
+								}
+							} else {
+								$tab_title = $tab_title_raw;
+							}
 							?>
 							<section class="product-single__accordion">
 								<button
