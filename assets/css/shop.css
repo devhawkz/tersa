@@ -431,7 +431,7 @@
     min-width: 58px;
     min-height: 24px;
     padding: 4px 10px;
-    background-color: #000000;
+    background-color:var(--c-accent);
     color: #ffffff;
     font-family: var(--f-body);
     font-size: 13px;

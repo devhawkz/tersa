@@ -104,22 +104,38 @@ add_filter('gettext', function ($translated, $text, $domain) {
 		}
 	}
 
-	// YITH Wishlist — product page (bilo koji domain)
-	if ($text === 'Add to wishlist') {
-		$hr = 'Dodaj na listu želja';
-		return function_exists('pll__') ? pll__($hr) : $hr;
-	}
-	if ($text === 'Browse wishlist') {
-		$hr = 'Pregledaj listu želja';
-		return function_exists('pll__') ? pll__($hr) : $hr;
-	}
-	if ($text === 'Added to wishlist' || $text === 'Product added to the wishlist') {
-		$hr = 'Dodano na listu želja';
-		return function_exists('pll__') ? pll__($hr) : $hr;
-	}
-
 	return $translated;
 }, 10, 3);
+
+/**
+ * YITH Wishlist — prijevodi na hrvatski.
+ *
+ * YITH labele su pohranjene kao WordPress opcije u bazi podataka
+ * (yith_wcwl_add_to_wishlist_text, yith_wcwl_browse_wishlist_text, itd.)
+ * i čitaju se direktno s get_option(), bez ikakve veze s __() ili gettext.
+ * Jedino pouzdano rješenje je option_{name} filter koji interceptuje
+ * čitanje opcije direktno iz baze.
+ */
+function tersa_pll_wishlist( string $key ): string {
+	$map = [
+		'add'    => 'Dodaj na listu želja',
+		'browse' => 'Pregledaj listu želja',
+		'added'  => 'Dodano na listu želja',
+		'remove' => 'Ukloni s liste želja',
+		'already_in' => 'Proizvod je već na listi želja!',
+	];
+	$str = $map[ $key ] ?? '';
+	return $str !== '' && function_exists('pll__') ? pll__( $str ) : $str;
+}
+
+add_filter('option_yith_wcwl_add_to_wishlist_text',    fn() => tersa_pll_wishlist('add'));
+add_filter('option_yith_wcwl_browse_wishlist_text',    fn() => tersa_pll_wishlist('browse'));
+add_filter('option_yith_wcwl_product_added_text',      fn() => tersa_pll_wishlist('added'));
+add_filter('option_yith_wcwl_remove_from_wishlist_text', fn() => tersa_pll_wishlist('remove'));
+add_filter('option_yith_wcwl_already_in_wishlist_text',  fn() => tersa_pll_wishlist('already_in'));
+
+// Fallback: YITH template filter za browse label (renderuje se direktno u template-u)
+add_filter('yith_wcwl_browse_wishlist_label', fn() => tersa_pll_wishlist('browse'));
 
 /**
  * Hrvatski množina za naslov recenzija: „%d recenzija/e za …“ (WooCommerce _n).
@@ -296,6 +312,8 @@ add_action('init', function () {
 	pll_register_string('tersa_add_to_wishlist', 'Dodaj na listu želja', 'Tersa – wishlist', ['multiline' => false]);
 	pll_register_string('tersa_browse_wishlist', 'Pregledaj listu želja', 'Tersa – wishlist', ['multiline' => false]);
 	pll_register_string('tersa_added_to_wishlist', 'Dodano na listu želja', 'Tersa – wishlist', ['multiline' => false]);
+	pll_register_string('tersa_remove_from_wishlist', 'Ukloni s liste želja', 'Tersa – wishlist', ['multiline' => false]);
+	pll_register_string('tersa_already_in_wishlist', 'Proizvod je već na listi želja!', 'Tersa – wishlist', ['multiline' => false]);
 	pll_register_string('tersa_product_weight', 'Težina', 'Tersa – proizvod (dodatne informacije)', ['multiline' => false]);
 	pll_register_string('tersa_product_dimensions', 'Dimenzije', 'Tersa – proizvod (dodatne informacije)', ['multiline' => false]);
 }, 20);

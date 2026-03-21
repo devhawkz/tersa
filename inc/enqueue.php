@@ -76,9 +76,16 @@ function tersa_enqueue_assets() {
 
 	if (function_exists('is_product') && is_product()) {
 		wp_enqueue_style(
+			'tersa-home',
+			$theme_uri . '/assets/css/home.css',
+			['tersa-base', 'tersa-layout'],
+			$theme_version
+		);
+
+		wp_enqueue_style(
 			'tersa-product',
 			$theme_uri . '/assets/css/product.css',
-			['tersa-base', 'tersa-layout'],
+			['tersa-base', 'tersa-layout', 'tersa-home'],
 			$theme_version
 		);
 	

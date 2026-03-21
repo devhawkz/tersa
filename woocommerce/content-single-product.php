@@ -116,14 +116,7 @@ if ($product->is_on_sale()) {
 							?>
 						</a>
 
-						<button
-							class="product-single__zoom-button"
-							type="button"
-							aria-label="<?php echo esc_attr(function_exists('pll__') ? pll__('Otvori galeriju slika') : __('Otvori galeriju slika', 'tersa-shop')); ?>"
-							data-image-target="<?php echo esc_attr((string) $main_image_id); ?>"
-						>
-							<span aria-hidden="true">⌕</span>
-						</button>
+						
 					<?php endif; ?>
 				</div>
 
@@ -324,3 +317,13 @@ if ($product->is_on_sale()) {
 		</div>
 	</div>
 </div>
+
+<?php
+get_template_part(
+	'template-parts/product/related-products',
+	null,
+	[
+		'product_id' => $product_id,
+	]
+);
+?>

@@ -84,7 +84,7 @@
     justify-content: center;
     min-height: 28px;
     padding: 4px 12px;
-    background: #000000;
+    background:var(--c-accent);
     color: #ffffff;
     font-size: 12px;
     line-height: 1;
@@ -526,5 +526,181 @@
     border-radius: 0;
   }
 
+  /************************************************************
+    RELATED PRODUCTS
+  ************************************************************/
+  .product-related {
+    padding: clamp(40px, 5vw, 84px) 0;
+    background-color: #f3f3f3;
+  }
 
-  
+  .product-related__inner {
+    width: min(100%, 1600px);
+    margin: 0 auto;
+    padding: 0 clamp(20px, 4vw, 48px);
+  }
+
+  .product-related__title {
+    margin: 0 0 clamp(24px, 3vw, 42px);
+    font-size: clamp(25px, 1.6vw, 38px);
+    line-height: 1.05;
+    font-weight: 800;
+    letter-spacing: 0.01em;
+    text-transform: uppercase;
+    color: #000000;
+  }
+
+  /* WooCommerce single product page resetuje height:auto na svim img
+     elementima — ovo overrideuje tu koliziju za kartice u related products */
+  .product-related .home-bestsellers__media {
+    position: relative;
+    overflow: hidden;
+    background-color: #ececec;
+    aspect-ratio: 1 / 1.28;
+  }
+
+  .product-related .home-bestsellers__image {
+    position: absolute;
+    inset: 0;
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  .product-related .home-bestsellers__cart-wrap {
+    position: absolute;
+    inset-inline: 16px;
+    bottom: 18px;
+    z-index: 4;
+    opacity: 0;
+    transform: translateY(14px);
+    transition: opacity 0.28s ease, transform 0.28s ease;
+    pointer-events: none;
+  }
+
+  .product-related .home-bestsellers__wishlist {
+    position: absolute;
+    top: 16px;
+    right: 16px;
+    z-index: 5;
+    opacity: 0;
+    transform: translateY(-8px);
+    pointer-events: none;
+    transition: opacity 0.28s ease, transform 0.28s ease;
+  }
+
+  .product-related .home-bestsellers__tags {
+    position: absolute;
+    top: 16px;
+    left: 16px;
+    z-index: 3;
+    opacity: 1;
+    transform: translateY(0);
+    transition: opacity 0.28s ease, transform 0.28s ease;
+  }
+
+  .product-related .home-bestsellers__media-wrap:hover .home-bestsellers__cart-wrap,
+  .product-related .home-bestsellers__card:focus-within .home-bestsellers__cart-wrap {
+    opacity: 1;
+    transform: translateY(0);
+    pointer-events: auto;
+  }
+
+  .product-related .home-bestsellers__media-wrap:hover .home-bestsellers__wishlist,
+  .product-related .home-bestsellers__card:focus-within .home-bestsellers__wishlist {
+    opacity: 1;
+    transform: translateY(0);
+    pointer-events: auto;
+  }
+
+  .product-related .home-bestsellers__media-wrap:hover .home-bestsellers__tags,
+  .product-related .home-bestsellers__card:focus-within .home-bestsellers__tags {
+    opacity: 0;
+    transform: translateY(-8px);
+    pointer-events: none;
+  }
+
+  /* Wishlist dugme — centriranje ikonice u krugu */
+  .product-related .home-bestsellers__wishlist a {
+    width: 36px;
+    height: 36px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 999px;
+    background: #ffffff;
+    box-shadow: 0 10px 24px rgba(0, 0, 0, 0.08);
+    text-decoration: none;
+    font-size: 0;
+    color: #000000;
+  }
+
+  .product-related .home-bestsellers__wishlist a i {
+    font-size: 16px;
+  }
+
+  .product-related .home-bestsellers__wishlist a svg {
+    width: 18px;
+    height: 18px;
+  }
+
+  .product-related .home-bestsellers__wishlist a span {
+    display: none;
+  }
+
+  /* Cart dugme — bijela boja, crni tekst, isti izgled kao u bestsellers */
+  .product-related .home-bestsellers__cart-button.button,
+  .product-related a.home-bestsellers__cart-button {
+    display: inline-flex;
+    width: 100%;
+    align-items: center;
+    justify-content: center;
+    min-height: 54px;
+    padding: 14px 18px;
+    border: 0;
+    border-radius: 0;
+    background: #ffffff;
+    color: #000000;
+    font-size: 15px;
+    line-height: 1;
+    font-weight: 800;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    text-decoration: none;
+    box-shadow: 0 10px 24px rgba(0, 0, 0, 0.08);
+    transition: background-color 0.2s ease, color 0.2s ease;
+  }
+
+  .product-related .home-bestsellers__cart-button.button:hover,
+  .product-related .home-bestsellers__cart-button.button:focus-visible,
+  .product-related a.home-bestsellers__cart-button:hover,
+  .product-related a.home-bestsellers__cart-button:focus-visible {
+    background-color: #000000;
+    color: #ffffff;
+  }
+
+  @media (max-width: 767px) {
+    .product-related {
+      padding: 36px 0 44px;
+    }
+
+    .product-related__inner {
+      padding: 0 18px;
+    }
+
+    .product-related .home-bestsellers__cart-wrap {
+      position: static;
+      inset: auto;
+      opacity: 1;
+      transform: none;
+      pointer-events: auto;
+      margin-top: 14px;
+    }
+
+    .product-related .home-bestsellers__wishlist {
+      opacity: 1;
+      transform: none;
+      pointer-events: auto;
+    }
+  }
