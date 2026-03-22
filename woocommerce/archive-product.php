@@ -269,4 +269,7 @@ $reset_url = function_exists('tersa_get_archive_reset_url')
 	</div>
 </main>
 
-<?php get_footer(); ?>
+<?php
+get_sidebar();
+get_footer();
+?>
