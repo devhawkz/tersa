@@ -459,6 +459,13 @@ add_action(
 		pll_register_string('tersa_wc_reviews_title_2', '%1$s recenzije za %2$s', 'Tersa – WooCommerce (recenzije)', ['multiline' => false]);
 		pll_register_string('tersa_wc_reviews_heading', 'Recenzije', 'Tersa – WooCommerce (recenzije)', ['multiline' => false]);
 
+		pll_register_string('tersa_orderby_latest',     'Sortiraj po najnovijim',             'Tersa – kolekcija (sortiranje)', ['multiline' => false]);
+		pll_register_string('tersa_orderby_default',    'Zadano sortiranje',                  'Tersa – kolekcija (sortiranje)', ['multiline' => false]);
+		pll_register_string('tersa_orderby_price_asc',  'Sortiraj po cijeni: nisko na visoko', 'Tersa – kolekcija (sortiranje)', ['multiline' => false]);
+		pll_register_string('tersa_orderby_price_desc', 'Sortiraj po cijeni: visoko na nisko', 'Tersa – kolekcija (sortiranje)', ['multiline' => false]);
+		pll_register_string('tersa_orderby_popularity', 'Sortiraj po popularnosti',            'Tersa – kolekcija (sortiranje)', ['multiline' => false]);
+		pll_register_string('tersa_orderby_rating',     'Sortiraj po ocjeni',                 'Tersa – kolekcija (sortiranje)', ['multiline' => false]);
+
 		pll_register_string('tersa_badge_na_akciji', 'Na akciji', 'Tersa – proizvod (badge)', ['multiline' => false]);
 		pll_register_string('tersa_stock_na_zalihi', '%s na stanju', 'Tersa – proizvod (stanje)', ['multiline' => false]);
 		pll_register_string('tersa_stock_na_zalihi_simple', 'na stanju', 'Tersa – proizvod (stanje)', ['multiline' => false]);
@@ -521,13 +528,17 @@ add_filter(
  * Dozvoljene orderby vrednosti.
  */
 function tersa_get_allowed_catalog_orderby(): array {
+	$t = function (string $str): string {
+		return function_exists('pll__') ? pll__($str) : $str;
+	};
+
 	return [
-		'date'       => __('Sort by latest', 'tersa-shop'),
-		'menu_order' => __('Default sorting', 'tersa-shop'),
-		'price'      => __('Sort by price: low to high', 'tersa-shop'),
-		'price-desc' => __('Sort by price: high to low', 'tersa-shop'),
-		'popularity' => __('Sort by popularity', 'tersa-shop'),
-		'rating'     => __('Sort by rating', 'tersa-shop'),
+		'date'       => $t('Sortiraj po najnovijim'),
+		'menu_order' => $t('Zadano sortiranje'),
+		'price'      => $t('Sortiraj po cijeni: nisko na visoko'),
+		'price-desc' => $t('Sortiraj po cijeni: visoko na nisko'),
+		'popularity' => $t('Sortiraj po popularnosti'),
+		'rating'     => $t('Sortiraj po ocjeni'),
 	];
 }
 

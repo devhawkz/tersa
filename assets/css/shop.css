@@ -614,6 +614,12 @@
     text-decoration-thickness: 2px;
   }
   
+  /* Kratki opis i list CTA — skriveni u grid prikazu, vidljivi samo u list prikazu */
+  .shop-card__excerpt,
+  .shop-card__list-cta {
+    display: none;
+  }
+
   /* list mode */
   .shop-archive__body--list .shop-card__inner {
     display: grid;
@@ -628,6 +634,53 @@
   
   .shop-archive__body--list .shop-card__content {
     padding-top: 0;
+    margin: auto 0;
+  }
+
+  .shop-archive__body--list .shop-card__excerpt {
+    display: block;
+    margin-top: 16px;
+    font-size: clamp(13px, 1.1vw, 15px);
+    line-height: 1.6;
+    color: #555555;
+  }
+
+  .shop-archive__body--list .shop-card__excerpt p {
+    margin: 0 0 8px;
+  }
+
+  .shop-archive__body--list .shop-card__excerpt p:last-child {
+    margin-bottom: 0;
+  }
+
+  .shop-archive__body--list .shop-card__list-cta {
+    display: block;
+    margin-top: 24px;
+  }
+
+  .shop-archive__body--list .shop-card__list-cta .shop-card__button {
+    display: inline-flex;
+    width: auto;
+    min-width: 220px;
+    min-height: 54px;
+    padding: 14px 28px;
+    border: 0;
+    background: #111111;
+    color: #ffffff;
+    font-size: 15px;
+    line-height: 1;
+    font-weight: 800;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    text-decoration: none;
+    box-shadow: none;
+    transition: background-color 0.2s ease, color 0.2s ease;
+  }
+
+  .shop-archive__body--list .shop-card__list-cta .shop-card__button:hover,
+  .shop-archive__body--list .shop-card__list-cta .shop-card__button:focus-visible {
+    background-color: #333333;
+    color: #ffffff;
   }
   
   /* --------------------------------------------------

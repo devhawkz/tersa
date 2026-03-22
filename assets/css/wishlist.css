@@ -111,6 +111,11 @@
 	text-align: left;
 }
 
+.product-name span{
+	padding-left: 20px;
+}
+
+
 /* Thead padding — širine određuje browser (table-layout: auto) */
 .woocommerce .wishlist_table thead th:nth-child(1),
 .yith-wcwl-form .wishlist_table thead th:nth-child(1) {
@@ -164,7 +169,6 @@
 	border: 0;
 	background: transparent;
 	vertical-align: middle;
-    text-align: left ;
 }
 
 /* Column widths — auto layout, kompaktne kolone se skupljaju na sadržaj */
@@ -216,7 +220,6 @@
 .yith-wcwl-form .wishlist_table a.remove {
 	display: inline-flex;
 	align-items: center;
-	justify-content: center;
 	width: 28px;
 	height: 28px;
 	border: 0;
@@ -259,6 +262,7 @@
 .yith-wcwl-form .wishlist_table .product-name a {
 	display: inline-block;
 	max-width: 80%;
+	padding-left: 20px;
 	font-size: clamp(1.25rem, 1.7vw, 1.5rem);
 	line-height: 1.35;
 	font-weight: var(--fw-400);
@@ -293,6 +297,7 @@
 	color: #9f9f9f;
 	font-weight: var(--fw-400);
 	text-decoration-thickness: 1px;
+	display: none;
 }
 
 .woocommerce .wishlist_table ins,
@@ -501,4 +506,7 @@
 .woocommerce #content table.wishlist_table.cart a.remove{
     background-color: transparent!important;
     color: var(--c-danger)!important;
+}
+.wishlist_table .product-add-to-cart a{
+	margin: 0!important;
 }

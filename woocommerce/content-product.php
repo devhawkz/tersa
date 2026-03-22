@@ -115,6 +115,10 @@ if ($product->is_on_sale()) {
 }
 
 $badges = array_slice($badges, 0, 2);
+
+$short_description = wp_kses_post(
+	apply_filters('woocommerce_short_description', $product->get_short_description())
+);
 ?>
 
 <li <?php wc_product_class('shop-card', $product); ?>>
@@ -225,6 +229,38 @@ $badges = array_slice($badges, 0, 2);
 						<?php echo wp_kses_post($regular_price_html); ?>
 					</span>
 				<?php endif; ?>
+			</div>
+
+			<?php if (!empty($short_description)) : ?>
+				<div class="shop-card__excerpt">
+					<?php echo $short_description; ?>
+				</div>
+			<?php endif; ?>
+
+			<div class="shop-card__list-cta">
+				<?php
+				if ($has_multiple_variants) {
+					echo sprintf(
+						'<a %s>%s</a>',
+						wc_implode_html_attributes($button_attributes),
+						esc_html($button_label_options)
+					);
+				} else {
+					echo apply_filters(
+						'woocommerce_loop_add_to_cart_link',
+						sprintf(
+							'<a %s>%s</a>',
+							wc_implode_html_attributes($button_attributes),
+							esc_html($button_label_add_to_cart)
+						),
+						$product,
+						[
+							'class'      => implode(' ', $button_classes),
+							'attributes' => $button_attributes,
+						]
+					);
+				}
+				?>
 			</div>
 		</div>
 	</article>
