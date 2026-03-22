@@ -92,7 +92,7 @@
 	border-collapse: collapse;
 	border: 0;
 	background: transparent;
-	table-layout: fixed;
+	table-layout: auto;
 }
 
 /* Desktop header */
@@ -111,41 +111,41 @@
 	text-align: left;
 }
 
-/* Eksplicitne širine po redoslijedu kolona — usklađeno s td širinama */
+/* Thead padding — širine određuje browser (table-layout: auto) */
 .woocommerce .wishlist_table thead th:nth-child(1),
 .yith-wcwl-form .wishlist_table thead th:nth-child(1) {
-	width: 42px;
 	padding-right: 18px;
+	white-space: nowrap;
 }
 
 .woocommerce .wishlist_table thead th:nth-child(2),
 .yith-wcwl-form .wishlist_table thead th:nth-child(2) {
-	width: 146px;
 	padding-right: 24px;
+	white-space: nowrap;
 }
 
 .woocommerce .wishlist_table thead th:nth-child(3),
 .yith-wcwl-form .wishlist_table thead th:nth-child(3) {
-	width: auto;
 	padding-right: 24px;
+	width: 99%;
 }
 
 .woocommerce .wishlist_table thead th:nth-child(4),
 .yith-wcwl-form .wishlist_table thead th:nth-child(4) {
-	width: 190px;
 	padding-right: 24px;
+	white-space: nowrap;
 }
 
 .woocommerce .wishlist_table thead th:nth-child(5),
 .yith-wcwl-form .wishlist_table thead th:nth-child(5) {
-	width: 190px;
 	padding-right: 24px;
+	white-space: nowrap;
 }
 
 .woocommerce .wishlist_table thead th:nth-child(6),
 .yith-wcwl-form .wishlist_table thead th:nth-child(6) {
-	width: 280px;
 	text-align: right;
+	white-space: nowrap;
 }
 
 /* Rows */
@@ -167,41 +167,46 @@
     text-align: left ;
 }
 
-/* Column widths */
+/* Column widths — auto layout, kompaktne kolone se skupljaju na sadržaj */
 .woocommerce .wishlist_table .product-remove,
 .yith-wcwl-form .wishlist_table .product-remove {
-	width: 42px;
+	width: 1%;
 	padding-right: 18px;
+	white-space: nowrap;
 }
 
 .woocommerce .wishlist_table .product-thumbnail,
 .yith-wcwl-form .wishlist_table .product-thumbnail {
-	width: 146px;
+	width: 1%;
 	padding-right: 24px;
+	white-space: nowrap;
 }
 
 .woocommerce .wishlist_table .product-name,
 .yith-wcwl-form .wishlist_table .product-name {
-	width: auto;
+	width: 99%;
 	padding-right: 24px;
 }
 
 .woocommerce .wishlist_table .product-price,
 .yith-wcwl-form .wishlist_table .product-price {
-	width: 190px;
+	width: 1%;
 	padding-right: 24px;
+	white-space: nowrap;
 }
 
 .woocommerce .wishlist_table .product-stock-status,
 .yith-wcwl-form .wishlist_table .product-stock-status {
-	width: 190px;
+	width: 1%;
 	padding-right: 24px;
+	white-space: nowrap;
 }
 
 .woocommerce .wishlist_table .product-add-to-cart,
 .yith-wcwl-form .wishlist_table .product-add-to-cart {
-	width: 280px;
+	width: 1%;
 	text-align: right;
+	white-space: nowrap;
 }
 
 /* Remove icon */

@@ -1,0 +1,60 @@
+.tersa-sidebar {
+	width: 100%;
+}
+
+.tersa-sidebar__inner {
+	display: flex;
+	flex-direction: column;
+	gap: 24px;
+}
+
+.tersa-widget {
+	padding: 24px;
+	border: 1px solid var(--c-border);
+	background: var(--c-surface, #fff);
+}
+
+.tersa-widget__title,
+.tersa-sidebar .widget-title {
+	margin: 0 0 16px;
+	font-family: var(--font-heading);
+	font-size: clamp(1.125rem, 1.6vw, 1.375rem);
+	line-height: 1.2;
+	color: var(--c-primary);
+}
+
+.tersa-sidebar .widget ul {
+	margin: 0;
+	padding-left: 1.1rem;
+}
+
+.tersa-sidebar .widget ul li + li {
+	margin-top: 10px;
+}
+
+.tersa-sidebar .widget a {
+	color: var(--c-text);
+	text-decoration: none;
+}
+
+.tersa-sidebar .widget a:hover,
+.tersa-sidebar .widget a:focus-visible {
+	color: var(--c-accent);
+	outline: none;
+}
+
+.tersa-sidebar .widget input,
+.tersa-sidebar .widget select,
+.tersa-sidebar .widget textarea {
+	width: 100%;
+	max-width: 100%;
+}
+
+.tersa-sidebar .widget a:focus-visible,
+.tersa-sidebar .widget button:focus-visible,
+.tersa-sidebar .widget input:focus-visible,
+.tersa-sidebar .widget select:focus-visible,
+.tersa-sidebar .widget textarea:focus-visible {
+	outline: 2px solid var(--c-accent);
+	outline-offset: 3px;
+}

@@ -53,3 +53,17 @@ function tersa_theme_setup() {
 	]);
 }
 add_action('after_setup_theme', 'tersa_theme_setup');
+
+
+function tersa_register_sidebars() {
+	register_sidebar([
+		'name'          => esc_html__('Glavna bočna traka', 'tersa-shop'),
+		'id'            => 'primary-sidebar',
+		'description'   => esc_html__('Widgeti za glavnu bočnu traku.', 'tersa-shop'),
+		'before_widget' => '<section id="%1$s" class="widget tersa-widget %2$s">',
+		'after_widget'  => '</section>',
+		'before_title'  => '<h2 class="widget-title tersa-widget__title">',
+		'after_title'   => '</h2>',
+	]);
+}
+add_action('widgets_init', 'tersa_register_sidebars');
