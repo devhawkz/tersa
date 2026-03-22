@@ -60,7 +60,7 @@ $reset_url = function_exists('tersa_get_archive_reset_url')
 					'wrap_after'  => '</ol>',
 					'before'      => '<li class="shop-archive__breadcrumb-item">',
 					'after'       => '</li>',
-					'home'        => esc_html__('Naslovna', 'tersa-shop'),
+					'home'        => esc_html__('Naslovnica', 'tersa-shop'),
 				]);
 				?>
 			</nav>
@@ -238,7 +238,7 @@ $reset_url = function_exists('tersa_get_archive_reset_url')
 						</button>
 
 						<a class="shop-archive__reset" href="<?php echo esc_url($reset_url); ?>">
-							<?php echo esc_html__('Resetuj filtre', 'tersa-shop'); ?>
+							<?php echo esc_html__('Poništi filtre', 'tersa-shop'); ?>
 						</a>
 					</div>
 				</form>

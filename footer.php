@@ -123,7 +123,7 @@ $legal_fallback = [
 						</h2>
 
 						<address class="site-footer__company">
-							<p><?php esc_html_e('Prerada drveta i trgovina drvenih proizvoda', 'tersa-shop'); ?></p>
+							<p><?php esc_html_e('Prerada drva i trgovina drvnim proizvodima', 'tersa-shop'); ?></p>
 							<p><?php esc_html_e('Nikole Tesle 71, 31553 Črnk​ovci', 'tersa-shop'); ?></p>
 							<p>
 								<span class="site-footer__label"><?php esc_html_e('E-mail:', 'tersa-shop'); ?></span>
@@ -134,7 +134,7 @@ $legal_fallback = [
 					</section>
 
 					<nav class="site-footer__nav-col" aria-label="<?php esc_attr_e('About footer navigation', 'tersa-shop'); ?>">
-						<h2 class="site-footer__heading"><?php esc_html_e('Korisni linkovi', 'tersa-shop'); ?></h2>
+						<h2 class="site-footer__heading"><?php esc_html_e('KORISNE POVEZNICE', 'tersa-shop'); ?></h2>
 
 						<?php if (has_nav_menu('footer_about')) : ?>
 							<?php

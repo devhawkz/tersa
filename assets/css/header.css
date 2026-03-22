@@ -1071,15 +1071,19 @@
     background: transparent;
     color: #111;
     border: 2px solid #111;
+    align-content: center;
+    text-align: center;
   }
   
   .site-header__cart-body .woocommerce-mini-cart__buttons .checkout,
   .site-header__cart-body .woocommerce-mini-cart__buttons .wc-forward.checkout,
   .site-header__cart-body .widget_shopping_cart .buttons .checkout,
   .site-header__cart-body .widget_shopping_cart .buttons .wc-forward.checkout {
-    background: #000;
+    background: var(--c-accent);
     color: #fff;
-    border: 2px solid #000;
+    border: 2px solid var(--c-accent);
+    align-content: center;
+    text-align: center;
   }
   
   .site-header__cart-body .woocommerce-mini-cart__empty-message {

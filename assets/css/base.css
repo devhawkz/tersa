@@ -470,3 +470,7 @@
   .wc-block-checkout__form .wc-block-components-address-form__country .wc-blocks-components-select{
     margin-top: 10px;
   }
+
+  .product-related{
+    background-color: #F8F3EE!important;
+  }

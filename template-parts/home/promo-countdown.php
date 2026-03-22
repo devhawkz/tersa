@@ -56,9 +56,9 @@ if (!empty($end_raw)) {
 				// Polylang stringovi: ako postoji `pll__()`, uzmi prevod za trenutni jezik.
 				// U suprotnom fallback na WP gettext prevod (standardni __()/esc_html__ mehanizam).
 				// (Koristimo srpske ključeve da se ne dešava fallback na engleski.)
-				$label_days    = function_exists('pll__') ? pll__('Dani') : 'Dani';
+				$label_days    = function_exists('pll__') ? pll__('Dana') : 'Dana';
 				$label_hours   = function_exists('pll__') ? pll__('Sati') : 'Sati';
-				$label_minutes = function_exists('pll__') ? pll__('Minute') : 'Minute';
+				$label_minutes = function_exists('pll__') ? pll__('Minuta') : 'Minuta';
 				$label_seconds = function_exists('pll__') ? pll__('Sekunde') : 'Sekunde';
 				?>
 				<div

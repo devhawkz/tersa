@@ -16,7 +16,7 @@ get_header();
 						'wrap_after'  => '</nav>',
 						'before'      => '<span class="tersa-breadcrumbs__item">',
 						'after'       => '</span>',
-						'home'        => esc_html__('Početna', 'tersa-shop'),
+						'home'        => esc_html__('Naslovnica', 'tersa-shop'),
 					]);
 					?>
 				<?php endif; ?>
