@@ -7,7 +7,7 @@ if (!class_exists('WooCommerce')) {
 	return;
 }
 
-$page_id = get_queried_object_id();
+$page_id = isset($args['page_id']) ? (int) $args['page_id'] : get_queried_object_id();
 
 $instance = 1;
 if (isset($args) && is_array($args) && isset($args['instance'])) {

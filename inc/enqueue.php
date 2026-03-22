@@ -97,6 +97,33 @@ function tersa_enqueue_assets() {
 			true
 		);
 	}
+
+	if (function_exists('is_cart') && is_cart()) {
+		wp_enqueue_style(
+			'tersa-home',
+			$theme_uri . '/assets/css/home.css',
+			['tersa-base', 'tersa-layout'],
+			$theme_version
+		);
+
+		wp_enqueue_script(
+			'tersa-home',
+			$theme_uri . '/assets/js/home.js',
+			[],
+			$theme_version,
+			true
+		);
+	}
+
+	if (tersa_is_wishlist_page()) {
+		wp_enqueue_style(
+			'tersa-wishlist',
+			$theme_uri . '/assets/css/wishlist.css',
+			['tersa-base', 'tersa-layout'],
+			$theme_version
+		);
+	}
+
 /*
 	if (function_exists('is_cart') && is_cart()) {
 		wp_enqueue_style('tersa-cart', $theme_uri . '/assets/css/cart.css', ['tersa-base', 'tersa-layout'], $theme_version);
