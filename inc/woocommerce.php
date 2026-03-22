@@ -4,6 +4,37 @@ if (!defined('ABSPATH')) {
 }
 
 /**
+ * WooCommerce Analytics sinkronizira korisničke podatke na svakom page loadu,
+ * čak i na frontendu, uzrokujući suvišne usermeta upite prema bazi.
+ * Na frontendu ovo nije potrebno — dovoljno je raditi tracking pri narudžbi.
+ */
+add_action(
+	'init',
+	function (): void {
+		if (is_admin()) {
+			return;
+		}
+
+		remove_action(
+			'woocommerce_new_customer',
+			[
+				'Automattic\WooCommerce\Admin\API\Reports\Customers\DataStore',
+				'update_registered_customer',
+			]
+		);
+
+		remove_action(
+			'woocommerce_update_customer',
+			[
+				'Automattic\WooCommerce\Admin\API\Reports\Customers\DataStore',
+				'update_registered_customer',
+			]
+		);
+	},
+	20
+);
+
+/**
  * Detekcija YITH wishlist stranice.
  */
 function tersa_is_wishlist_page(): bool {

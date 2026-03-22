@@ -133,6 +133,15 @@ function tersa_enqueue_assets() {
 		);
 	}
 
+	if (is_page() && !is_front_page()) {
+		wp_enqueue_style(
+			'tersa-page',
+			$theme_uri . '/assets/css/page.css',
+			['tersa-base', 'tersa-layout'],
+			$theme_version
+		);
+	}
+
 /*
 	if (function_exists('is_cart') && is_cart()) {
 		wp_enqueue_style('tersa-cart', $theme_uri . '/assets/css/cart.css', ['tersa-base', 'tersa-layout'], $theme_version);
