@@ -976,6 +976,11 @@
     padding: clamp(40px, 5vw, 84px) 0;
     background-color: #f3f3f3;
   }
+
+  .home-bestsellers.cart {
+    background-color: #F8F3EE;
+    padding: clamp(20px, 5vw, 40px) 0;
+  }
   
   .home-bestsellers__inner {
     width: min(100%, 1600px);
@@ -1311,6 +1316,10 @@
     .home-bestsellers__cart-wrap {
       transition: none;
     }
+  }
+
+  .home-bestsellers.cart .home-bestsellers__cart-wrap a{
+    color:#fff;
   }
 
   /************************************************************

@@ -116,7 +116,7 @@ if (!$query->have_posts()) {
 }
 ?>
 
-<section class="home-bestsellers" aria-labelledby="home-bestsellers-title">
+<section class="home-bestsellers cart" aria-labelledby="home-bestsellers-title">
 	<div class="home-bestsellers__inner">
 		<h2 id="home-bestsellers-title" class="home-bestsellers__title">
 			<?php echo esc_html($section_title); ?>
