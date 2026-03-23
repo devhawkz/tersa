@@ -2,7 +2,7 @@
    SINGLE PROJECT - REDESIGN
    ========================================================= */
 .site {
-    min-height: 70vh!important;
+    min-height: 40vh!important;
    }
 body.single-eu_project .site-main.eu-project-single {
 	max-height: 600px !important;
@@ -214,8 +214,8 @@ body.single-eu_project .site-main.eu-project-single {
 	align-items: center;
 	min-height: 32px;
 	padding: 6px 12px;
-	background: rgba(81, 110, 82, 0.08);
-	color: var(--c-accent);
+	background: var(--c-accent);
+	color: #fff;
 	font-size: 0.8rem;
 	font-weight: 600;
 	letter-spacing: 0.04em;
@@ -521,6 +521,9 @@ body.single-eu_project .site-main.eu-project-single {
 	.eu-projects-archive__grid {
 		grid-template-columns: 1fr;
 	}
+    .site {
+        min-height: 10vh!important;
+       }
 }
 
 @media (max-width: 640px) {

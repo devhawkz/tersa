@@ -9,16 +9,13 @@ get_header();
 <main id="primary" class="site-main eu-projects-archive">
 	<section class="eu-projects-archive__hero">
 		<div class="container container--narrow">
-			<div class="eu-projects-archive__hero-inner">
-
-				<h1 class="eu-projects-archive__title">
-					<?php esc_html_e('EU Projekti', 'tersa-shop'); ?>
-				</h1>
-
-				<p class="eu-projects-archive__text">
-					<?php esc_html_e('Pregled razvojnih, investicijskih i inovacijskih projekata kompanije Tersa, sa fokusom na održivost, tehnološki razvoj i dugoročan rast.', 'tersa-shop'); ?>
-				</p>
-			</div>
+		<nav class="eu-projects-archive__breadcrumbs" aria-label="<?php esc_attr_e('Breadcrumbs', 'tersa-shop'); ?>">
+				<a href="<?php echo esc_url(home_url('/')); ?>">
+					<?php esc_html_e('Naslovnica', 'tersa-shop'); ?>
+				</a>
+				<span>/</span>
+				<span><?php esc_html_e('EU Projekti', 'tersa-shop'); ?></span>
+			</nav>
 		</div>
 	</section>
 
