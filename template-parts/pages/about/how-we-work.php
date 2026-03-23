@@ -57,22 +57,22 @@ $item3_text  = $get ? $get('about_work_item_3_text', __('Rutrum vitae risus eget
 					<?php echo esc_html($work_title); ?>
 				</h2>
 
-				<div class="about-work__items">
-					<article class="about-work__item">
-						<h3 class="about-work__item-title"><?php echo esc_html($item1_title); ?></h3>
-						<p><?php echo esc_html($item1_text); ?></p>
-					</article>
+			<ol class="about-work__items">
+				<li class="about-work__item">
+					<h3 class="about-work__item-title"><?php echo esc_html($item1_title); ?></h3>
+					<p><?php echo wp_kses_post($item1_text); ?></p>
+				</li>
 
-					<article class="about-work__item">
-						<h3 class="about-work__item-title"><?php echo esc_html($item2_title); ?></h3>
-						<p><?php echo esc_html($item2_text); ?></p>
-					</article>
+				<li class="about-work__item">
+					<h3 class="about-work__item-title"><?php echo esc_html($item2_title); ?></h3>
+					<p><?php echo wp_kses_post($item2_text); ?></p>
+				</li>
 
-					<article class="about-work__item">
-						<h3 class="about-work__item-title"><?php echo esc_html($item3_title); ?></h3>
-						<p><?php echo esc_html($item3_text); ?></p>
-					</article>
-				</div>
+				<li class="about-work__item">
+					<h3 class="about-work__item-title"><?php echo esc_html($item3_title); ?></h3>
+					<p><?php echo wp_kses_post($item3_text); ?></p>
+				</li>
+			</ol>
 			</div>
 		</div>
 	</div>

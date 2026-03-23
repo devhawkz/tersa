@@ -93,21 +93,52 @@ if (function_exists('get_field')) {
 	}
 }
 
+$current_lang     = function_exists('pll_current_language') ? pll_current_language() : '';
+$transient_key    = 'tersa_bestsellers_' . $product_tag_slug . '_' . $instance . ($current_lang ? '_' . $current_lang : '');
+$cached_post_ids  = get_transient($transient_key);
+
+if (false === $cached_post_ids) {
+	$query_args = [
+		'post_type'              => 'product',
+		'post_status'            => 'publish',
+		'posts_per_page'         => 4,
+		'no_found_rows'          => true,
+		'ignore_sticky_posts'    => true,
+		'update_post_meta_cache' => false,
+		'update_post_term_cache' => true,
+		'fields'                 => 'ids',
+		'tax_query'              => [
+			[
+				'taxonomy' => 'product_tag',
+				'field'    => 'slug',
+				'terms'    => $product_tag_slug,
+			],
+		],
+	];
+
+	if ($current_lang) {
+		$query_args['lang'] = $current_lang;
+	}
+
+	$id_query        = new WP_Query($query_args);
+	$cached_post_ids = $id_query->posts ?: [];
+	set_transient($transient_key, $cached_post_ids, 6 * HOUR_IN_SECONDS);
+	wp_reset_postdata();
+}
+
+if (empty($cached_post_ids)) {
+	return;
+}
+
 $query = new WP_Query([
 	'post_type'              => 'product',
 	'post_status'            => 'publish',
-	'posts_per_page'         => 4,
+	'post__in'               => $cached_post_ids,
+	'orderby'                => 'post__in',
 	'no_found_rows'          => true,
 	'ignore_sticky_posts'    => true,
 	'update_post_meta_cache' => false,
 	'update_post_term_cache' => true,
-	'tax_query'              => [
-		[
-			'taxonomy' => 'product_tag',
-			'field'    => 'slug',
-			'terms'    => $product_tag_slug,
-		],
-	],
 ]);
 
 if (!$query->have_posts()) {
@@ -122,7 +153,7 @@ if (!$query->have_posts()) {
 			<?php echo esc_html($section_title); ?>
 		</h2>
 
-		<div class="home-bestsellers__grid">
+		<ul class="home-bestsellers__grid" role="list">
 			<?php
 			while ($query->have_posts()) :
 				$query->the_post();
@@ -193,8 +224,9 @@ if (!$query->have_posts()) {
 						'rel'              => 'nofollow',
 					];
 				}
-				?>
-				<article class="home-bestsellers__card">
+			?>
+			<li>
+			<article class="home-bestsellers__card">
 					<div class="home-bestsellers__media-wrap">
 						<a class="home-bestsellers__media-link" href="<?php echo esc_url($product_url); ?>">
 							<div class="home-bestsellers__media">
@@ -320,9 +352,10 @@ if (!$query->have_posts()) {
 							<?php endif; ?>
 						</div>
 					</div>
-				</article>
-			<?php endwhile; ?>
-		</div>
+			</article>
+			</li>
+		<?php endwhile; ?>
+		</ul>
 	</div>
 </section>
 

@@ -62,14 +62,14 @@ if (!WC()->cart->is_empty()) : ?>
 				);
 				?>
 
-				<div class="tersa-mini-cart__thumb">
-					<?php if ($product_permalink) : ?>
-						<a href="<?php echo esc_url($product_permalink); ?>">
-							<?php echo $thumbnail; ?>
-						</a>
-					<?php else : ?>
-						<?php echo $thumbnail; ?>
-					<?php endif; ?>
+			<div class="tersa-mini-cart__thumb">
+				<?php if ($product_permalink) : ?>
+					<a href="<?php echo esc_url($product_permalink); ?>">
+						<?php echo wp_kses_post($thumbnail); ?>
+					</a>
+				<?php else : ?>
+					<?php echo wp_kses_post($thumbnail); ?>
+				<?php endif; ?>
 				</div>
 
 				<div class="tersa-mini-cart__content">

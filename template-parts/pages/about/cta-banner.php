@@ -34,7 +34,7 @@ $cta_image_alt = $get ? $get('about_cta_image_alt', '') : '';
 $cta_title   = $get ? $get('about_cta_title', __('We Deliver Genuine Products', 'tersa-shop')) : __('We Deliver Genuine Products', 'tersa-shop');
 $cta_text    = $get ? $get('about_cta_text', __('Sed viverra consectetur risus nec ultricies. Curabitur tincidunt tincidunt urna id maximus.', 'tersa-shop')) : __('Sed viverra consectetur risus nec ultricies. Curabitur tincidunt tincidunt urna id maximus.', 'tersa-shop');
 $cta_btn     = $get ? $get('about_cta_button_text', __('Contact Us', 'tersa-shop')) : __('Contact Us', 'tersa-shop');
-$cta_btn_url = $get ? $get('about_cta_button_url', home_url('/kontakt/')) : home_url('/kontakt/');
+$cta_btn_url = $get ? $get('about_cta_button_url', tersa_pll_page_url('kontakt')) : tersa_pll_page_url('kontakt');
 ?>
 
 <section class="about-cta" aria-labelledby="about-cta-title">

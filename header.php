@@ -68,7 +68,7 @@ $topbar_link_is_external = $data['topbar_link_is_external'];
 
 					<?php get_template_part('template-parts/global/navigation'); ?>
 
-					<div class="site-header__actions" role="group" aria-label="<?php esc_attr_e('Header actions', 'tersa-shop'); ?>">
+					<div class="site-header__actions" role="toolbar" aria-label="<?php esc_attr_e('Header actions', 'tersa-shop'); ?>">
 						<div class="site-header__search">
 							<button
 								type="button"

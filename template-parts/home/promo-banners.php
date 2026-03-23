@@ -56,17 +56,17 @@ if (empty($banners)) {
 				<a class="home-promo-banners__item" href="<?php echo esc_url($banner['link']); ?>">
 					<span class="home-promo-banners__media">
 						<?php
-						echo wp_get_attachment_image(
-							$banner['image_id'],
-							'full',
-							false,
-							[
-								'class'    => 'home-promo-banners__image',
-								'loading'  => 'lazy',
-								'decoding' => 'async',
-								'alt'      => '',
-							]
-						);
+					echo wp_get_attachment_image(
+						$banner['image_id'],
+						'tersa-banner',
+						false,
+						[
+							'class'    => 'home-promo-banners__image',
+							'loading'  => 'lazy',
+							'decoding' => 'async',
+							'alt'      => '',
+						]
+					);
 						?>
 						<span class="home-promo-banners__frame" aria-hidden="true">
 							<span class="home-promo-banners__line home-promo-banners__line--top"></span>

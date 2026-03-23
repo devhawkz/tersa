@@ -7,12 +7,26 @@ if (!class_exists('WooCommerce')) {
 	return;
 }
 
-$product_id  = isset($args['product_id']) ? (int) $args['product_id'] : 0;
-$related_ids = $product_id > 0 ? wc_get_related_products($product_id, 4) : [];
+$product_id = isset($args['product_id']) ? (int) $args['product_id'] : 0;
+
+if ($product_id <= 0) {
+	return;
+}
+
+$transient_key = 'tersa_related_' . $product_id;
+$related_ids   = get_transient($transient_key);
+
+if (false === $related_ids) {
+	$related_ids = wc_get_related_products($product_id, 4);
+	set_transient($transient_key, $related_ids ?: [], 12 * HOUR_IN_SECONDS);
+}
 
 if (empty($related_ids)) {
 	return;
 }
+
+// Batch-warm term cache da bi se izbegli individual DB upiti po proizvodu.
+update_object_term_cache($related_ids, 'product');
 
 $badge_color = '#000000';
 ?>
@@ -23,7 +37,7 @@ $badge_color = '#000000';
 			<?php echo esc_html(function_exists('pll__') ? pll__('Slični proizvodi') : __('Slični proizvodi', 'tersa-shop')); ?>
 		</h2>
 
-		<div class="home-bestsellers__grid">
+		<ul class="home-bestsellers__grid" role="list">
 			<?php foreach ($related_ids as $related_id) :
 				$rel_product = wc_get_product($related_id);
 
@@ -99,8 +113,9 @@ $badge_color = '#000000';
 					]
 				);
 				$rel_tag_names = is_array($rel_tag_names) ? array_slice(array_values($rel_tag_names), 0, 2) : [];
-			?>
-			<article class="home-bestsellers__card">
+		?>
+		<li>
+		<article class="home-bestsellers__card">
 				<div class="home-bestsellers__media-wrap">
 					<a class="home-bestsellers__media-link" href="<?php echo esc_url($rel_url); ?>">
 						<div class="home-bestsellers__media">
@@ -208,8 +223,9 @@ $badge_color = '#000000';
 						<?php endif; ?>
 					</div>
 				</div>
-			</article>
-			<?php endforeach; ?>
-		</div>
+		</article>
+		</li>
+		<?php endforeach; ?>
+		</ul>
 	</div>
 </section>

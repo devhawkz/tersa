@@ -42,6 +42,16 @@ function tersa_theme_setup() {
 	// Custom image size za logo (2× za Retina prikaz)
 	// Nakon dodavanja, treba pokrenuti regeneraciju thumbnailova ako je logo već uploadovan.
 	add_image_size('tersa-logo', 370, 104);
+
+	// Veličina za product kartice na shop/archive stranicama
+	add_image_size('tersa-card', 480, 600, true);
+
+	// Veličina za hero slider slike (desktop i mobile)
+	add_image_size('tersa-hero', 1600, 900, true);
+	add_image_size('tersa-hero-mobile', 800, 1000, true);
+
+	// Veličina za promo banner slike
+	add_image_size('tersa-banner', 900, 700, true);
 	
 	
 

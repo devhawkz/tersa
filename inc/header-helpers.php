@@ -136,7 +136,10 @@ function tersa_get_wishlist_count(): int {
 
 	$count = 0;
 
-	if (shortcode_exists('yith_wcwl_items_count')) {
+	// Direktan YITH API — bez parsera shortcode-a (manje CPU-a po requestu).
+	if (function_exists('yith_wcwl_count_products')) {
+		$count = (int) yith_wcwl_count_products();
+	} elseif (shortcode_exists('yith_wcwl_items_count')) {
 		$output = do_shortcode('[yith_wcwl_items_count]');
 		$output = wp_strip_all_tags((string) $output);
 		$output = trim($output);
@@ -341,6 +344,12 @@ function tersa_nav_link_external_rel(array $atts, $item, $args, $depth): array {
 /**
  * Vraća prevedeni URL topbar linka i da li je eksterni.
  * Centralizuje detekciju eksternog linka van template fajla.
+ *
+ * Napomena o Polylang-u: topbar_link_url se čuva kao string u ACF i registruje
+ * putem pll_register_string(), što prevodiocima omogućava unos različitog URL-a
+ * po jeziku direktno u Polylang → String translations. Ovaj pristup je ispravan
+ * za polja koja mogu sadržavati i interne i eksterne URL-ove. Za stranice koje
+ * postoje kao WP page post type, koristi tersa_pll_page_url() umesto ovog poziva.
  *
  * @param string $url Sirovi URL iz ACF podešavanja.
  * @return array{ url: string, is_external: bool }

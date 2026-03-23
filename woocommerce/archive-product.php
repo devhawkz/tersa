@@ -110,44 +110,60 @@ $reset_url = function_exists('tersa_get_archive_reset_url')
 			</div>
 
 			<div class="shop-archive__toolbar-actions">
-				<label class="shop-archive__sale-toggle">
-					<input
-						type="checkbox"
-						name="on_sale"
-						value="1"
-						<?php checked(function_exists('tersa_is_sale_filter_active') && tersa_is_sale_filter_active()); ?>
-						onchange="this.form.submit()"
-					>
-					<span><?php echo esc_html__('Prikaži samo proizvode na popustu', 'tersa-shop'); ?></span>
-				</label>
+		<label class="shop-archive__sale-toggle">
+				<input
+					type="checkbox"
+					name="on_sale"
+					value="1"
+					<?php checked(function_exists('tersa_is_sale_filter_active') && tersa_is_sale_filter_active()); ?>
+				>
+				<span><?php echo esc_html__('Prikaži samo proizvode na popustu', 'tersa-shop'); ?></span>
+			</label>
 
-				<label class="shop-archive__orderby-label">
-					<span class="screen-reader-text"><?php echo esc_html__('Sort products', 'tersa-shop'); ?></span>
-					<select name="orderby" class="shop-archive__orderby" onchange="this.form.submit()">
-						<?php foreach ($order_options as $order_value => $order_label) : ?>
-							<option value="<?php echo esc_attr($order_value); ?>" <?php selected($current_orderby, $order_value); ?>>
-								<?php echo esc_html($order_label); ?>
-							</option>
-						<?php endforeach; ?>
-					</select>
-				</label>
-			</div>
+			<label class="shop-archive__orderby-label">
+				<span class="screen-reader-text"><?php echo esc_html__('Sort products', 'tersa-shop'); ?></span>
+				<select name="orderby" class="shop-archive__orderby">
+					<?php foreach ($order_options as $order_value => $order_label) : ?>
+						<option value="<?php echo esc_attr($order_value); ?>" <?php selected($current_orderby, $order_value); ?>>
+							<?php echo esc_html($order_label); ?>
+						</option>
+					<?php endforeach; ?>
+				</select>
+			</label>
 
-			<?php
-			foreach ($_GET as $key => $value) {
-				if (in_array($key, ['view', 'orderby', 'on_sale'], true)) {
-					continue;
-				}
+			<button type="submit" class="shop-archive__toolbar-apply">
+				<?php echo esc_html__('Primijeni', 'tersa-shop'); ?>
+			</button>
+		</div>
 
-				if (is_array($value)) {
-					foreach ($value as $item) {
-						echo '<input type="hidden" name="' . esc_attr($key) . '[]" value="' . esc_attr(sanitize_text_field(wp_unslash($item))) . '">';
-					}
-				} else {
-					echo '<input type="hidden" name="' . esc_attr($key) . '" value="' . esc_attr(sanitize_text_field(wp_unslash($value))) . '">';
-				}
+		<?php
+		$toolbar_skip = ['view', 'orderby', 'on_sale'];
+
+		$allowed_passthrough = ['paged', 'min_price', 'max_price', 'rating_filter'];
+		foreach (array_keys($filter_taxonomies) as $tax) {
+			$allowed_passthrough[] = 'filter_' . $tax;
+		}
+
+		foreach ($_GET as $key => $value) { // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+			$key = sanitize_key($key);
+
+			if (in_array($key, $toolbar_skip, true)) {
+				continue;
 			}
-			?>
+
+			if (!in_array($key, $allowed_passthrough, true)) {
+				continue;
+			}
+
+			if (is_array($value)) {
+				foreach ($value as $item) {
+					echo '<input type="hidden" name="' . esc_attr($key) . '[]" value="' . esc_attr(sanitize_text_field(wp_unslash($item))) . '">';
+				}
+			} else {
+				echo '<input type="hidden" name="' . esc_attr($key) . '" value="' . esc_attr(sanitize_text_field(wp_unslash($value))) . '">';
+			}
+		}
+		?>
 		</form>
 
 		<div class="shop-archive__body shop-archive__body--<?php echo esc_attr($current_view); ?>">

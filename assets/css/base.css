@@ -422,9 +422,20 @@
 
   .woocommerce-message, .woocommerce-error, .woocommerce-info{
     text-align: center;
-    width: 30%;
+    width: 85%;
   }
   
+  .woocommerce-message > a{
+    background-color: var(--c-accent);
+    color:#fff;
+    text-transform: uppercase;
+    padding:10px 20px;
+    border-radius: 5px;
+    text-decoration: none;
+    font-weight: 600;
+    font-size: 14pxs;
+  }
+
   .woocommerce-message {
     border-color: rgba(47, 107, 61, 0.25);
   }

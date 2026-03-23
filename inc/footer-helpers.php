@@ -80,3 +80,29 @@ function tersa_maybe_clear_footer_settings_cache(int $post_id, $post = null): vo
 	delete_transient(tersa_get_footer_settings_cache_key());
 }
 add_action('save_post_page', 'tersa_maybe_clear_footer_settings_cache', 10, 2);
+
+/**
+ * Vraća URL stranice za trenutni Polylang jezik.
+ * Koristi pll_get_post() da bi pronašao prevedenu verziju stranice po slug-u.
+ * Fallback na get_permalink() originalne stranice ako prevod ne postoji.
+ *
+ * @param string $slug Post slug na default jeziku (npr. 'kontakt', 'o-nama').
+ * @return string URL stranice na trenutnom jeziku.
+ */
+function tersa_pll_page_url(string $slug): string {
+	$page = get_page_by_path($slug);
+
+	if (!$page instanceof WP_Post) {
+		return home_url('/' . $slug . '/');
+	}
+
+	if (function_exists('pll_get_post')) {
+		$translated_id = pll_get_post($page->ID);
+		if ($translated_id) {
+			$url = get_permalink($translated_id);
+			return $url ?: get_permalink($page->ID) ?: home_url('/' . $slug . '/');
+		}
+	}
+
+	return get_permalink($page->ID) ?: home_url('/' . $slug . '/');
+}

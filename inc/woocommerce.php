@@ -66,21 +66,22 @@ function tersa_is_wishlist_page(): bool {
  */
 function tersa_pll_wishlist(string $key): string {
 	$map = [
-		'add'              => 'Dodaj na listu želja',
-		'browse'           => 'Pregledaj listu želja',
-		'added'            => 'Dodano na listu želja',
-		'remove'           => 'Ukloni s liste želja',
-		'already_in'       => 'Proizvod je već na listi želja!',
-		'title'            => 'Lista želja',
-		'title_mine'       => 'Moja lista želja',
-		'product_name'     => 'Naziv proizvoda',
-		'unit_price'       => 'Cijena',
-		'price'            => 'Cijena',
-		'stock_status'     => 'Status zaliha',
-		'add_to_cart'      => 'Dodaj u košaricu',
-		'remove_product'   => 'Ukloni ovaj proizvod',
-		'empty'            => 'Nema proizvoda na listi želja.',
-		'in_stock'         => 'Na stanju',
+		'add'                   => 'Dodaj na listu želja',
+		'browse'                => 'Pregledaj listu želja',
+		'added'                 => 'Dodano na listu želja',
+		'added_notification'    => '"%s" je dodano na vašu listu "%s"!',
+		'remove'                => 'Ukloni s liste želja',
+		'already_in'            => 'Proizvod je već na listi želja!',
+		'title'                 => 'Lista želja',
+		'title_mine'            => 'Moja lista želja',
+		'product_name'          => 'Naziv proizvoda',
+		'unit_price'            => 'Cijena',
+		'price'                 => 'Cijena',
+		'stock_status'          => 'Status zaliha',
+		'add_to_cart'           => 'Dodaj u košaricu',
+		'remove_product'        => 'Ukloni ovaj proizvod',
+		'empty'                 => 'Nema proizvoda na listi želja.',
+		'in_stock'              => 'Na stanju',
 	];
 
 	$string = $map[$key] ?? '';
@@ -94,10 +95,16 @@ function tersa_pll_wishlist(string $key): string {
 add_filter(
 	'gettext',
 	function ($translated, $text, $domain) {
+		// Tisuće gettext poziva za druge domene — izlaz odmah (CPU na sharedu).
+		if ($domain !== 'woocommerce' && $domain !== 'yith-woocommerce-wishlist') {
+			return $translated;
+		}
+
 		if ($domain === 'woocommerce') {
-			switch ($text) {
-			case 'No products in the cart.':
-				return 'Trenutno nema proizvoda u košarici.';
+		switch ($text) {
+		case 'No products in the cart.':
+			$hr = 'Trenutačno nema proizvoda u košarici.';
+			return function_exists('pll__') ? pll__($hr) : $hr;
 
 
 				case 'Subtotal':
@@ -223,6 +230,16 @@ add_filter(
 
 		if ($domain === 'yith-woocommerce-wishlist' || $domain === 'woocommerce') {
 			switch ($text) {
+				// Popup poruka kada se proizvod doda u wishlist.
+				// YITH koristi %1$s/%2$s u starijim verzijama, %s u novijim.
+				case '"%1$s" has been added to your "%2$s" list!':
+					$hr = '"%1$s" je dodano na vašu listu "%2$s"!';
+					return function_exists('pll__') ? pll__($hr) : $hr;
+
+				case '"%s" has been added to your "%s" list!':
+					$hr = '"%s" je dodano na vašu listu "%s"!';
+					return function_exists('pll__') ? pll__($hr) : $hr;
+
 				case 'Product name':
 					return tersa_pll_wishlist('product_name');
 
@@ -275,6 +292,34 @@ add_filter('option_yith_wcwl_add_to_cart_text',          fn() => tersa_pll_wishl
 
 // Fallback za YITH template filtere.
 add_filter('yith_wcwl_browse_wishlist_label', fn() => tersa_pll_wishlist('browse'));
+
+/**
+ * Fallback za YITH AJAX notifikacijsku poruku.
+ * Koristi se u slučajevima kada YITH ne prolazi notifikacijski string
+ * kroz gettext (npr. poruka je generisana direktno u JavaScriptu).
+ * Radi za YITH WooCommerce Wishlist Free i Premium.
+ */
+add_filter(
+	'yith_wcwl_ajax_add_response',
+	function (array $response): array {
+		if (empty($response['message'])) {
+			return $response;
+		}
+
+		$product_name   = $response['product_name'] ?? '';
+		$wishlist_title = function_exists('pll__') ? pll__('Moja lista želja') : 'Moja lista želja';
+
+		if ($product_name !== '') {
+			$hr = function_exists('pll__')
+				? pll__('"%s" je dodano na vašu listu "%s"!')
+				: '"%s" je dodano na vašu listu "%s"!';
+
+			$response['message'] = sprintf($hr, $product_name, $wishlist_title);
+		}
+
+		return $response;
+	}
+);
 
 /**
  * Hrvatski množina za naslov recenzija.
@@ -470,6 +515,7 @@ add_action(
 		pll_register_string('tersa_stock_na_zalihi', '%s na stanju', 'Tersa – proizvod (stanje)', ['multiline' => false]);
 		pll_register_string('tersa_stock_na_zalihi_simple', 'na stanju', 'Tersa – proizvod (stanje)', ['multiline' => false]);
 
+		pll_register_string('tersa_wishlist_added_notification', '"%s" je dodano na vašu listu "%s"!', 'Tersa – wishlist', ['multiline' => false]);
 		pll_register_string('tersa_add_to_wishlist', 'Dodaj na listu želja', 'Tersa – wishlist', ['multiline' => false]);
 		pll_register_string('tersa_browse_wishlist', 'Pregledaj listu želja', 'Tersa – wishlist', ['multiline' => false]);
 		pll_register_string('tersa_added_to_wishlist', 'Dodano na listu želja', 'Tersa – wishlist', ['multiline' => false]);
@@ -487,8 +533,44 @@ add_action(
 
 		pll_register_string('tersa_product_weight', 'Težina', 'Tersa – proizvod (dodatne informacije)', ['multiline' => false]);
 		pll_register_string('tersa_product_dimensions', 'Dimenzije', 'Tersa – proizvod (dodatne informacije)', ['multiline' => false]);
+
+		pll_register_string('tersa_countdown_dana', 'Dana', 'Tersa – promo countdown', ['multiline' => false]);
+		pll_register_string('tersa_countdown_sati', 'Sati', 'Tersa – promo countdown', ['multiline' => false]);
+		pll_register_string('tersa_countdown_minuta', 'Minuta', 'Tersa – promo countdown', ['multiline' => false]);
+		pll_register_string('tersa_countdown_sekunde', 'Sekunde', 'Tersa – promo countdown', ['multiline' => false]);
+
+		pll_register_string('tersa_related_products_title', 'Slični proizvodi', 'Tersa – proizvod (slični)', ['multiline' => false]);
+
+		pll_register_string('tersa_wc_empty_cart', 'Trenutno nema proizvoda u košarici.', 'Tersa – WooCommerce (košarica)', ['multiline' => false]);
 	},
 	20
+);
+
+/**
+ * Invalidacija bestsellers transient-a pri promeni proizvoda.
+ */
+add_action(
+	'save_post_product',
+	function (): void {
+		global $wpdb;
+		$wpdb->query(
+			"DELETE FROM {$wpdb->options} WHERE option_name LIKE '_transient_tersa_bestsellers_%' OR option_name LIKE '_transient_timeout_tersa_bestsellers_%'"
+		);
+	}
+);
+
+add_action(
+	'save_post_product',
+	function (int $post_id): void {
+		global $wpdb;
+		$wpdb->query(
+			$wpdb->prepare(
+				"DELETE FROM {$wpdb->options} WHERE option_name LIKE %s OR option_name LIKE %s",
+				'_transient_tersa_related_' . $post_id,
+				'_transient_timeout_tersa_related_' . $post_id
+			)
+		);
+	}
 );
 
 /**

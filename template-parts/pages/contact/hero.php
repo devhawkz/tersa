@@ -44,8 +44,7 @@ if (!is_string($hero_title) || trim($hero_title) === '') {
 	<div
 		class="contact-hero__media contact-hero__media--parallax<?php echo $hero_image_url ? '' : ' contact-hero__media--no-image'; ?>"
 		<?php if ($hero_image_url) : ?>style="background-image: url(<?php echo esc_url($hero_image_url); ?>);"<?php endif; ?>
-		role="img"
-		aria-label=""
+		aria-hidden="true"
 	>
 		<div class="contact-hero__overlay"></div>
 	</div>
