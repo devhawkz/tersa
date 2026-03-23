@@ -4,7 +4,7 @@ if (!defined('ABSPATH')) {
 }
 
 require_once get_template_directory() . '/inc/enqueue.php';
-
+require_once get_template_directory() . '/inc/eu-projects.php';
 
 // Theme setup
 require_once get_template_directory() . '/inc/setup.php';

@@ -142,6 +142,15 @@ function tersa_enqueue_assets() {
 		);
 	}
 
+	// CPT slug u kodu je 'eu_project' (rewrite URL je /eu-projekti/ — to ne ide ovdje).
+	if (is_post_type_archive('eu_project') || is_singular('eu_project')) {
+		wp_enqueue_style(
+			'tersa-eu-project',
+			$theme_uri . '/assets/css/eu-project.css',
+			['tersa-base', 'tersa-layout'],
+			$theme_version
+		);
+	}
 /*
 	if (function_exists('is_cart') && is_cart()) {
 		wp_enqueue_style('tersa-cart', $theme_uri . '/assets/css/cart.css', ['tersa-base', 'tersa-layout'], $theme_version);
