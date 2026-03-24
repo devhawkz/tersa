@@ -50,31 +50,81 @@ while (have_posts()) :
 			return '';
 		}
 
-		if (preg_match('/^\d{2}\.\d{2}\.\d{4}\.?$/', $date_value)) {
+		if (preg_match('/^\d{2}\.\d{2}\.\d{4}\.?$/', (string) $date_value)) {
 			return $date_value;
 		}
 
-		$timestamp = strtotime($date_value);
+		$timestamp = strtotime((string) $date_value);
 		if (!$timestamp) {
-			return $date_value;
+			return (string) $date_value;
 		}
 
 		return date_i18n('d.m.Y.', $timestamp);
 	};
 
+	$get_image_data = static function ($image, $fallback_alt = '') {
+		$data = [
+			'url' => '',
+			'alt' => $fallback_alt,
+		];
+
+		if (empty($image)) {
+			return $data;
+		}
+
+		if (is_array($image)) {
+			if (!empty($image['sizes']['medium_large'])) {
+				$data['url'] = $image['sizes']['medium_large'];
+			} elseif (!empty($image['url'])) {
+				$data['url'] = $image['url'];
+			}
+
+			if (!empty($image['alt'])) {
+				$data['alt'] = $image['alt'];
+			}
+
+			return $data;
+		}
+
+		if (is_numeric($image)) {
+			$image_id = (int) $image;
+			$data['url'] = wp_get_attachment_image_url($image_id, 'medium_large');
+
+			$attachment_alt = get_post_meta($image_id, '_wp_attachment_image_alt', true);
+			if (!empty($attachment_alt)) {
+				$data['alt'] = $attachment_alt;
+			}
+
+			return $data;
+		}
+
+		if (is_string($image)) {
+			$data['url'] = $image;
+		}
+
+		return $data;
+	};
+
 	$start_date_formatted = $format_date($start_date);
 	$end_date_formatted   = $format_date($end_date);
-	?>
+	$period_label         = trim($start_date_formatted . ' – ' . $end_date_formatted, ' –');
 
+	$archive_url = get_post_type_archive_link('eu_project');
+	if (!$archive_url) {
+		$archive_url = home_url('/');
+	}
+
+	$content = get_the_content();
+	?>
 	<main id="primary" class="site-main eu-project-single">
 		<section class="eu-project-single__hero">
 			<div class="container container--narrow">
 				<nav class="eu-project-breadcrumbs" aria-label="<?php esc_attr_e('Breadcrumbs', 'tersa-shop'); ?>">
-					<a href="<?php echo esc_url(get_post_type_archive_link('eu_project')); ?>">
+					<a href="<?php echo esc_url($archive_url); ?>">
 						<?php esc_html_e('EU projekti', 'tersa-shop'); ?>
 					</a>
 					<span>/</span>
-					<span><?php the_title(); ?></span>
+					<span><?php echo esc_html(get_the_title()); ?></span>
 				</nav>
 
 				<?php if (!empty($logos)) : ?>
@@ -82,32 +132,15 @@ while (have_posts()) :
 						<div class="eu-project-single__logos">
 							<?php foreach ($logos as $logo) : ?>
 								<?php
-								$logo_url = '';
-								$logo_alt = get_the_title();
-
-								if (is_array($logo)) {
-									$logo_url = !empty($logo['sizes']['medium_large'])
-										? $logo['sizes']['medium_large']
-										: (!empty($logo['url']) ? $logo['url'] : '');
-
-									if (!empty($logo['alt'])) {
-										$logo_alt = $logo['alt'];
-									}
-								} elseif (is_numeric($logo)) {
-									$logo_url = wp_get_attachment_image_url((int) $logo, 'medium_large');
-									$logo_alt = get_post_meta((int) $logo, '_wp_attachment_image_alt', true) ?: get_the_title();
-								} elseif (is_string($logo)) {
-									$logo_url = $logo;
-								}
-
-								if (!$logo_url) {
+								$logo_data = $get_image_data($logo, $display_title);
+								if (empty($logo_data['url'])) {
 									continue;
 								}
 								?>
 								<div class="eu-project-single__logo-item">
 									<img
-										src="<?php echo esc_url($logo_url); ?>"
-										alt="<?php echo esc_attr($logo_alt); ?>"
+										src="<?php echo esc_url($logo_data['url']); ?>"
+										alt="<?php echo esc_attr($logo_data['alt']); ?>"
 										loading="lazy"
 										decoding="async"
 									>
@@ -118,29 +151,57 @@ while (have_posts()) :
 				<?php endif; ?>
 
 				<div class="eu-project-single__hero-card">
-					
+					<?php if ($status || $program) : ?>
+						<div class="eu-project-single__meta">
+							<?php if ($status) : ?>
+								<span class="eu-project-single__badge">
+									<?php echo esc_html($status); ?>
+								</span>
+							<?php endif; ?>
+
+							<?php if ($program) : ?>
+								<span class="eu-project-single__program">
+									<?php echo esc_html($program); ?>
+								</span>
+							<?php endif; ?>
+						</div>
+					<?php endif; ?>
 
 					<h1 class="eu-project-single__title">
 						<?php echo esc_html($display_title); ?>
 					</h1>
 
-					<div class="eu-project-single__period">
-						<?php if ($start_date_formatted || $end_date_formatted) : ?>
+					<?php if ($period_label) : ?>
+						<div class="eu-project-single__period">
 							<p>
 								<strong><?php esc_html_e('Razdoblje projekta:', 'tersa-shop'); ?></strong>
-								<?php echo esc_html(trim($start_date_formatted . ' – ' . $end_date_formatted, ' –')); ?>
+								<?php echo esc_html($period_label); ?>
 							</p>
-						<?php endif; ?>
-					</div>
+						</div>
+					<?php endif; ?>
 
 					<?php if ($pdf_url || ($cta_url && $cta_label)) : ?>
+						<div class="eu-project-single__actions">
+							<?php if ($pdf_url) : ?>
+								<a class="button button--secondary" href="<?php echo esc_url($pdf_url); ?>" target="_blank" rel="noopener">
+									<?php esc_html_e('Preuzmi dokument', 'tersa-shop'); ?>
+								</a>
+							<?php endif; ?>
+
+							<!--
+							<?php if ($cta_url && $cta_label) : ?>
+								<a class="button button--primary" href="<?php echo esc_url($cta_url); ?>">
+									<?php echo esc_html($cta_label); ?>
+								</a>
+							<?php endif; ?>
+							-->
 						</div>
 					<?php endif; ?>
 				</div>
 			</div>
 		</section>
 
-		<section class="eu-project-single__overview section">
+		<section class="eu-project-single__overview">
 			<div class="container container--narrow">
 				<div class="eu-project-single__facts-grid">
 					<?php if ($beneficiary) : ?>
@@ -195,7 +256,7 @@ while (have_posts()) :
 		</section>
 
 		<?php if ($description) : ?>
-			<section class="eu-project-single__section section">
+			<section class="eu-project-single__section">
 				<div class="container container--narrow">
 					<div class="eu-project-single__content-card">
 						<div class="eu-project-single__section-head">
@@ -212,7 +273,7 @@ while (have_posts()) :
 		<?php endif; ?>
 
 		<?php if ($contact_info) : ?>
-			<section class="eu-project-single__section eu-project-single__section--contact section">
+			<section class="eu-project-single__section eu-project-single__section--contact">
 				<div class="container container--narrow">
 					<div class="eu-project-single__content-card">
 						<div class="eu-project-single__section-head">
@@ -228,8 +289,8 @@ while (have_posts()) :
 			</section>
 		<?php endif; ?>
 
-		<?php if (get_the_content()) : ?>
-			<section class="eu-project-single__section section">
+		<?php if (!empty(trim(wp_strip_all_tags($content)))) : ?>
+			<section class="eu-project-single__section">
 				<div class="container container--narrow">
 					<div class="eu-project-single__content-card">
 						<div class="eu-project-single__section-head">
@@ -245,7 +306,6 @@ while (have_posts()) :
 			</section>
 		<?php endif; ?>
 	</main>
-
 	<?php
 endwhile;
 
