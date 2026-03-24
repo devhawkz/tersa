@@ -292,9 +292,7 @@
    
    .eu-project-single__logo-item img {
 	   display: block;
-	   max-width: 100%;
-	   width: auto;
-	   height: auto;
+	   width: 100%;
 	   object-fit: contain;
    }
    
