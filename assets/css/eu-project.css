@@ -1,35 +1,28 @@
 /* =========================================================
-   SINGLE EU PROJECT
+   EU PROJECTS
    ========================================================= */
 
-   body.single-eu_project .site,
+   body.post-type-archive-eu_project .site-main,
    body.single-eu_project .site-main {
-	   min-height: 0;
-   }
-   
-   .eu-project-single {
+	   min-width: 0;
 	   padding-block: clamp(2rem, 4vw, 4rem);
    }
    
-   .eu-project-single__hero,
-   .eu-project-single__overview,
-   .eu-project-single__section {
-	   padding: 0;
+   body.post-type-archive-eu_project .container,
+   body.single-eu_project .container {
+	   min-width: 0;
    }
    
-   .eu-project-single__hero .container,
-   .eu-project-single__overview .container,
-   .eu-project-single__section .container {
-	   display: grid;
-	   gap: clamp(1.25rem, 2vw, 1.5rem);
-   }
+   /* =========================================================
+	  COMMON
+	  ========================================================= */
    
    .eu-project-breadcrumbs {
 	   display: flex;
 	   flex-wrap: wrap;
 	   align-items: center;
 	   gap: 0.4rem;
-	   margin: 0;
+	   margin: 0 0 clamp(1rem, 2vw, 1.5rem);
 	   font-size: 0.95rem;
 	   line-height: 1.5;
 	   color: var(--c-text-soft);
@@ -45,6 +38,238 @@
 	   text-decoration: underline;
    }
    
+   .eu-project-archive-card,
+   .eu-project-single__hero-card,
+   .eu-project-single__fact-card,
+   .eu-project-single__content-card,
+   .eu-project-single__logos {
+	   background: rgba(255, 255, 255, 0.96);
+	   border: 1px solid rgba(58, 38, 24, 0.08);
+	   box-shadow: 0 18px 40px rgba(42, 33, 27, 0.06);
+   }
+   
+   .eu-project-archive-card__status,
+   .eu-project-single__badge,
+   .eu-project-single__section-kicker {
+	   display: inline-flex;
+	   align-items: center;
+	   justify-content: center;
+	   width: fit-content;
+	   padding: 0.5rem 0.8rem;
+	   font-size: 0.85rem;
+	   font-weight: 600;
+	   line-height: 1.2;
+	   letter-spacing: 0.02em;
+	   background:var(--c-accent);
+	   color: #fff;
+   }
+   
+   .eu-project-archive-card__program,
+   .eu-project-single__program {
+	   display: inline-flex;
+	   align-items: center;
+	   width: fit-content;
+	   font-size: 0.95rem;
+	   font-weight: 600;
+	   line-height: 1.5;
+	   background:var(--c-accent);
+	   color: #fff;
+   }
+
+   .eu-project-single__program{
+		max-width: fit-content;
+		padding: 0.5rem 0.8rem!important;
+   }
+   
+   .eu-project-archive-card__button,
+   .eu-project-single__actions .button,
+   .eu-project-single__actions a.button,
+   .eu-project-single__actions .button--primary,
+   .eu-project-single__actions .button--secondary {
+	   display: inline-flex;
+	   align-items: center;
+	   justify-content: center;
+	   gap: 0.5rem;
+	   width: fit-content;
+	   padding: 0.9rem 1.35rem;
+	   font-weight: 600;
+	   line-height: 1.2;
+	   text-decoration: none;
+	   transition:
+		   background-color var(--transition-fast),
+		   color var(--transition-fast),
+		   border-color var(--transition-fast),
+		   transform var(--transition-fast);
+   }
+   
+   .eu-project-archive-card__button:hover,
+   .eu-project-single__actions .button:hover,
+   .eu-project-single__actions a.button:hover,
+   .eu-project-single__actions .button:focus-visible,
+   .eu-project-single__actions a.button:focus-visible {
+	   transform: translateY(-1px);
+   }
+   
+   /* =========================================================
+	  ARCHIVE EU PROJECTS
+	  ========================================================= */
+   
+   .eu-projects-archive {
+	   min-width: 0;
+   }
+   
+   .eu-projects-archive__header {
+	   display: grid;
+	   gap: 1rem;
+	   margin-bottom: clamp(1.5rem, 3vw, 2rem);
+   }
+   
+   .eu-projects-archive__title {
+	   margin: 0;
+	   font-family: var(--font-heading);
+	   font-size: clamp(2rem, 4vw, 3.5rem);
+	   line-height: 1.08;
+	   letter-spacing: -0.02em;
+	   color: var(--c-primary);
+   }
+   
+   .eu-projects-archive__description {
+	   margin: 0;
+	   max-width: 70ch;
+	   font-size: 1rem;
+	   line-height: 1.8;
+	   color: var(--c-text-soft);
+   }
+   
+   .eu-projects-archive__grid {
+	   display: grid;
+	   grid-template-columns: repeat(2, minmax(0, 1fr));
+	   gap: clamp(1.25rem, 2vw, 1.75rem);
+	   align-items: stretch;
+   }
+   
+   .eu-project-archive-card {
+	   display: grid;
+	   grid-template-rows: auto 1fr;
+	   min-width: 0;
+	   overflow: hidden;
+   }
+   
+   .eu-project-archive-card__media {
+	   display: flex;
+	   align-items: center;
+	   justify-content: center;
+	   padding: clamp(1rem, 2vw, 1.5rem);
+	   background: rgba(247, 243, 238, 0.7);
+	   border-bottom: 1px solid rgba(58, 38, 24, 0.08);
+	   min-width: 0;
+   }
+   
+   .eu-project-archive-card__media img {
+	   display: block;
+	   max-width: 100%;
+	   width: auto;
+	   height: auto;
+	   object-fit: contain;
+   }
+   
+   .eu-project-archive-card__content {
+	   display: grid;
+	   align-content: start;
+	   gap: 0.9rem;
+	   padding: clamp(1.25rem, 2.5vw, 1.75rem);
+	   min-width: 0;
+   }
+   
+   .eu-project-archive-card__meta {
+	   display: grid;
+	   gap: 0.5rem;
+	   min-width: 0;
+   }
+   
+   .eu-project-archive-card__title {
+	   margin: 0;
+	   font-family: var(--font-heading);
+	   font-size: clamp(1.8rem, 2.5vw, 2.35rem);
+	   line-height: 1.1;
+	   letter-spacing: -0.02em;
+	   color: var(--c-primary);
+	   overflow-wrap: anywhere;
+	   hyphens: auto;
+   }
+   
+   .eu-project-archive-card__title a {
+	   color: inherit;
+	   text-decoration: none;
+   }
+   
+   .eu-project-archive-card__title a:hover,
+   .eu-project-archive-card__title a:focus-visible {
+	   color: var(--c-accent);
+   }
+   
+   .eu-project-archive-card__period {
+	   margin: 0;
+	   font-size: 1rem;
+	   line-height: 1.7;
+	   color: var(--c-text-soft);
+   }
+   
+   .eu-project-archive-card__excerpt {
+	   margin: 0;
+	   font-size: 1rem;
+	   line-height: 1.9;
+	   color: var(--c-text-soft);
+	   overflow-wrap: anywhere;
+   }
+   
+   .eu-project-archive-card__footer {
+	   display: flex;
+	   flex-wrap: wrap;
+	   gap: 0.75rem;
+	   padding-top: 0.25rem;
+	   margin-top: auto;
+   }
+   
+   .eu-project-archive-card__button {
+	   background: var(--c-accent);
+	   color: #fff;
+	   border: 1px solid var(--c-accent);
+   }
+   
+   .eu-project-archive-card__button:hover,
+   .eu-project-archive-card__button:focus-visible {
+	   background: var(--c-accent-hover);
+	   border-color: var(--c-accent-hover);
+	   color: #fff;
+   }
+   
+   /* =========================================================
+	  SINGLE EU PROJECT
+	  ========================================================= */
+   
+   body.single-eu_project .site,
+   body.single-eu_project .site-main {
+	   min-height: 0;
+   }
+   
+   .eu-project-single {
+	   min-width: 0;
+   }
+   
+   .eu-project-single__hero,
+   .eu-project-single__overview,
+   .eu-project-single__section {
+	   padding: 0;
+   }
+   
+   .eu-project-single__hero .container,
+   .eu-project-single__overview .container,
+   .eu-project-single__section .container {
+	   display: grid;
+	   gap: clamp(1.25rem, 2vw, 1.5rem);
+   }
+   
    .eu-project-single__logos-wrap {
 	   margin: 0;
    }
@@ -55,9 +280,6 @@
 	   gap: clamp(0.75rem, 1.5vw, 1.25rem);
 	   align-items: center;
 	   padding: clamp(1rem, 2vw, 1.75rem);
-	   background: rgba(255, 255, 255, 0.96);
-	   border: 1px solid rgba(58, 38, 24, 0.08);
-	   box-shadow: 0 14px 28px rgba(42, 33, 27, 0.05);
    }
    
    .eu-project-single__logo-item {
@@ -70,9 +292,10 @@
    
    .eu-project-single__logo-item img {
 	   display: block;
-	   width: 100%;
+	   max-width: 100%;
+	   width: auto;
 	   height: auto;
-	   
+	   object-fit: contain;
    }
    
    .eu-project-single__hero-card {
@@ -80,9 +303,6 @@
 	   gap: clamp(0.9rem, 1.8vw, 1.35rem);
 	   align-content: start;
 	   padding: clamp(1.5rem, 3vw, 2.5rem);
-	   background: rgba(255, 255, 255, 0.96);
-	   border: 1px solid rgba(58, 38, 24, 0.08);
-	   box-shadow: 0 20px 42px rgba(42, 33, 27, 0.07);
 	   overflow: hidden;
 	   min-width: 0;
    }
@@ -94,30 +314,14 @@
 	   margin: 0;
    }
    
-   .eu-project-single__badge,
    .eu-project-single__program {
-	   display: inline-flex;
-	   align-items: center;
-	   padding: 0.55rem 0.9rem;
-	   font-size: 0.875rem;
-	   font-weight: 600;
-	   line-height: 1.2;
-   }
-   
-   .eu-project-single__badge {
-	   background: rgba(81, 110, 82, 0.1);
-	   color: var(--c-accent);
-   }
-   
-   .eu-project-single__program {
-	   background: rgba(58, 38, 24, 0.06);
-	   color: var(--c-primary);
+	   padding: 0;
    }
    
    .eu-project-single__title {
 	   margin: 0;
 	   font-family: var(--font-heading);
-	   font-size: clamp(2rem, 2.3vw, 3.8rem) !important;
+	   font-size: clamp(2rem, 2.5vw, 3.6rem) !important;
 	   line-height: 1.06;
 	   letter-spacing: -0.02em;
 	   text-transform: none;
@@ -145,24 +349,6 @@
 	   flex-wrap: wrap;
 	   gap: 0.75rem;
 	   margin: 0;
-   }
-   
-   .eu-project-single__actions .button,
-   .eu-project-single__actions a.button,
-   .eu-project-single__actions .button--primary,
-   .eu-project-single__actions .button--secondary {
-	   display: inline-flex;
-	   align-items: center;
-	   justify-content: center;
-	   padding: 0.9rem 1.35rem;
-	   font-weight: 600;
-	   line-height: 1.2;
-	   text-decoration: none;
-	   transition:
-		   background-color var(--transition-fast),
-		   color var(--transition-fast),
-		   border-color var(--transition-fast),
-		   transform var(--transition-fast);
    }
    
    .eu-project-single__actions .button--primary {
@@ -209,9 +395,6 @@
 	   min-width: 0;
 	   min-height: 15rem;
 	   padding: clamp(1.375rem, 2.5vw, 2rem);
-	   background: rgba(255, 255, 255, 0.96);
-	   border: 1px solid rgba(58, 38, 24, 0.08);
-	   box-shadow: 0 18px 40px rgba(42, 33, 27, 0.06);
 	   overflow: hidden;
    }
    
@@ -275,19 +458,6 @@
 	   margin: 0;
    }
    
-   .eu-project-single__section-kicker {
-	   display: inline-flex;
-	   align-items: center;
-	   justify-self: start;
-	   padding: 0.45rem 0.75rem;
-	   background: var(--c-accent);
-	   color: #fff;
-	   font-size: 0.8rem;
-	   font-weight: 600;
-	   letter-spacing: 0.04em;
-	   text-transform: uppercase;
-   }
-   
    .eu-project-single__content-card .entry-content {
 	   width: 100%;
 	   max-width: none;
@@ -297,14 +467,37 @@
 	   margin-top: 1rem;
    }
    
+   /* =========================================================
+	  EMPTY / FALLBACK
+	  ========================================================= */
+   
+   .eu-projects-archive__empty {
+	   padding: clamp(1.5rem, 3vw, 2rem);
+	   background: rgba(255, 255, 255, 0.96);
+	   border: 1px solid rgba(58, 38, 24, 0.08);
+	   box-shadow: 0 18px 40px rgba(42, 33, 27, 0.06);
+	   color: var(--c-text-soft);
+	   font-size: 1rem;
+	   line-height: 1.8;
+   }
+   
+   /* =========================================================
+	  RESPONSIVE
+	  ========================================================= */
+   
    @media (max-width: 960px) {
+	   .eu-projects-archive__grid,
 	   .eu-project-single__facts-grid {
 		   grid-template-columns: 1fr;
+	   }
+	   .eu-project-single__fact-card{
+		min-height: 10rem;
 	   }
    }
    
    @media (max-width: 640px) {
-	   .eu-project-single {
+	   body.post-type-archive-eu_project .site-main,
+	   body.single-eu_project .site-main {
 		   padding-block: 1.5rem;
 	   }
    
@@ -313,6 +506,7 @@
 		   padding: 1rem;
 	   }
    
+	   .eu-project-archive-card__content,
 	   .eu-project-single__hero-card,
 	   .eu-project-single__fact-card,
 	   .eu-project-single__content-card {
@@ -320,10 +514,52 @@
 		   min-height: 8rem;
 	   }
    
+	   .eu-project-archive-card__title {
+		   font-size: clamp(1.5rem, 8vw, 2rem);
+		   line-height: 1.12;
+	   }
+   
 	   .eu-project-single__title {
-		   font-size: clamp(1.2rem, 5vw, 2.8rem) !important;
+		   font-size: clamp(1.75rem, 5vw, 2.8rem) !important;
 		   line-height: 1.1;
 		   text-wrap: pretty;
-		   
 	   }
+   }
+
+  
+   .eu-project-archive-card__top{
+	display: flex;
+	flex-direction: column;
+	align-items: left;
+	justify-content: space-between;
+	gap: 1rem;
+   }
+
+   .eu-project-archive-card__program,
+   .eu-project-archive-card__badge{
+    background: var(--c-accent);
+    color: #fff;
+    border: 1px solid var(--c-accent);
+	padding: 0.35rem 0.75rem;
+	max-width: fit-content;
+	font-weight: 400;
+	font-size: 1rem;
+   }
+
+   .eu-project-archive-card__link{
+	padding: 1rem 1rem;
+	background-color: var(--c-accent);
+	color: #fff;
+	text-decoration: none;
+	font-weight: 600;
+	font-size: 1rem;
+	line-height: 1.2;
+	letter-spacing: 0.02em;
+	text-transform: uppercase;
+   }
+
+   .eu-project-archive-card__link:hover{
+	background-color: var(--c-accent-hover);
+	color: #fff;
+	transform: translateY(-1px);
    }
