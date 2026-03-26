@@ -11,7 +11,7 @@
    body.post-type-archive-eu_project .container,
    body.single-eu_project .container {
 	   min-width: 0;
-   }
+   
    
    /* =========================================================
 	  COMMON
@@ -38,6 +38,10 @@
 	   text-decoration: underline;
    }
    
+   .eu-projects-archive__title{
+	padding: 20px 0;
+   }
+
    .eu-project-archive-card,
    .eu-project-single__hero-card,
    .eu-project-single__fact-card,
@@ -560,4 +564,8 @@
 	background-color: var(--c-accent-hover);
 	color: #fff;
 	transform: translateY(-1px);
+   }
+
+   .eu-projects-archive__breadcrumbs{
+	padding-bottom: 10px;
    }

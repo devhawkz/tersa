@@ -415,7 +415,6 @@
   .woocommerce-error {
     margin-bottom: var(--sp-20);
     padding: var(--sp-16) var(--sp-20);
-    border-radius: var(--radius-md);
     border: 1px solid var(--c-border);
     background: var(--c-surface);
   }
@@ -484,4 +483,22 @@
 
   .product-related{
     background-color: #F8F3EE!important;
+  }
+
+  .wc-block-components-checkout-place-order-button__text{
+    font-weight: 700;
+  }
+  .woocommerce-breadcrumb.tersa-breadcrumbs span{
+   padding-left:5px;
+  }
+  @media (max-width: 768px) {
+    .wc-block-formatted-money-amount.wc-block-components-formatted-money-amount.wc-block-components-checkout-order-summary__title-price,
+    .wc-block-components-checkout-order-summary__title-icon{
+      color:#fff;
+      font-weight: 600;
+    }
+  }
+
+  .yith-wcwl-add-to-wishlist-button__label{
+    display:none;
   }

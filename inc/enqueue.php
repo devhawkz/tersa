@@ -31,8 +31,9 @@ function tersa_enqueue_assets() {
 			$theme_version
 		);
 	}
-	
-	if (is_front_page()) {
+	$is_wishlist = function_exists('tersa_is_wishlist_page') && tersa_is_wishlist_page();
+	//hompeage
+	if (is_front_page() && !$is_wishlist) {
 		wp_enqueue_style(
 			'tersa-home',
 			$theme_uri . '/assets/css/home.css',
@@ -49,6 +50,17 @@ function tersa_enqueue_assets() {
 		);
 	}
 
+	if ($is_wishlist) {
+		wp_enqueue_style(
+			'tersa-wishlist',
+			$theme_uri . '/assets/css/wishlist.css',
+			['tersa-base', 'tersa-layout'],
+			$theme_version
+		);
+
+	}
+
+	//shop page
 	if (
 		function_exists('is_shop')
 		&& (
@@ -115,15 +127,6 @@ function tersa_enqueue_assets() {
 		);
 	}
 
-	if (tersa_is_wishlist_page()) {
-		wp_enqueue_style(
-			'tersa-wishlist',
-			$theme_uri . '/assets/css/wishlist.css',
-			['tersa-base', 'tersa-layout'],
-			$theme_version
-		);
-	}
-
 	if (is_404()) {
 		wp_enqueue_style(
 			'tersa-404',
@@ -133,7 +136,7 @@ function tersa_enqueue_assets() {
 		);
 	}
 
-	if (is_page() && !is_front_page()) {
+	if (is_page() && !is_front_page() && (!function_exists('tersa_is_wishlist_page') || !tersa_is_wishlist_page())) {
 		wp_enqueue_style(
 			'tersa-page',
 			$theme_uri . '/assets/css/page.css',

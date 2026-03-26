@@ -17,6 +17,11 @@ get_header();
 				<span><?php esc_html_e('EU Projekti', 'tersa-shop'); ?></span>
 			</nav>
 		</div>
+		<div class="container container--narrow">
+			<h1 class="eu-projects-archive__title">
+				<?php esc_html_e('EU Projekti', 'tersa-shop'); ?>
+			</h1>
+		</div>
 	</section>
 
 	<section class="eu-projects-archive__list section">

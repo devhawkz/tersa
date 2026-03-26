@@ -77,6 +77,7 @@ function tersa_pll_wishlist(string $key): string {
 		'product_name'          => 'Naziv proizvoda',
 		'unit_price'            => 'Cijena',
 		'price'                 => 'Cijena',
+		'stock'                 => 'Status zaliha',
 		'stock_status'          => 'Status zaliha',
 		'add_to_cart'           => 'Dodaj u košaricu',
 		'remove_product'        => 'Ukloni ovaj proizvod',
@@ -106,6 +107,9 @@ add_filter(
 			$hr = 'Trenutačno nema proizvoda u košarici.';
 			return function_exists('pll__') ? pll__($hr) : $hr;
 
+			case 'Stock':
+				$hr = 'Zalihe';
+				return function_exists('pll__') ? pll__($hr) : $hr;
 
 				case 'Subtotal':
 					return 'Međuzbir';
@@ -247,7 +251,14 @@ add_filter(
 					return tersa_pll_wishlist('unit_price');
 
 				case 'Price':
+				case 'Price:':
 					return tersa_pll_wishlist('price');
+
+				case 'Stock':
+				case 'stock':
+				case 'Stock:':
+				case 'stock:':
+					return tersa_pll_wishlist('stock');
 
 				case 'Stock status':
 					return tersa_pll_wishlist('stock_status');
@@ -525,6 +536,7 @@ add_action(
 		pll_register_string('tersa_wishlist_title_mine', 'Moja lista želja', 'Tersa – wishlist', ['multiline' => false]);
 		pll_register_string('tersa_wishlist_product_name', 'Naziv proizvoda', 'Tersa – wishlist', ['multiline' => false]);
 		pll_register_string('tersa_wishlist_price', 'Cijena', 'Tersa – wishlist', ['multiline' => false]);
+		pll_register_string('tersa_wishlist_stock', 'Zaliha', 'Tersa – wishlist', ['multiline' => false]);
 		pll_register_string('tersa_wishlist_stock_status', 'Status zaliha', 'Tersa – wishlist', ['multiline' => false]);
 		pll_register_string('tersa_wishlist_add_to_cart', 'Dodaj u košaricu', 'Tersa – wishlist', ['multiline' => false]);
 		pll_register_string('tersa_wishlist_remove_product', 'Ukloni ovaj proizvod', 'Tersa – wishlist', ['multiline' => false]);
