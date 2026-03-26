@@ -502,3 +502,19 @@
   .yith-wcwl-add-to-wishlist-button__label{
     display:none;
   }
+
+  .tersa-page__content a{
+    color: #fff!important;
+  }
+
+  .wp-block-button__link{
+    background-color: var(--c-accent);
+    color:#fff;
+    text-transform: uppercase;
+    padding:10px 20px;
+    border-radius: 5px;
+    text-decoration: none;
+    font-weight: 600;
+    font-size: 14px;
+    height: auto!important;
+  }
