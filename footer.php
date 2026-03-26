@@ -229,7 +229,7 @@ $legal_fallback = [
 
 						$company_link = sprintf(
 							'<a href="%s">Tersa d.o.o.</a>',
-							esc_url('http://tersa.local/')
+							esc_url(home_url('/'))
 						);
 
 						echo wp_kses_post(str_replace('Tersa d.o.o.', $company_link, $copyright_text));

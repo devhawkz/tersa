@@ -4,47 +4,42 @@ if (!defined('ABSPATH')) {
 }
 
 /**
- * Uklanja WordPress verziju iz front-end HTML-a i RSS feedova.
- * Sprečava automatsko skeniranje poznate ranjivosti po verziji.
+ * Tersa security hardening
+ *
+ * Tema-level hardening sloj. Ne pokušava da zameni server/WAF zaštitu,
+ * već pokriva ono što je bezbedno i smisleno držati u temi.
+ */
+
+/**
+ * Ukloni generator meta tag i generator iz feedova.
  */
 add_filter('the_generator', '__return_empty_string');
 
 /**
- * Uklanja ?ver= query string iz URL-ova statičnih resursa na frontendu.
- * Smanjuje informacije o instalaciji dostupne automatskim skenerima.
+ * XML-RPC nije potreban za ovaj projekat i ostaje ugašen.
+ */
+add_filter('xmlrpc_enabled', '__return_false');
+
+/**
+ * Ukloni X-Pingback header.
  */
 add_filter(
-	'style_loader_src',
-	function (string $src): string {
-		if (is_admin()) {
-			return $src;
-		}
-
-		return $src ? esc_url(remove_query_arg('ver', $src)) : $src;
-	}
-);
-
-add_filter(
-	'script_loader_src',
-	function (string $src): string {
-		if (is_admin()) {
-			return $src;
-		}
-
-		return $src ? esc_url(remove_query_arg('ver', $src)) : $src;
+	'wp_headers',
+	static function (array $headers): array {
+		unset($headers['X-Pingback']);
+		return $headers;
 	}
 );
 
 /**
- * Onemogućava enumeraciju korisnika putem REST API-ja (/wp-json/wp/v2/users).
- * Izlaganje korisničkih lozinki/user-name-ova olakšava brute-force napade.
+ * Sakrij REST users endpoint za neprivilegovane korisnike.
  */
 add_filter(
 	'rest_endpoints',
-	function (array $endpoints): array {
+	static function (array $endpoints): array {
 		if (!current_user_can('list_users')) {
 			unset($endpoints['/wp/v2/users']);
-			unset($endpoints['/wp/v2/users/(?P<id>[\d]+)']);
+			unset($endpoints['/wp/v2/users/(?P<id>[\\d]+)']);
 		}
 
 		return $endpoints;
@@ -52,38 +47,59 @@ add_filter(
 );
 
 /**
- * Dodaje sigurnosne HTTP zaglavlja za sve frontend odgovore.
- * - X-Content-Type-Options: Sprečava MIME-type sniffing napad.
- * - X-Frame-Options: Sprečava clickjacking embedding u iframe.
- * - Referrer-Policy: Ograničava koje se informacije šalju u Referer zaglavlju.
+ * Blokiraj klasičnu author enumeration putanju (?author=1).
+ */
+add_action(
+	'template_redirect',
+	static function (): void {
+		if (is_admin()) {
+			return;
+		}
+
+		if (!isset($_GET['author'])) {
+			return;
+		}
+
+		$author = wp_unslash($_GET['author']);
+
+		if (is_scalar($author) && preg_match('/^\d+$/', (string) $author)) {
+			wp_safe_redirect(home_url('/'), 301);
+			exit;
+		}
+	}
+);
+
+/**
+ * Generičke login greške: ne otkrivaj da li je problem username ili password.
+ */
+add_filter(
+	'login_errors',
+	static function (): string {
+		return __('Prijava nije uspela.', 'tersa-shop');
+	}
+);
+
+/**
+ * Sigurnosna HTTP zaglavlja.
+ *
+ * CSP nije dodat iz teme jer lako lomi WooCommerce/payment/plugin flow.
+ * To se uvodi tek posle punog QA-a i report-only faze.
  */
 add_action(
 	'send_headers',
-	function (): void {
-		if (is_admin()) {
+	static function (): void {
+		if (headers_sent()) {
 			return;
 		}
 
 		header('X-Content-Type-Options: nosniff');
 		header('X-Frame-Options: SAMEORIGIN');
 		header('Referrer-Policy: strict-origin-when-cross-origin');
-	}
-);
+		header('Permissions-Policy: geolocation=(), microphone=(), camera=(), usb=(), payment=()');
 
-/**
- * Onemogućava XML-RPC pristup koji se koristi za brute-force i DDoS amplifikaciju.
- * WooCommerce ne koristi XML-RPC — isključivo REST API.
- */
-add_filter('xmlrpc_enabled', '__return_false');
-
-/**
- * Uklanja X-Pingback zaglavlje koje otkriva da sajt koristi WordPress.
- */
-add_filter(
-	'wp_headers',
-	function (array $headers): array {
-		unset($headers['X-Pingback']);
-
-		return $headers;
-	}
+		if (is_ssl()) {
+			header('Strict-Transport-Security: max-age=31536000; includeSubDomains');
+		}
+	},
+	20
 );
