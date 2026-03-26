@@ -664,20 +664,17 @@ function tersa_get_active_filter_values(string $taxonomy): array {
 }
 
 function tersa_get_archive_reset_url(): string {
-	if (is_product_category() || is_product_tag() || is_tax()) {
-		$term = get_queried_object();
-		if ($term instanceof WP_Term) {
-			$link = get_term_link($term);
-			if (!is_wp_error($link)) {
-				return $link;
-			}
-		}
-	}
-
 	if (function_exists('wc_get_page_id')) {
 		$shop_id = wc_get_page_id('shop');
 		if ($shop_id > 0) {
 			return get_permalink($shop_id);
+		}
+	}
+
+	if (function_exists('get_post_type_archive_link')) {
+		$archive_link = get_post_type_archive_link('product');
+		if (!empty($archive_link)) {
+			return $archive_link;
 		}
 	}
 
