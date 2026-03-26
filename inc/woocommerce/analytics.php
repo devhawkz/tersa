@@ -4,8 +4,9 @@ if (!defined('ABSPATH')) {
 }
 
 /**
- * WooCommerce Analytics sinkronizacija kupaca na frontend-u.
- * Na frontendu to nije potrebno, pa uklanjamo dodatne usermeta upite.
+ * WooCommerce analytics:
+ * - uklanja customer analytics hookove na `frontend` (smanjuje DB upite)
+ * - na admin-u ostavlja originalno ponašanje
  */
 function tersa_disable_woocommerce_customer_analytics_on_frontend(): void {
 	if (is_admin()) {
