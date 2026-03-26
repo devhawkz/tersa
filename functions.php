@@ -17,10 +17,10 @@ require_once get_template_directory() . '/inc/footer-helpers.php';
 require_once get_template_directory() . '/inc/woocommerce.php';
 
 // SEO / Schema
-// require_once get_template_directory() . '/inc/schema.php';
+ require_once get_template_directory() . '/inc/schema.php';
 
 // Performance
 require_once get_template_directory() . '/inc/performance.php';
 
 // Security
-// require_once get_template_directory() . '/inc/security.php';
+ require_once get_template_directory() . '/inc/security.php';
