@@ -18,15 +18,15 @@ add_action('init', function (): void {
 	);
 }, 20);
 
-add_action('save_post_product', function (): void {
+function tersa_purge_woocommerce_transients_on_product_save(int $post_id, $post = null, $update = null): void {
 	global $wpdb;
+
+	// Purge bestsellers transients (ne zavise od konkretnog product ID-a).
 	$wpdb->query(
 		"DELETE FROM {$wpdb->options} WHERE option_name LIKE '_transient_tersa_bestsellers_%' OR option_name LIKE '_transient_timeout_tersa_bestsellers_%'"
 	);
-});
 
-add_action('save_post_product', function (int $post_id): void {
-	global $wpdb;
+	// Purge related transients (zavisi od product ID-a).
 	$wpdb->query(
 		$wpdb->prepare(
 			"DELETE FROM {$wpdb->options} WHERE option_name LIKE %s OR option_name LIKE %s",
@@ -34,7 +34,9 @@ add_action('save_post_product', function (int $post_id): void {
 			'_transient_timeout_tersa_related_' . $post_id
 		)
 	);
-});
+}
+
+add_action('save_post_product', 'tersa_purge_woocommerce_transients_on_product_save', 10, 3);
 
 function &tersa_wishlist_shortcode_cache(): array {
 	static $cache = [];
