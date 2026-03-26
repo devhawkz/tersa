@@ -106,3 +106,22 @@ function tersa_pll_page_url(string $slug): string {
 
 	return get_permalink($page->ID) ?: home_url('/' . $slug . '/');
 }
+
+/**
+ * Slug stranice koja cuva globalna podešavanja za ACF Free.
+ *
+ * @return string
+ */
+function tersa_get_global_settings_slug(): string {
+	return 'global-settings';
+}
+
+/**
+ * ID global settings stranice (ACF Free pristup).
+ *
+ * @return int
+ */
+function tersa_get_global_settings_page_id(): int {
+	$page = get_page_by_path(tersa_get_global_settings_slug());
+	return $page ? (int) $page->ID : 0;
+}

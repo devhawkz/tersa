@@ -52,44 +52,21 @@ $section_title = !empty($section_title) ? $section_title : 'Bestsellers';
 $badge_color   = !empty($badge_color) ? $badge_color : '#000000';
 
 $product_tag_slug = 'najprodavanije';
-	$title_defined_tag_slug = false;
-
-// Ako se section title postavi kao "Najnovije" / "Najprodavanije",
-// onda filter proizvoda radi na osnovu toga (umesto hardcodovanog slug-a).
-if (!empty($section_title)) {
-	$normalized_title = function_exists('mb_strtolower') ? mb_strtolower((string) $section_title) : strtolower((string) $section_title);
-	$normalized_title = trim($normalized_title);
-
-	// Najnovije
-	if (strpos($normalized_title, 'najnov') !== false) {
-		$product_tag_slug = 'novo';
-		$title_defined_tag_slug = true;
-	}
-
-	// Najprodavanije
-	elseif (strpos($normalized_title, 'najprod') !== false) {
-		$product_tag_slug = 'najprodavanije';
-		$title_defined_tag_slug = true;
-	}
-}
 
 if (function_exists('get_field')) {
-	// Ovaj field može da bude string/select u ACF-u: 'najprodavanije' ili 'novo'
-	// Primeni ga SAMO ako title nije mogao da se prepozna.
-	if (!$title_defined_tag_slug) {
-		$acf_product_tag_slug = get_field($tag_slug_field, $page_id);
-		if ($acf_product_tag_slug === null) {
-			$acf_product_tag_slug = get_field('home_bestsellers_product_tag_slug', $page_id);
-		}
+	// Izbor taga mora da bude eksplicitan (ACF), ne izveden iz naslova sekcije.
+	$acf_product_tag_slug = get_field($tag_slug_field, $page_id);
+	if ($acf_product_tag_slug === null) {
+		$acf_product_tag_slug = get_field('home_bestsellers_product_tag_slug', $page_id);
+	}
 
-		$acf_product_tag_slug = (string) $acf_product_tag_slug;
-		if ($acf_product_tag_slug === 'novo') {
-			$acf_product_tag_slug = 'najnovije';
-		}
+	$acf_product_tag_slug = (string) $acf_product_tag_slug;
+	if ($acf_product_tag_slug === 'novo') {
+		$acf_product_tag_slug = 'najnovije';
+	}
 
-		if (in_array($acf_product_tag_slug, ['najprodavanije', 'najnovije'], true)) {
-			$product_tag_slug = $acf_product_tag_slug;
-		}
+	if (in_array($acf_product_tag_slug, ['najprodavanije', 'najnovije'], true)) {
+		$product_tag_slug = $acf_product_tag_slug;
 	}
 }
 

@@ -5,7 +5,6 @@ if (!defined('ABSPATH')) {
 
 get_header();
 ?>
-<?php echo '<!-- FRONT PAGE LOADED -->'; ?>
 
 <main id="content" class="site-main" role="main">
 	<?php get_template_part('template-parts/home/hero-slider'); ?>

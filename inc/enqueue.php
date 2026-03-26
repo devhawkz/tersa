@@ -11,6 +11,7 @@ function tersa_enqueue_assets() {
 	wp_enqueue_style('tersa-layout', $theme_uri . '/assets/css/layout.css', ['tersa-base'], $theme_version);
 	wp_enqueue_style('tersa-header', $theme_uri . '/assets/css/header.css', ['tersa-base'], $theme_version);
 	wp_enqueue_style('tersa-footer', $theme_uri . '/assets/css/footer.css', ['tersa-base'], $theme_version);
+	wp_enqueue_style('tersa-sidebar', $theme_uri . '/assets/css/sidebar.css', ['tersa-base'], $theme_version);
 
 	//contact page style
 	if (is_page_template('page-templates/template-contact.php')) {
@@ -154,15 +155,7 @@ function tersa_enqueue_assets() {
 			$theme_version
 		);
 	}
-/*
-	if (function_exists('is_cart') && is_cart()) {
-		wp_enqueue_style('tersa-cart', $theme_uri . '/assets/css/cart.css', ['tersa-base', 'tersa-layout'], $theme_version);
-	}
-
-	if (function_exists('is_checkout') && is_checkout()) {
-		wp_enqueue_style('tersa-checkout', $theme_uri . '/assets/css/checkout.css', ['tersa-base', 'tersa-layout'], $theme_version);
-	}
-	*/
+	
 
 	wp_enqueue_script('tersa-header-js', $theme_uri . '/assets/js/header.js', [], $theme_version, true);
 

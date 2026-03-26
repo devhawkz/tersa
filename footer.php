@@ -4,6 +4,14 @@ if (!defined('ABSPATH')) {
 }
 
 $site_name = get_bloginfo('name');
+$settings_page_id = function_exists('tersa_get_global_settings_page_id') ? tersa_get_global_settings_page_id() : 0;
+$get_option = function_exists('get_field') ? function ($key, $fallback = '') use ($settings_page_id) {
+	if (!$settings_page_id) {
+		return $fallback;
+	}
+	$value = get_field($key, $settings_page_id);
+	return (is_string($value) && trim($value) !== '') ? $value : $fallback;
+} : null;
 
 /**
  * Footer logo:
@@ -49,6 +57,11 @@ if (!$footer_logo_markup) {
 }
 
 $footer_settings = function_exists('tersa_get_footer_settings') ? tersa_get_footer_settings() : ['footer_newsletter_heading' => '', 'footer_newsletter_text' => ''];
+$company_name = $get_option ? $get_option('company_name', 'Tersa d.o.o.') : 'Tersa d.o.o.';
+$company_activity = $get_option ? $get_option('company_activity', __('Prerada drva i trgovina drvnim proizvodima', 'tersa-shop')) : __('Prerada drva i trgovina drvnim proizvodima', 'tersa-shop');
+$company_address = $get_option ? $get_option('company_address', __('Nikole Tesle 71, 31553 Črnk​ovci', 'tersa-shop')) : __('Nikole Tesle 71, 31553 Črnk​ovci', 'tersa-shop');
+$company_email = $get_option ? $get_option('company_email', 'tersa@tersa.hr') : 'tersa@tersa.hr';
+$footer_newsletter_shortcode = $get_option ? $get_option('footer_newsletter_cf7_shortcode', '[contact-form-7 id="02a3794" title="Contact form 1"]') : '[contact-form-7 id="02a3794" title="Contact form 1"]';
 
 $about_fallback = [
 	[
@@ -123,11 +136,11 @@ $legal_fallback = [
 						</h2>
 
 						<address class="site-footer__company">
-							<p><?php esc_html_e('Prerada drva i trgovina drvnim proizvodima', 'tersa-shop'); ?></p>
-							<p><?php esc_html_e('Nikole Tesle 71, 31553 Črnk​ovci', 'tersa-shop'); ?></p>
+							<p><?php echo esc_html($company_activity); ?></p>
+							<p><?php echo esc_html($company_address); ?></p>
 							<p>
 								<span class="site-footer__label"><?php esc_html_e('E-mail:', 'tersa-shop'); ?></span>
-								<a href="mailto:tersa@tersa.hr">tersa@tersa.hr</a>
+								<a href="mailto:<?php echo esc_attr($company_email); ?>"><?php echo esc_html($company_email); ?></a>
 							</p>
 							
 						</address>
@@ -184,7 +197,7 @@ $legal_fallback = [
 						// npr. text polju: [email* your-email class:site-footer__newsletter-input]
 						// i dugmetu: [submit class:site-footer__newsletter-button \"Prijavi se\"]
 						if (function_exists('do_shortcode')) {
-							echo do_shortcode('[contact-form-7 id="02a3794" title="Contact form 1"]');
+							echo do_shortcode($footer_newsletter_shortcode);
 						}
 						?>
 					</section>
@@ -221,18 +234,19 @@ $legal_fallback = [
 
 					<p class="site-footer__copyright">
 						<?php
-						$copyright_text = sprintf(
-							/* translators: %s: current year */
-							__('© %s Tersa d.o.o., sva prava pridržana', 'tersa-shop'),
-							date_i18n('Y')
-						);
-
 						$company_link = sprintf(
-							'<a href="%s">Tersa d.o.o.</a>',
-							esc_url(home_url('/'))
+							'<a href="%s">%s</a>',
+							esc_url(home_url('/')),
+							esc_html($company_name)
 						);
 
-						echo wp_kses_post(str_replace('Tersa d.o.o.', $company_link, $copyright_text));
+						$copyright_markup = sprintf(
+							__('© %1$s %2$s, sva prava pridržana', 'tersa-shop'),
+							date_i18n('Y'),
+							$company_link
+						);
+
+						echo wp_kses_post($copyright_markup);
 						?>
 					</p>
 

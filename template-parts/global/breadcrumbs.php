@@ -7,7 +7,22 @@ if (!function_exists('woocommerce_breadcrumb')) {
 	return;
 }
 ?>
-<nav class="tersa-breadcrumbs" aria-label="<?php esc_attr_e('Breadcrumb', 'tersa-shop'); ?>" aria-hidden="false" style="display:none;">
+
+<style>
+	.screen-reader-only {
+	position: absolute !important;
+	width: 1px;
+	height: 1px;
+	padding: 0;
+	margin: -1px;
+	overflow: hidden;
+	clip: rect(0, 0, 0, 0);
+	white-space: nowrap;
+	border: 0;
+}
+</style>
+
+<nav class="tersa-breadcrumbs .screen-reader-only" aria-label="<?php esc_attr_e('Breadcrumb', 'tersa-shop'); ?>" aria-hidden="false">
 	<?php
 	woocommerce_breadcrumb([
 		'delimiter'   => ' / ',
