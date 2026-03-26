@@ -22,8 +22,15 @@ function tersa_purge_woocommerce_transients_on_product_save(int $post_id, $post 
 	global $wpdb;
 
 	// Purge bestsellers transients (ne zavise od konkretnog product ID-a).
+	// NOTE: Keširanje koristi više delova key-a (slug/tag/instance/lang), pa ovde čistimo opseg
+	// preko options tabele LIKE match-om. Ako kasnije budemo hteli 100% deterministiku,
+	// možemo preći na enumeraciju tačnih transient key-ova.
 	$wpdb->query(
-		"DELETE FROM {$wpdb->options} WHERE option_name LIKE '_transient_tersa_bestsellers_%' OR option_name LIKE '_transient_timeout_tersa_bestsellers_%'"
+		$wpdb->prepare(
+			"DELETE FROM {$wpdb->options} WHERE option_name LIKE %s OR option_name LIKE %s",
+			'_transient_tersa_bestsellers_%',
+			'_transient_timeout_tersa_bestsellers_%'
+		)
 	);
 
 	// Purge related transients (zavisi od product ID-a).
