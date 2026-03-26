@@ -6,7 +6,7 @@ if (!defined('ABSPATH')) {
 /**
  * Polylang register strings (catalog/orderby + badge/stock + countdown + related + cart empty).
  */
-add_action('init', function () {
+function tersa_pll_register_general_shop_strings(): void {
 	if (!function_exists('pll_register_string')) {
 		return;
 	}
@@ -32,5 +32,6 @@ add_action('init', function () {
 
 	pll_register_string('tersa_related_products_title', 'Slični proizvodi', 'Tersa – proizvod (slični)', ['multiline' => false]);
 	pll_register_string('tersa_wc_empty_cart', 'Trenutno nema proizvoda u košarici.', 'Tersa – WooCommerce (košarica)', ['multiline' => false]);
-}, 20);
+}
+add_action('init', 'tersa_pll_register_general_shop_strings', 20);
 

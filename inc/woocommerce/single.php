@@ -3,7 +3,13 @@ if (!defined('ABSPATH')) {
 	exit;
 }
 
-add_filter('woocommerce_product_tabs', function ($tabs) {
+/**
+ * Product single behavior:
+ * - overwrite product tab titles
+ * - pluralization for reviews count (Polylang-aware)
+ */
+
+function tersa_woocommerce_product_tabs_override($tabs) {
 	global $product;
 
 	$hr_titles = [
@@ -26,9 +32,10 @@ add_filter('woocommerce_product_tabs', function ($tabs) {
 	}
 
 	return $tabs;
-}, 20);
+}
+add_filter('woocommerce_product_tabs', 'tersa_woocommerce_product_tabs_override', 20);
 
-add_filter('ngettext', function ($translation, $single, $plural, $number, $domain) {
+function tersa_woocommerce_ngettext_reviews_plural($translation, $single, $plural, $number, $domain) {
 	if ($domain !== 'woocommerce') {
 		return $translation;
 	}
@@ -50,4 +57,5 @@ add_filter('ngettext', function ($translation, $single, $plural, $number, $domai
 	}
 
 	return function_exists('pll__') ? pll__($hr) : $hr;
-}, 10, 5);
+}
+add_filter('ngettext', 'tersa_woocommerce_ngettext_reviews_plural', 10, 5);

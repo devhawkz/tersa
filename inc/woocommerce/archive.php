@@ -3,6 +3,14 @@ if (!defined('ABSPATH')) {
 	exit;
 }
 
+/**
+ * WooCommerce archive behavior:
+ * - shop/category/page cleanup hooks
+ * - allowed catalog sorting
+ * - taxonomy + meta filtering for archives
+ * - custom `orderby` implementation
+ */
+
 remove_action('woocommerce_before_main_content', 'woocommerce_breadcrumb', 20);
 remove_action('woocommerce_sidebar', 'woocommerce_get_sidebar', 10);
 remove_action('woocommerce_before_shop_loop', 'woocommerce_result_count', 20);
@@ -11,7 +19,7 @@ remove_action('woocommerce_after_shop_loop_item', 'woocommerce_template_loop_add
 remove_action('woocommerce_before_shop_loop_item_title', 'woocommerce_show_product_loop_sale_flash', 10);
 remove_action('woocommerce_after_shop_loop_item_title', 'woocommerce_template_loop_rating', 5);
 
-add_filter('woocommerce_cart_fragments_params', function ($params) {
+function tersa_woocommerce_cart_fragments_params($params) {
 	if (
 		function_exists('is_shop')
 		&& (
@@ -25,7 +33,8 @@ add_filter('woocommerce_cart_fragments_params', function ($params) {
 	}
 
 	return $params;
-});
+}
+add_filter('woocommerce_cart_fragments_params', 'tersa_woocommerce_cart_fragments_params', 10, 1);
 
 function tersa_get_allowed_catalog_orderby(): array {
 	$t = function (string $str): string {

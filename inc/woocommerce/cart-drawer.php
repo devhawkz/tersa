@@ -3,7 +3,13 @@ if (!defined('ABSPATH')) {
 	exit;
 }
 
-add_filter('wc_add_to_cart_message_html', function ($message, $products, $show_qty) {
+/**
+ * Cart drawer:
+ * - remove default "added to cart" message for AJAX add-to-cart flows
+ * - append bestsellers section below cart block (block-based + classic)
+ */
+
+function tersa_wc_suppress_add_to_cart_message_html($message, $products, $show_qty) {
 	$is_ajax = function_exists('wp_doing_ajax') ? wp_doing_ajax() : false;
 	$is_xhr = !empty($_SERVER['HTTP_X_REQUESTED_WITH']) && strtolower((string) $_SERVER['HTTP_X_REQUESTED_WITH']) === 'xmlhttprequest';
 	$is_wc_ajax = isset($_REQUEST['wc-ajax']) && in_array((string) $_REQUEST['wc-ajax'], ['add_to_cart', 'add_to_cart_form'], true);
@@ -13,7 +19,8 @@ add_filter('wc_add_to_cart_message_html', function ($message, $products, $show_q
 	}
 
 	return $message;
-}, 999, 3);
+}
+add_filter('wc_add_to_cart_message_html', 'tersa_wc_suppress_add_to_cart_message_html', 999, 3);
 
 function tersa_get_cart_drawer_fragments() {
 	ob_start();
@@ -35,7 +42,7 @@ function tersa_get_cart_drawer_fragments() {
 	]);
 }
 
-add_filter('render_block', function (string $block_content, array $block): string {
+function tersa_append_bestsellers_to_cart_block(string $block_content, array $block): string {
 	if (($block['blockName'] ?? '') !== 'woocommerce/cart') {
 		return $block_content;
 	}
@@ -54,4 +61,5 @@ add_filter('render_block', function (string $block_content, array $block): strin
 	}
 
 	return $block_content . $bestsellers;
-}, 10, 2);
+}
+add_filter('render_block', 'tersa_append_bestsellers_to_cart_block', 10, 2);

@@ -3,6 +3,12 @@ if (!defined('ABSPATH')) {
 	exit;
 }
 
+/**
+ * WooCommerce AJAX endpoints (mini-cart drawer):
+ * - update quantity of a cart item
+ * - fetch drawer fragments (mini cart HTML/count/total)
+ */
+
 function tersa_ajax_update_mini_cart_qty() {
 	check_ajax_referer('tersa_cart_nonce', 'nonce');
 

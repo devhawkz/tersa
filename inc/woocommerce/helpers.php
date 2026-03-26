@@ -4,6 +4,12 @@ if (!defined('ABSPATH')) {
 }
 
 /**
+ * Shared helpers for WooCommerce/YITH integration.
+ *
+ * Keeps plugin-specific string mapping isolated from hook files.
+ */
+
+/**
  * Detekcija YITH wishlist stranice.
  */
 function tersa_is_wishlist_page(): bool {

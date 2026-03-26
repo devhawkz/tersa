@@ -6,7 +6,7 @@ if (!defined('ABSPATH')) {
 /**
  * Polylang register strings (wishlist).
  */
-add_action('init', function () {
+function tersa_pll_register_wishlist_strings(): void {
 	if (!function_exists('pll_register_string')) {
 		return;
 	}
@@ -26,5 +26,6 @@ add_action('init', function () {
 	pll_register_string('tersa_wishlist_add_to_cart', 'Dodaj u košaricu', 'Tersa – wishlist', ['multiline' => false]);
 	pll_register_string('tersa_wishlist_remove_product', 'Ukloni ovaj proizvod', 'Tersa – wishlist', ['multiline' => false]);
 	pll_register_string('tersa_wishlist_empty', 'Nema proizvoda na listi želja.', 'Tersa – wishlist', ['multiline' => false]);
-}, 20);
+}
+add_action('init', 'tersa_pll_register_wishlist_strings', 20);
 

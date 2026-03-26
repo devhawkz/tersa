@@ -6,7 +6,7 @@ if (!defined('ABSPATH')) {
 /**
  * Polylang register strings (reviews + product tabs + aria labels).
  */
-add_action('init', function () {
+function tersa_pll_register_reviews_strings(): void {
 	if (!function_exists('pll_register_string')) {
 		return;
 	}
@@ -43,5 +43,6 @@ add_action('init', function () {
 	pll_register_string('tersa_wc_reviews_title_1', '%1$s recenzija za %2$s', 'Tersa – WooCommerce (recenzije)', ['multiline' => false]);
 	pll_register_string('tersa_wc_reviews_title_2', '%1$s recenzije za %2$s', 'Tersa – WooCommerce (recenzije)', ['multiline' => false]);
 	pll_register_string('tersa_wc_reviews_heading', 'Recenzije', 'Tersa – WooCommerce (recenzije)', ['multiline' => false]);
-}, 20);
+}
+add_action('init', 'tersa_pll_register_reviews_strings', 20);
 

@@ -3,16 +3,43 @@ if (!defined('ABSPATH')) {
 	exit;
 }
 
-add_filter('option_yith_wcwl_add_to_wishlist_text', fn() => tersa_pll_wishlist('add'));
-add_filter('option_yith_wcwl_browse_wishlist_text', fn() => tersa_pll_wishlist('browse'));
-add_filter('option_yith_wcwl_product_added_text', fn() => tersa_pll_wishlist('added'));
-add_filter('option_yith_wcwl_remove_from_wishlist_text', fn() => tersa_pll_wishlist('remove'));
-add_filter('option_yith_wcwl_already_in_wishlist_text', fn() => tersa_pll_wishlist('already_in'));
-add_filter('option_yith_wcwl_wishlist_title', fn() => tersa_pll_wishlist('title_mine'));
-add_filter('option_yith_wcwl_add_to_cart_text', fn() => tersa_pll_wishlist('add_to_cart'));
-add_filter('yith_wcwl_browse_wishlist_label', fn() => tersa_pll_wishlist('browse'));
+/**
+ * YITH wishlist hooks:
+ * - option string overrides (Polylang)
+ * - AJAX wishlist message translation fallback
+ */
 
-add_filter('yith_wcwl_ajax_add_response', function (array $response): array {
+function tersa_yith_wcwl_option_text_override_from_current_filter($value) {
+	$map = [
+		'option_yith_wcwl_add_to_wishlist_text'          => 'add',
+		'option_yith_wcwl_browse_wishlist_text'          => 'browse',
+		'option_yith_wcwl_product_added_text'           => 'added',
+		'option_yith_wcwl_remove_from_wishlist_text'     => 'remove',
+		'option_yith_wcwl_already_in_wishlist_text'     => 'already_in',
+		'option_yith_wcwl_wishlist_title'              => 'title_mine',
+		'option_yith_wcwl_add_to_cart_text'            => 'add_to_cart',
+		'yith_wcwl_browse_wishlist_label'              => 'browse',
+	];
+
+	$filter = function_exists('current_filter') ? current_filter() : '';
+	if (!is_string($filter) || $filter === '') {
+		return $value;
+	}
+
+	$key = $map[$filter] ?? '';
+	return $key !== '' ? tersa_pll_wishlist($key) : $value;
+}
+
+add_filter('option_yith_wcwl_add_to_wishlist_text', 'tersa_yith_wcwl_option_text_override_from_current_filter', 10, 1);
+add_filter('option_yith_wcwl_browse_wishlist_text', 'tersa_yith_wcwl_option_text_override_from_current_filter', 10, 1);
+add_filter('option_yith_wcwl_product_added_text', 'tersa_yith_wcwl_option_text_override_from_current_filter', 10, 1);
+add_filter('option_yith_wcwl_remove_from_wishlist_text', 'tersa_yith_wcwl_option_text_override_from_current_filter', 10, 1);
+add_filter('option_yith_wcwl_already_in_wishlist_text', 'tersa_yith_wcwl_option_text_override_from_current_filter', 10, 1);
+add_filter('option_yith_wcwl_wishlist_title', 'tersa_yith_wcwl_option_text_override_from_current_filter', 10, 1);
+add_filter('option_yith_wcwl_add_to_cart_text', 'tersa_yith_wcwl_option_text_override_from_current_filter', 10, 1);
+add_filter('yith_wcwl_browse_wishlist_label', 'tersa_yith_wcwl_option_text_override_from_current_filter', 10, 1);
+
+function tersa_yith_wcwl_ajax_add_response(array $response): array {
 	if (empty($response['message'])) {
 		return $response;
 	}
@@ -28,4 +55,5 @@ add_filter('yith_wcwl_ajax_add_response', function (array $response): array {
 	}
 
 	return $response;
-});
+}
+add_filter('yith_wcwl_ajax_add_response', 'tersa_yith_wcwl_ajax_add_response', 10, 1);

@@ -4,9 +4,11 @@ if (!defined('ABSPATH')) {
 }
 
 /**
- * Cache/transient i shortcode cache logika.
+ * Cache-related WooCommerce modules loader.
  *
- * Razdvojeno radi duge održivosti (transients vs shortcode cache).
+ * Razdvaja:
+ * - transient/cache invalidation
+ * - shortcode in-request cache
  */
 require_once __DIR__ . '/analytics.php';       // Woo analytics disable (per-request)
 require_once __DIR__ . '/cache-transients.php';      // purge transients on product save

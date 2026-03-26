@@ -10,7 +10,7 @@ if (!defined('ABSPATH')) {
  * (`Stock`, `in stock`, `Add to cart`) jer ih već obrađuje
  * `translations-gettext-woocommerce.php` (isto kao u originalnom monolitu).
  */
-add_filter('gettext', function ($translated, $text, $domain) {
+function tersa_yith_wishlist_gettext_override($translated, $text, $domain) {
 	if ($domain !== 'yith-woocommerce-wishlist' && $domain !== 'woocommerce') {
 		return $translated;
 	}
@@ -59,5 +59,6 @@ add_filter('gettext', function ($translated, $text, $domain) {
 	}
 
 	return $translated;
-}, 10, 3);
+}
+add_filter('gettext', 'tersa_yith_wishlist_gettext_override', 10, 3);
 

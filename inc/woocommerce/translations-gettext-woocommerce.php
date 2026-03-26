@@ -8,7 +8,7 @@ if (!defined('ABSPATH')) {
  *
  * Ovde držimo samo domen `woocommerce`, da bismo izbegli “overlap” override-e sa wishlist logikom.
  */
-add_filter('gettext', function ($translated, $text, $domain) {
+function tersa_woocommerce_gettext_override($translated, $text, $domain) {
 	if ($domain !== 'woocommerce') {
 		return $translated;
 	}
@@ -112,5 +112,6 @@ add_filter('gettext', function ($translated, $text, $domain) {
 		default:
 			return $translated;
 	}
-}, 10, 3);
+}
+add_filter('gettext', 'tersa_woocommerce_gettext_override', 10, 3);
 

@@ -3,6 +3,14 @@ if (!defined('ABSPATH')) {
 	exit;
 }
 
+/**
+ * WooCommerce/YITH translation layer loader.
+ *
+ * Split modulima:
+ * - frontend gettext overrides
+ * - Polylang string registration
+ */
+
 require_once __DIR__ . '/translations-gettext-woocommerce.php';        // WooCommerce string overrides
 require_once __DIR__ . '/translations-gettext-wishlist.php';          // YITH/Wishlist overrides
 require_once __DIR__ . '/translations-register-reviews.php';         // Polylang register strings (reviews/product tabs)
