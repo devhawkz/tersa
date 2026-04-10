@@ -14,6 +14,13 @@ if (isset($args) && is_array($args) && isset($args['instance'])) {
 	$instance = max(1, (int) $args['instance']);
 }
 
+$fields = function_exists('get_field') ? get_fields($page_id) : [];
+$fields = is_array($fields) ? $fields : [];
+
+$get_acf_value = static function (array $source, string $key, $fallback = null) {
+	return array_key_exists($key, $source) ? $source[$key] : $fallback;
+};
+
 $show_section_field = $instance === 2 ? 'show_home_bestsellers_section_2' : 'show_home_bestsellers_section_1';
 $title_field        = $instance === 2 ? 'home_bestsellers_section_title_2' : 'home_bestsellers_section_title_1';
 $badge_color_field  = $instance === 2 ? 'home_bestsellers_badge_color_2' : 'home_bestsellers_badge_color_1';
@@ -21,9 +28,9 @@ $tag_slug_field     = $instance === 2 ? 'home_bestsellers_product_tag_slug_2' : 
 
 $show_section = false;
 if (function_exists('get_field')) {
-	$show_value = get_field($show_section_field, $page_id);
+	$show_value = $get_acf_value($fields, $show_section_field, null);
 	if ($show_value === null) {
-		$show_value = get_field('show_home_bestsellers_section', $page_id);
+		$show_value = $get_acf_value($fields, 'show_home_bestsellers_section', false);
 	}
 	$show_section = (bool) $show_value;
 }
@@ -35,15 +42,15 @@ if (!$show_section) {
 $section_title = '';
 $badge_color   = '';
 if (function_exists('get_field')) {
-	$title_value = get_field($title_field, $page_id);
+	$title_value = $get_acf_value($fields, $title_field, null);
 	if ($title_value === null) {
-		$title_value = get_field('home_bestsellers_section_title', $page_id);
+		$title_value = $get_acf_value($fields, 'home_bestsellers_section_title', '');
 	}
 	$section_title = (string) $title_value;
 
-	$badge_value = get_field($badge_color_field, $page_id);
+	$badge_value = $get_acf_value($fields, $badge_color_field, null);
 	if ($badge_value === null) {
-		$badge_value = get_field('home_bestsellers_badge_color', $page_id);
+		$badge_value = $get_acf_value($fields, 'home_bestsellers_badge_color', '');
 	}
 	$badge_color = (string) $badge_value;
 }
@@ -55,9 +62,9 @@ $product_tag_slug = 'najprodavanije';
 
 if (function_exists('get_field')) {
 	// Izbor taga mora da bude eksplicitan (ACF), ne izveden iz naslova sekcije.
-	$acf_product_tag_slug = get_field($tag_slug_field, $page_id);
+	$acf_product_tag_slug = $get_acf_value($fields, $tag_slug_field, null);
 	if ($acf_product_tag_slug === null) {
-		$acf_product_tag_slug = get_field('home_bestsellers_product_tag_slug', $page_id);
+		$acf_product_tag_slug = $get_acf_value($fields, 'home_bestsellers_product_tag_slug', '');
 	}
 
 	$acf_product_tag_slug = (string) $acf_product_tag_slug;
@@ -70,37 +77,51 @@ if (function_exists('get_field')) {
 	}
 }
 
-$current_lang     = function_exists('pll_current_language') ? pll_current_language() : '';
+$current_lang     = function_exists('pll_current_language') ? (string) call_user_func('pll_current_language') : '';
 $transient_key    = 'tersa_bestsellers_' . $product_tag_slug . '_' . $instance . ($current_lang ? '_' . $current_lang : '');
 $cached_post_ids  = get_transient($transient_key);
+static $request_post_ids_cache = [];
+
+$translate = static function (string $text): string {
+	if (function_exists('pll__')) {
+		return (string) call_user_func('pll__', $text);
+	}
+	return $text;
+};
 
 if (false === $cached_post_ids) {
-	$query_args = [
-		'post_type'              => 'product',
-		'post_status'            => 'publish',
-		'posts_per_page'         => 4,
-		'no_found_rows'          => true,
-		'ignore_sticky_posts'    => true,
-		'update_post_meta_cache' => false,
-		'update_post_term_cache' => true,
-		'fields'                 => 'ids',
-		'tax_query'              => [
-			[
-				'taxonomy' => 'product_tag',
-				'field'    => 'slug',
-				'terms'    => $product_tag_slug,
-			],
-		],
-	];
+	$request_cache_key = $product_tag_slug . ($current_lang ? '_' . $current_lang : '');
 
-	if ($current_lang) {
-		$query_args['lang'] = $current_lang;
+	if (!array_key_exists($request_cache_key, $request_post_ids_cache)) {
+		$query_args = [
+			'post_type'              => 'product',
+			'post_status'            => 'publish',
+			'posts_per_page'         => 4,
+			'no_found_rows'          => true,
+			'ignore_sticky_posts'    => true,
+			'update_post_meta_cache' => true,
+			'update_post_term_cache' => true,
+			'fields'                 => 'ids',
+			'tax_query'              => [
+				[
+					'taxonomy' => 'product_tag',
+					'field'    => 'slug',
+					'terms'    => $product_tag_slug,
+				],
+			],
+		];
+
+		if ($current_lang) {
+			$query_args['lang'] = $current_lang;
+		}
+
+		$id_query                                 = new WP_Query($query_args);
+		$request_post_ids_cache[$request_cache_key] = $id_query->posts ?: [];
+		wp_reset_postdata();
 	}
 
-	$id_query        = new WP_Query($query_args);
-	$cached_post_ids = $id_query->posts ?: [];
+	$cached_post_ids = $request_post_ids_cache[$request_cache_key];
 	set_transient($transient_key, $cached_post_ids, 6 * HOUR_IN_SECONDS);
-	wp_reset_postdata();
 }
 
 if (empty($cached_post_ids)) {
@@ -114,13 +135,54 @@ $query = new WP_Query([
 	'orderby'                => 'post__in',
 	'no_found_rows'          => true,
 	'ignore_sticky_posts'    => true,
-	'update_post_meta_cache' => false,
+	'update_post_meta_cache' => true,
 	'update_post_term_cache' => true,
 ]);
 
 if (!$query->have_posts()) {
 	wp_reset_postdata();
 	return;
+}
+?>
+
+<?php
+$product_ids = array_map('intval', $query->posts);
+$product_tags_by_id = [];
+
+if (!empty($product_ids)) {
+	$terms = wp_get_object_terms(
+		$product_ids,
+		'product_tag',
+		[
+			'fields' => 'all_with_object_id',
+		]
+	);
+
+	if (!is_wp_error($terms) && is_array($terms)) {
+		foreach ($terms as $term) {
+			if (!isset($term->object_id)) {
+				continue;
+			}
+
+			$product_id = (int) $term->object_id;
+			if (!isset($product_tags_by_id[$product_id])) {
+				$product_tags_by_id[$product_id] = [];
+			}
+			$product_tags_by_id[$product_id][] = $term;
+		}
+
+		foreach ($product_tags_by_id as $product_id => $tag_terms) {
+			usort($tag_terms, static function ($a, $b) {
+				return (int) $b->count <=> (int) $a->count;
+			});
+			$product_tags_by_id[$product_id] = array_map(
+				static function ($term) {
+					return (string) $term->name;
+				},
+				array_slice($tag_terms, 0, 2)
+			);
+		}
+	}
 }
 ?>
 
@@ -181,7 +243,7 @@ if (!$query->have_posts()) {
 					$button_classes[] = 'ajax_add_to_cart';
 				}
 
-				$button_label_options = function_exists('pll__') ? pll__('Vidi opcije') : 'Vidi opcije';
+				$button_label_options = $translate('Vidi opcije');
 
 				if ($has_multiple_variants) {
 					$button_attributes = [
@@ -209,17 +271,7 @@ if (!$query->have_posts()) {
 							<div class="home-bestsellers__media">
 								<?php
 								// Prikaži do 2 taga iz WooCommerce proizvoda (umesto "sale badge").
-								$tag_names = wp_get_post_terms(
-									$product_id,
-									'product_tag',
-									[
-										'fields' => 'names',
-										'orderby' => 'count',
-										'order' => 'DESC',
-									]
-								);
-								$tag_names = is_array($tag_names) ? array_values($tag_names) : [];
-								$tag_names = array_slice($tag_names, 0, 2);
+								$tag_names = $product_tags_by_id[$product_id] ?? [];
 								?>
 								<?php if (!empty($tag_names)) : ?>
 									<div class="home-bestsellers__tags" aria-label="<?php echo esc_attr__('Product tags', 'tersa-shop'); ?>">
@@ -271,12 +323,19 @@ if (!$query->have_posts()) {
 						<?php if (function_exists('shortcode_exists') && shortcode_exists('yith_wcwl_add_to_wishlist')) : ?>
 							<div class="home-bestsellers__wishlist">
 								<?php
-								echo do_shortcode(
-									sprintf(
-										'[yith_wcwl_add_to_wishlist product_id="%d" link_classes="home-bestsellers__wishlist-link"]',
-										$product_id
-									)
-								);
+								static $wishlist_markup_cache = [];
+								$wishlist_key = (string) $product_id;
+
+								if (!isset($wishlist_markup_cache[$wishlist_key])) {
+									$wishlist_markup_cache[$wishlist_key] = do_shortcode(
+										sprintf(
+											'[yith_wcwl_add_to_wishlist product_id="%d" link_classes="home-bestsellers__wishlist-link"]',
+											$product_id
+										)
+									);
+								}
+
+								echo $wishlist_markup_cache[$wishlist_key];
 								?>
 							</div>
 						<?php endif; ?>

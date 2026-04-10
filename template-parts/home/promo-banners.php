@@ -13,15 +13,18 @@ if (!$page_id) {
 	return;
 }
 
-$show_section = (bool) get_field('show_home_promo_banners', $page_id);
+$fields = get_fields($page_id);
+$fields = is_array($fields) ? $fields : [];
+
+$show_section = !empty($fields['show_home_promo_banners']);
 
 if (!$show_section) {
 	return;
 }
 
 $banners_raw = [
-	get_field('home_promo_banner_1', $page_id),
-	get_field('home_promo_banner_2', $page_id),
+	$fields['home_promo_banner_1'] ?? null,
+	$fields['home_promo_banner_2'] ?? null,
 ];
 
 $banners = [];

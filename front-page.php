@@ -16,5 +16,10 @@ get_header();
 </main>
 
 <?php
-get_sidebar();
+$show_front_page_sidebar = (bool) get_theme_mod('tersa_show_front_page_sidebar', false);
+$show_front_page_sidebar = (bool) apply_filters('tersa_show_front_page_sidebar', $show_front_page_sidebar);
+
+if ($show_front_page_sidebar && is_active_sidebar('primary-sidebar')) {
+	get_sidebar();
+}
 get_footer();

@@ -13,16 +13,23 @@ if (!$page_id) {
 	return;
 }
 
-$show_section = (bool) get_field('show_home_promo_countdown', $page_id);
+$fields = get_fields($page_id);
+$fields = is_array($fields) ? $fields : [];
+
+$get_value = static function (array $source, string $key, $fallback = '') {
+	return array_key_exists($key, $source) ? $source[$key] : $fallback;
+};
+
+$show_section = (bool) $get_value($fields, 'show_home_promo_countdown', false);
 
 if (!$show_section) {
 	return;
 }
 
-$eyebrow = get_field('home_promo_countdown_eyebrow', $page_id);
-$title   = get_field('home_promo_countdown_title', $page_id);
-$image_id = get_field('home_promo_countdown_image', $page_id);
-$end_raw = get_field('home_promo_countdown_end', $page_id);
+$eyebrow  = (string) $get_value($fields, 'home_promo_countdown_eyebrow', '');
+$title    = (string) $get_value($fields, 'home_promo_countdown_title', '');
+$image_id = (int) $get_value($fields, 'home_promo_countdown_image', 0);
+$end_raw  = (string) $get_value($fields, 'home_promo_countdown_end', '');
 
 if (empty($title) || empty($image_id)) {
 	return;
@@ -36,6 +43,13 @@ if (!empty($end_raw)) {
 		$end_timestamp = (int) $parsed;
 	}
 }
+
+$translate = static function (string $text): string {
+	if (function_exists('pll__')) {
+		return (string) call_user_func('pll__', $text);
+	}
+	return $text;
+};
 ?>
 
 <section class="home-promo-countdown" aria-labelledby="home-promo-countdown-title">
@@ -56,10 +70,10 @@ if (!empty($end_raw)) {
 				// Polylang stringovi: ako postoji `pll__()`, uzmi prevod za trenutni jezik.
 				// U suprotnom fallback na WP gettext prevod (standardni __()/esc_html__ mehanizam).
 				// (Koristimo srpske ključeve da se ne dešava fallback na engleski.)
-				$label_days    = function_exists('pll__') ? pll__('Dana') : 'Dana';
-				$label_hours   = function_exists('pll__') ? pll__('Sati') : 'Sati';
-				$label_minutes = function_exists('pll__') ? pll__('Minuta') : 'Minuta';
-				$label_seconds = function_exists('pll__') ? pll__('Sekunde') : 'Sekunde';
+				$label_days    = $translate('Dana');
+				$label_hours   = $translate('Sati');
+				$label_minutes = $translate('Minuta');
+				$label_seconds = $translate('Sekunde');
 				?>
 				<div
 					class="home-promo-countdown__timer js-home-promo-countdown"
@@ -92,8 +106,8 @@ if (!empty($end_raw)) {
 		<div class="home-promo-countdown__media">
 			<?php
 			echo wp_get_attachment_image(
-				(int) $image_id,
-				'full',
+				$image_id,
+				'tersa-countdown',
 				false,
 				[
 					'class'         => 'home-promo-countdown__image',

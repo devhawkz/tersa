@@ -7,6 +7,7 @@ if (!defined('ABSPATH')) {
 $data        = tersa_get_header_template_data();
 $home_url    = $data['home_url'];
 $logo_markup = $data['logo_markup'];
+$mobile_logo_markup = str_replace(' loading="eager"', ' loading="lazy"', $logo_markup);
 ?>
 <div class="site-header__mobile-backdrop" data-mobile-close aria-hidden="true"></div>
 
@@ -27,7 +28,7 @@ $logo_markup = $data['logo_markup'];
 			aria-hidden="true"
 			tabindex="-1"
 		>
-			<?php echo $logo_markup; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
+			<?php echo $mobile_logo_markup; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
 		</a>
 
 		<button

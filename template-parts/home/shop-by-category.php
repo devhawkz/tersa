@@ -13,29 +13,32 @@ if (!$page_id) {
 	return;
 }
 
-$show_section = (bool) get_field('show_home_shop_by_category', $page_id);
+$fields = get_fields($page_id);
+$fields = is_array($fields) ? $fields : [];
+
+$show_section = !empty($fields['show_home_shop_by_category']);
 
 if (!$show_section) {
 	return;
 }
 
-$section_title = get_field('home_shop_by_category_title', $page_id);
+$section_title = $fields['home_shop_by_category_title'] ?? '';
 
 $items_raw = [
-	get_field('home_category_item_1', $page_id),
-	get_field('home_category_item_2', $page_id),
-	get_field('home_category_item_3', $page_id),
-	get_field('home_category_item_4', $page_id)
+	$fields['home_category_item_1'] ?? null,
+	$fields['home_category_item_2'] ?? null,
+	$fields['home_category_item_3'] ?? null,
+	$fields['home_category_item_4'] ?? null,
 ];
 
 $theme_uri = get_template_directory_uri();
+$theme_dir = get_template_directory();
 
 $icon_files = [
-	'icon-4-2x.png',
-	'icon-4-2x.png',
-	'icon-4-2x.png',
-	'icon-4-2x.png'
-
+	'icon-1-2x.svg',
+	'icon-2-2x.svg',
+	'icon-3-2x.svg',
+	'icon-4-2x.svg',
 ];
 
 $items = [];
@@ -50,11 +53,15 @@ foreach ($items_raw as $index => $item) {
 	}
 
 	$icon_file = $icon_files[$index] ?? 'icon-1-2x.svg';
+	$icon_path = $theme_dir . '/assets/img/' . $icon_file;
+	$icon_url  = file_exists($icon_path)
+		? $theme_uri . '/assets/img/' . $icon_file
+		: $theme_uri . '/assets/img/heart-svgrepo-com.svg';
 
 	$items[] = [
 		'title'    => $item['title'],
 		'url'      => $item['link'],
-		'icon_url' => $theme_uri . '/assets/img/' . $icon_file,
+		'icon_url' => $icon_url,
 	];
 }
 

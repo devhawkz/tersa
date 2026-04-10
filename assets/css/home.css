@@ -247,8 +247,11 @@
     align-items: center;
   }
   
-  .home-hero__image--mobile {
-    display: none;
+  .home-hero__picture {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
   }
   
   .home-hero__img {
@@ -386,14 +389,6 @@
 
     .home-hero__badge-main{
         font-size: 50px;
-    }
-  
-    .home-hero__image--desktop {
-      display: none;
-    }
-  
-    .home-hero__image--mobile {
-      display: flex;
     }
   
     .home-hero__img {

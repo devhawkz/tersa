@@ -52,6 +52,7 @@ function tersa_theme_setup() {
 
 	// Veličina za promo banner slike
 	add_image_size('tersa-banner', 900, 700, true);
+	add_image_size('tersa-countdown', 900, 900, true);
 	
 	
 

@@ -13,16 +13,19 @@ if (!$page_id) {
 	return;
 }
 
-$show_slider = (bool) get_field('show_home_hero_slider', $page_id);
+$fields = get_fields($page_id);
+$fields = is_array($fields) ? $fields : [];
+
+$show_slider = !empty($fields['show_home_hero_slider']);
 
 if (!$show_slider) {
 	return;
 }
 
 $slides_raw = [
-	get_field('hero_slide_1', $page_id),
-	get_field('hero_slide_2', $page_id),
-	get_field('hero_slide_3', $page_id),
+	$fields['hero_slide_1'] ?? null,
+	$fields['hero_slide_2'] ?? null,
+	$fields['hero_slide_3'] ?? null,
 ];
 
 $slides = [];
@@ -71,6 +74,7 @@ if (empty($slides)) {
 
 				$desktop_image_id = !empty($slide['image_desktop']) ? (int) $slide['image_desktop'] : 0;
 				$mobile_image_id  = !empty($slide['image_mobile']) ? (int) $slide['image_mobile'] : 0;
+				$primary_image_id = $desktop_image_id ?: $mobile_image_id;
 				?>
 			<div
 				class="home-hero__slide<?php echo $is_active ? ' is-active' : ''; ?>"
@@ -129,39 +133,37 @@ if (empty($slides)) {
 								</div>
 							<?php endif; ?>
 
-							<?php if ($desktop_image_id) : ?>
-						<div class="home-hero__image home-hero__image--desktop">
+							<?php if ($primary_image_id) : ?>
 								<?php
-								echo wp_get_attachment_image(
-									$desktop_image_id,
-									'tersa-hero',
-									false,
-									[
-										'class'         => 'home-hero__img',
-										'decoding'      => 'async',
-										'fetchpriority' => $is_active ? 'high' : 'auto',
-										'loading'       => $is_active ? 'eager' : 'lazy',
-									]
-								);
+								$desktop_src     = $desktop_image_id ? wp_get_attachment_image_url($desktop_image_id, 'tersa-hero') : wp_get_attachment_image_url($primary_image_id, 'tersa-hero');
+								$desktop_srcset  = $desktop_image_id ? wp_get_attachment_image_srcset($desktop_image_id, 'tersa-hero') : wp_get_attachment_image_srcset($primary_image_id, 'tersa-hero');
+								$mobile_srcset   = $mobile_image_id ? wp_get_attachment_image_srcset($mobile_image_id, 'tersa-hero-mobile') : '';
+								$desktop_sizes   = '(max-width: 1024px) 100vw, 50vw';
+								$mobile_sizes    = '100vw';
+								$hero_image_alt  = get_post_meta($primary_image_id, '_wp_attachment_image_alt', true);
+								$hero_image_alt  = is_string($hero_image_alt) && $hero_image_alt !== '' ? $hero_image_alt : $title;
 								?>
-							</div>
-						<?php endif; ?>
-
-						<?php if ($mobile_image_id) : ?>
-							<div class="home-hero__image home-hero__image--mobile">
-								<?php
-								echo wp_get_attachment_image(
-									$mobile_image_id,
-									'tersa-hero-mobile',
-									false,
-									[
-										'class'    => 'home-hero__img',
-										'decoding' => 'async',
-										'loading'  => 'lazy',
-									]
-								);
-								?>
-							</div>
+								<div class="home-hero__image">
+									<picture class="home-hero__picture">
+										<?php if ($mobile_image_id && $mobile_srcset) : ?>
+											<source
+												media="(max-width: 1024px)"
+												srcset="<?php echo esc_attr($mobile_srcset); ?>"
+												sizes="<?php echo esc_attr($mobile_sizes); ?>"
+											>
+										<?php endif; ?>
+										<img
+											class="home-hero__img"
+											src="<?php echo esc_url((string) $desktop_src); ?>"
+											<?php if ($desktop_srcset) : ?>srcset="<?php echo esc_attr($desktop_srcset); ?>"<?php endif; ?>
+											sizes="<?php echo esc_attr($desktop_sizes); ?>"
+											alt="<?php echo esc_attr($hero_image_alt); ?>"
+											decoding="async"
+											fetchpriority="<?php echo esc_attr($is_active ? 'high' : 'auto'); ?>"
+											loading="<?php echo esc_attr($is_active ? 'eager' : 'lazy'); ?>"
+										>
+									</picture>
+								</div>
 							<?php endif; ?>
 						</div>
 					</div>

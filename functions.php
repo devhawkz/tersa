@@ -8,6 +8,7 @@ require_once get_template_directory() . '/inc/eu-projects.php';
 
 // Theme setup
 require_once get_template_directory() . '/inc/setup.php';
+require_once get_template_directory() . '/inc/customizer.php';
 
 // Helpers
 require_once get_template_directory() . '/inc/header-helpers.php';
