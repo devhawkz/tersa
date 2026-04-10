@@ -234,9 +234,21 @@
     font-size: 16px;
     line-height: 1.7;
   }
+
+  .product-single__excerpt:has(+ .product-single__purchase) {
+    margin-bottom: 16px;
+  }
+
+  .product-single__price-row:has(+ .product-single__purchase) {
+    margin-bottom: 12px;
+  }
   
   .product-single__purchase {
     margin-bottom: 20px;
+  }
+
+  .product-single__purchase > p.stock {
+    margin: 0 0 10px;
   }
   
   /* Woo add to cart form */
@@ -246,7 +258,7 @@
   
   .product-single .variations_form .variations {
     width: 100%;
-    margin-bottom: 20px;
+    margin-bottom: 12px;
     border: 0;
   }
   
@@ -405,8 +417,21 @@
   }
 
   .product-single .single_variation_wrap {
-    display: grid;
-    gap: 14px;
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+  }
+
+  /*
+   * WooCommerce block theme: .woocommerce .single_variation_wrap .woocommerce-variation { margin-bottom: var(--wp--style--block-gap); }
+   * To vrijedi i za prazan placeholder — stvara veliki razmak prije količine/košarice.
+   */
+  .product.product-single .single_variation_wrap > .woocommerce-variation.single_variation {
+    margin-bottom: 0 !important;
+  }
+
+  .product.product-single .single_variation_wrap > .woocommerce-variation.single_variation:has(> *) {
+    margin-bottom: 14px !important;
   }
   
   .product-single .woocommerce-variation-price {
