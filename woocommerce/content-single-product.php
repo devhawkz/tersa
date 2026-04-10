@@ -78,13 +78,35 @@ if ($product->is_on_sale()) {
 		$discount_percent = '-' . round((($regular_price - $sale_price) / $regular_price) * 100) . '%';
 	}
 }
+
+$tersa_variation_gallery_reset_id = 0;
+$tersa_variation_gallery_reset_alt = $product_name;
+if ($product->is_type('variable') && !empty($attachment_ids)) {
+	$tersa_variation_gallery_reset_id = (int) $attachment_ids[0];
+	if ($tersa_variation_gallery_reset_id > 0) {
+		$alt_meta = trim((string) get_post_meta($tersa_variation_gallery_reset_id, '_wp_attachment_image_alt', true));
+		if ($alt_meta !== '') {
+			$tersa_variation_gallery_reset_alt = $alt_meta;
+		}
+	}
+}
 ?>
 
 <div id="product-<?php the_ID(); ?>" <?php wc_product_class('product-single', $product); ?>>
 	<div class="product-single__inner">
 		<div class="product-single__gallery-column">
 			<div class="product-single__gallery">
-				<div class="product-single__main-media">
+				<div
+					class="product-single__main-media"
+					<?php if ($tersa_variation_gallery_reset_id > 0) : ?>
+						data-tersa-variation-gallery="1"
+						data-tersa-default-large="<?php echo esc_url(wp_get_attachment_image_url($tersa_variation_gallery_reset_id, 'large')); ?>"
+						data-tersa-default-full="<?php echo esc_url(wp_get_attachment_image_url($tersa_variation_gallery_reset_id, 'full')); ?>"
+						data-tersa-default-srcset="<?php echo esc_attr((string) wp_get_attachment_image_srcset($tersa_variation_gallery_reset_id, 'large')); ?>"
+						data-tersa-default-sizes="<?php echo esc_attr((string) wp_get_attachment_image_sizes($tersa_variation_gallery_reset_id, 'large')); ?>"
+						data-tersa-default-alt="<?php echo esc_attr($tersa_variation_gallery_reset_alt); ?>"
+					<?php endif; ?>
+				>
 					<?php if (!empty($badge_items)) : ?>
 						<div class="product-single__badges" aria-label="<?php echo esc_attr(function_exists('pll__') ? pll__('Označke proizvoda') : __('Označke proizvoda', 'tersa-shop')); ?>">
 							<?php foreach ($badge_items as $badge) : ?>
@@ -299,14 +321,16 @@ if ($product->is_on_sale()) {
 									id="<?php echo esc_attr($panel_id); ?>"
 									class="product-single__accordion-panel"
 									aria-labelledby="<?php echo esc_attr($button_id); ?>"
-									hidden
+									aria-hidden="true"
 								>
-									<div class="product-single__accordion-content">
-										<?php
-										if (isset($tab['callback']) && is_callable($tab['callback'])) {
-											call_user_func($tab['callback'], $tab_key, $tab);
-										}
-										?>
+									<div class="product-single__accordion-panel-inner">
+										<div class="product-single__accordion-content">
+											<?php
+											if (isset($tab['callback']) && is_callable($tab['callback'])) {
+												call_user_func($tab['callback'], $tab_key, $tab);
+											}
+											?>
+										</div>
 									</div>
 								</div>
 							</section>

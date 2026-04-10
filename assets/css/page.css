@@ -63,7 +63,7 @@
 }
 
 .tersa-page__content a {
-	color: var(--c-accent);
+	color: var(--c-accent)!important;
 	text-underline-offset: 0.14em;
 }
 

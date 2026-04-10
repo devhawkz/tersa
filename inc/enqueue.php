@@ -105,7 +105,7 @@ function tersa_enqueue_assets() {
 		wp_enqueue_script(
 			'tersa-product',
 			$theme_uri . '/assets/js/product.js',
-			[],
+			['jquery'],
 			$theme_version,
 			true
 		);
