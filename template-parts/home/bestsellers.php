@@ -133,6 +133,7 @@ $query = new WP_Query([
 	'post_status'            => 'publish',
 	'post__in'               => $cached_post_ids,
 	'orderby'                => 'post__in',
+	'fields'                 => 'ids',
 	'no_found_rows'          => true,
 	'ignore_sticky_posts'    => true,
 	'update_post_meta_cache' => true,
