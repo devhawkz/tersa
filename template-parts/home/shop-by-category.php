@@ -35,10 +35,10 @@ $theme_uri = get_template_directory_uri();
 $theme_dir = get_template_directory();
 
 $icon_files = [
-	'icon-1-2x.svg',
-	'icon-2-2x.svg',
-	'icon-3-2x.svg',
-	'icon-4-2x.svg',
+	'icon-4-2x.png',
+	'icon-4-2x.png',
+	'icon-4-2x.png',
+	'icon-4-2x.png'
 ];
 
 $items = [];
