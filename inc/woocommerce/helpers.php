@@ -63,3 +63,25 @@ function tersa_pll_wishlist(string $key): string {
 	$string = $map[$key] ?? '';
 	return ($string !== '' && function_exists('pll__')) ? pll__($string) : $string;
 }
+
+/**
+ * Oznaka „Prethodna“ za the_posts_pagination — hr + Polylang (Strings translations).
+ */
+function tersa_pagination_prev_text(): string {
+	$hr = 'Prethodna';
+	if (function_exists('pll__')) {
+		return (string) pll__($hr);
+	}
+	return (string) __($hr, 'tersa-shop');
+}
+
+/**
+ * Oznaka „Sljedeća“ za the_posts_pagination — hr + Polylang (Strings translations).
+ */
+function tersa_pagination_next_text(): string {
+	$hr = 'Sljedeća';
+	if (function_exists('pll__')) {
+		return (string) pll__($hr);
+	}
+	return (string) __($hr, 'tersa-shop');
+}

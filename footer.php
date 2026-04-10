@@ -27,33 +27,16 @@ if ($custom_logo_id) {
 		'tersa-logo',
 		false,
 		[
-			'class'   => 'site-footer__logo-image',
-			'loading' => 'lazy',
-			'alt'     => $site_name,
+			'class'    => 'site-footer__logo-image',
+			'loading'  => 'lazy',
+			'decoding' => 'async',
+			'alt'      => $site_name,
 		]
 	);
 }
 
-if (!$footer_logo_markup) {
-	$fallback_logo_path = get_template_directory() . '/assets/img/tersa-logo.png';
-
-	if (file_exists($fallback_logo_path)) {
-		$fallback_logo_url = get_template_directory_uri() . '/assets/img/tersa-logo.png';
-		$logo_size         = function_exists('wp_getimagesize')
-			? wp_getimagesize($fallback_logo_path)
-			: @getimagesize($fallback_logo_path); // phpcs:ignore WordPress.PHP.NoSilencedErrors.Discouraged
-
-		$width_attr  = !empty($logo_size[0]) ? ' width="' . (int) $logo_size[0] . '"' : '';
-		$height_attr = !empty($logo_size[1]) ? ' height="' . (int) $logo_size[1] . '"' : '';
-
-		$footer_logo_markup = sprintf(
-			'<img src="%1$s" alt="%2$s" class="site-footer__logo-image" loading="lazy"%3$s%4$s>',
-			esc_url($fallback_logo_url),
-			esc_attr($site_name),
-			$width_attr,
-			$height_attr
-		);
-	}
+if (!$footer_logo_markup && function_exists('tersa_get_theme_fallback_logo_markup')) {
+	$footer_logo_markup = tersa_get_theme_fallback_logo_markup('site-footer__logo-image', 'lazy', 'async', '');
 }
 
 $footer_settings = function_exists('tersa_get_footer_settings') ? tersa_get_footer_settings() : ['footer_newsletter_heading' => '', 'footer_newsletter_text' => ''];

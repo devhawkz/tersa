@@ -147,7 +147,6 @@
     display: inline-flex;
     align-items: center;
     gap: 12px;
-    background: #e8e8e8;
     cursor: pointer;
     font-size: 16px;
     line-height: 1.2;
@@ -164,12 +163,12 @@
   .shop-archive__orderby {
     min-width: 250px;
     min-height: 52px;
-    border: 0;
-    background: #e8e8e8;
+    border-radius: 0;
     padding: 0 16px;
     color: #111111;
     appearance: none;
     -webkit-appearance: none;
+    background-color: #F8F3EE;
     background-image:
       linear-gradient(45deg, transparent 50%, #111111 50%),
       linear-gradient(135deg, #111111 50%, transparent 50%);
@@ -177,8 +176,29 @@
       calc(100% - 20px) calc(50% - 2px),
       calc(100% - 14px) calc(50% - 2px);
     background-size: 6px 6px, 6px 6px;
+    border: 1px solid #111111;
     background-repeat: no-repeat;
     padding-right: 42px;
+  }
+
+ .shop-archive__toolbar-apply{
+    background-color: var(--c-accent);
+    color: #ffffff;
+    box-shadow: var(--shadow-sm);
+    border: 1px solid var(--c-accent);
+    font-family: var(--f-body);
+    font-size: 14px;
+    font-weight: 700;
+    letter-spacing: 0.02em;
+    text-transform: uppercase;
+    cursor: pointer;
+    padding: var(--sp-12) var(--sp-24);
+  }
+
+  .shop-archive__toolbar-apply:hover{
+    background-color: var(--c-accent-hover);
+    color: #ffffff;
+    border: 1px solid var(--c-accent-hover);
   }
   
   /* --------------------------------------------------

@@ -290,12 +290,13 @@ if (!empty($product_ids)) {
 									<?php
 									echo wp_get_attachment_image(
 										$main_image_id,
-										'large',
+										'tersa-bestseller',
 										false,
 										[
 											'class'    => 'home-bestsellers__image home-bestsellers__image--primary',
 											'loading'  => 'lazy',
 											'decoding' => 'async',
+											'sizes'    => '(max-width: 767px) 100vw, (max-width: 1200px) 50vw, 25vw',
 											'alt'      => esc_attr($product_name),
 										]
 									);
@@ -306,12 +307,13 @@ if (!empty($product_ids)) {
 									<?php
 									echo wp_get_attachment_image(
 										$hover_image_id,
-										'large',
+										'tersa-bestseller',
 										false,
 										[
 											'class'    => 'home-bestsellers__image home-bestsellers__image--hover',
 											'loading'  => 'lazy',
 											'decoding' => 'async',
+											'sizes'    => '(max-width: 767px) 100vw, (max-width: 1200px) 50vw, 25vw',
 											'alt'      => '',
 										]
 									);

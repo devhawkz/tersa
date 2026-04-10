@@ -143,8 +143,8 @@ get_header();
 					<?php
 					the_posts_pagination([
 						'mid_size'  => 1,
-						'prev_text' => __('← Prethodna', 'tersa-shop'),
-						'next_text' => __('Sljedeća →', 'tersa-shop'),
+						'prev_text' => '← ' . (function_exists('tersa_pagination_prev_text') ? tersa_pagination_prev_text() : __('Prethodna', 'tersa-shop')),
+						'next_text' => (function_exists('tersa_pagination_next_text') ? tersa_pagination_next_text() : __('Sljedeća', 'tersa-shop')) . ' →',
 					]);
 					?>
 				</div>

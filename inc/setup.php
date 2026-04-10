@@ -46,6 +46,9 @@ function tersa_theme_setup() {
 	// Veličina za product kartice na shop/archive stranicama
 	add_image_size('tersa-card', 480, 600, true);
 
+	// Home „Bestsellers“ kartice — aspect 1 / 1.28 (usklađeno sa .home-bestsellers__media u home.css)
+	add_image_size('tersa-bestseller', 756, 968, true);
+
 	// Veličina za hero slider slike (desktop i mobile)
 	add_image_size('tersa-hero', 1600, 900, true);
 	add_image_size('tersa-hero-mobile', 800, 1000, true);

@@ -180,6 +180,80 @@ function tersa_get_cart_count(): int {
 }
 
 /**
+ * Fallback logo iz teme (PNG + opcioni WebP u istom folderu).
+ *
+ * @param string $img_class       Klasa na <img> (npr. site-header__logo-image).
+ * @param string $loading         eager|lazy.
+ * @param string $decoding        async|auto.
+ * @param string $fetchpriority   high|low|auto (prazan = ne dodaje atribut).
+ * @return string Prazno ako PNG ne postoji.
+ */
+function tersa_get_theme_fallback_logo_markup(
+	string $img_class,
+	string $loading = 'lazy',
+	string $decoding = 'async',
+	string $fetchpriority = ''
+): string {
+	$theme_dir = get_template_directory();
+	$theme_uri = get_template_directory_uri();
+	$png_path  = $theme_dir . '/assets/img/tersa-logo.png';
+	$webp_path = $theme_dir . '/assets/img/tersa-logo.webp';
+
+	if (!file_exists($png_path)) {
+		return '';
+	}
+
+	$site_name = get_bloginfo('name');
+
+	$logo_size = wp_cache_get('tersa_fallback_logo_dims', 'tersa_theme');
+	if (false === $logo_size) {
+		$logo_size = function_exists('wp_getimagesize')
+			? wp_getimagesize($png_path)
+			: @getimagesize($png_path); // phpcs:ignore WordPress.PHP.NoSilencedErrors.Discouraged
+		wp_cache_set('tersa_fallback_logo_dims', $logo_size ?: [], 'tersa_theme');
+	}
+
+	$width_attr  = !empty($logo_size[0]) ? ' width="' . (int) $logo_size[0] . '"' : '';
+	$height_attr = !empty($logo_size[1]) ? ' height="' . (int) $logo_size[1] . '"' : '';
+
+	$fetch_attr = '';
+	if ($fetchpriority !== '') {
+		$fetchpriority = in_array($fetchpriority, ['high', 'low', 'auto'], true) ? $fetchpriority : 'auto';
+		$fetch_attr    = ' fetchpriority="' . esc_attr($fetchpriority) . '"';
+	}
+
+	$common_img_attrs = sprintf(
+		' class="%s" alt="%s" loading="%s" decoding="%s"%s%s%s',
+		esc_attr($img_class),
+		esc_attr($site_name),
+		esc_attr($loading),
+		esc_attr($decoding),
+		$fetch_attr,
+		$width_attr,
+		$height_attr
+	);
+
+	$png_url = $theme_uri . '/assets/img/tersa-logo.png';
+
+	if (file_exists($webp_path)) {
+		$webp_url = $theme_uri . '/assets/img/tersa-logo.webp';
+
+		return sprintf(
+			'<picture><source srcset="%1$s" type="image/webp" /><img src="%2$s"%3$s /></picture>',
+			esc_url($webp_url),
+			esc_url($png_url),
+			$common_img_attrs
+		);
+	}
+
+	return sprintf(
+		'<img src="%1$s"%2$s />',
+		esc_url($png_url),
+		$common_img_attrs
+	);
+}
+
+/**
  * Vraća markup za logo sa fallback-om.
  *
  * @return string
@@ -194,9 +268,11 @@ function tersa_get_header_logo_markup(): string {
 			'tersa-logo',
 			false,
 			[
-				'class'   => 'site-header__logo-image',
-				'loading' => 'eager',
-				'alt'     => $site_name,
+				'class'         => 'site-header__logo-image',
+				'loading'       => 'eager',
+				'decoding'      => 'async',
+				'fetchpriority' => 'high',
+				'alt'           => $site_name,
 			]
 		);
 
@@ -205,29 +281,9 @@ function tersa_get_header_logo_markup(): string {
 		}
 	}
 
-	$fallback_logo_path = get_template_directory() . '/assets/img/tersa-logo.png';
-	if (file_exists($fallback_logo_path)) {
-		$fallback_logo_url = get_template_directory_uri() . '/assets/img/tersa-logo.png';
-
-		// Keširanje dimenzija po requestu — sprečava CLS (Cumulative Layout Shift)
-		$logo_size = wp_cache_get('tersa_fallback_logo_dims', 'tersa_theme');
-		if (false === $logo_size) {
-			$logo_size = function_exists('wp_getimagesize')
-				? wp_getimagesize($fallback_logo_path)
-				: @getimagesize($fallback_logo_path); // phpcs:ignore WordPress.PHP.NoSilencedErrors.Discouraged
-			wp_cache_set('tersa_fallback_logo_dims', $logo_size ?: [], 'tersa_theme');
-		}
-
-		$width_attr  = !empty($logo_size[0]) ? ' width="' . (int) $logo_size[0] . '"' : '';
-		$height_attr = !empty($logo_size[1]) ? ' height="' . (int) $logo_size[1] . '"' : '';
-
-		return sprintf(
-			'<img src="%1$s" alt="%2$s" class="site-header__logo-image" loading="eager"%3$s%4$s>',
-			esc_url($fallback_logo_url),
-			esc_attr($site_name),
-			$width_attr,
-			$height_attr
-		);
+	$fallback = tersa_get_theme_fallback_logo_markup('site-header__logo-image', 'eager', 'async', 'high');
+	if ($fallback !== '') {
+		return $fallback;
 	}
 
 	return sprintf(

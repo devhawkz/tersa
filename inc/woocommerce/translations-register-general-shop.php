@@ -32,6 +32,9 @@ function tersa_pll_register_general_shop_strings(): void {
 
 	pll_register_string('tersa_related_products_title', 'Slični proizvodi', 'Tersa – proizvod (slični)', ['multiline' => false]);
 	pll_register_string('tersa_wc_empty_cart', 'Trenutno nema proizvoda u košarici.', 'Tersa – WooCommerce (košarica)', ['multiline' => false]);
+
+	pll_register_string('tersa_pagination_previous', 'Prethodna', 'Tersa – paginacija (arhiva)', ['multiline' => false]);
+	pll_register_string('tersa_pagination_next', 'Sljedeća', 'Tersa – paginacija (arhiva)', ['multiline' => false]);
 }
 add_action('init', 'tersa_pll_register_general_shop_strings', 20);
 
