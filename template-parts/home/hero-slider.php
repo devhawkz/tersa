@@ -54,6 +54,7 @@ if (empty($slides)) {
 	<div
 		class="home-hero__slider js-home-hero-slider"
 		data-slide-count="<?php echo esc_attr(count($slides)); ?>"
+		data-autoplay-ms="<?php echo esc_attr((string) (int) apply_filters('tersa_home_hero_autoplay_ms', 3000)); ?>"
 	>
 		<div class="home-hero__track">
 			<?php foreach ($slides as $index => $slide) : ?>

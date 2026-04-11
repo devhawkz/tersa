@@ -67,14 +67,81 @@ document.addEventListener('DOMContentLoaded', () => {
       }
     });
   
+    const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
+
+    const goToNextSlide = () => {
+      const nextIndex = (currentIndex + 1) % slides.length;
+      setActiveSlide(nextIndex);
+    };
+
+    let autoplayTimerId = null;
+
+    const parseAutoplayMs = () => {
+      const raw = slider.getAttribute('data-autoplay-ms');
+      const n = raw ? Number.parseInt(raw, 10) : NaN;
+      if (Number.isFinite(n) && n >= 3000) {
+        return n;
+      }
+      return 3000;
+    };
+
+    const autoplayMs = parseAutoplayMs();
+
+    const stopAutoplay = () => {
+      if (autoplayTimerId !== null) {
+        window.clearInterval(autoplayTimerId);
+        autoplayTimerId = null;
+      }
+    };
+
+    const startAutoplay = () => {
+      stopAutoplay();
+      if (prefersReducedMotion.matches || slides.length < 2) {
+        return;
+      }
+      autoplayTimerId = window.setInterval(goToNextSlide, autoplayMs);
+    };
+
+    const restartAutoplay = () => {
+      stopAutoplay();
+      startAutoplay();
+    };
+
     dots.forEach((dot) => {
       dot.addEventListener('click', () => {
         const nextIndex = Number(dot.getAttribute('data-slide-to'));
         setActiveSlide(nextIndex);
+        restartAutoplay();
       });
     });
 
+    slider.addEventListener('mouseenter', stopAutoplay);
+    slider.addEventListener('mouseleave', startAutoplay);
 
+    slider.addEventListener('focusin', stopAutoplay);
+    slider.addEventListener('focusout', (event) => {
+      if (!slider.contains(event.relatedTarget)) {
+        startAutoplay();
+      }
+    });
+
+    document.addEventListener('visibilitychange', () => {
+      if (document.hidden) {
+        stopAutoplay();
+      } else {
+        startAutoplay();
+      }
+    });
+
+    prefersReducedMotion.addEventListener('change', () => {
+      if (prefersReducedMotion.matches) {
+        stopAutoplay();
+      } else {
+        startAutoplay();
+      }
+    });
+
+    startAutoplay();
 
     const countdowns = document.querySelectorAll('.js-home-promo-countdown');
 
