@@ -463,10 +463,13 @@
     text-transform: uppercase;
   }
   
-  .wc-block-cart__submit-container > a{
+  .wc-block-cart__submit-container > a {
     background-color:var(--c-accent);
-    color:#fff!important;
     text-transform: uppercase;
+  }
+
+  .wc-block-cart__submit-container > a .wc-block-components-button__text{
+    color:#fff!important;
   }
   
   .wc-block-checkout__actions_row > button:hover,
