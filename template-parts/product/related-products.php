@@ -25,8 +25,34 @@ if (empty($related_ids)) {
 	return;
 }
 
-// Batch-warm term cache da bi se izbegli individual DB upiti po proizvodu.
-update_object_term_cache($related_ids, 'product');
+// Jedan SQL upit donosi terme za sve related proizvode odjednom (isti pattern kao bestsellers.php).
+$rel_tags_by_id = [];
+$rel_terms_raw  = wp_get_object_terms(
+	$related_ids,
+	'product_tag',
+	['fields' => 'all_with_object_id']
+);
+
+if (!is_wp_error($rel_terms_raw) && is_array($rel_terms_raw)) {
+	foreach ($rel_terms_raw as $term) {
+		if (!isset($term->object_id)) {
+			continue;
+		}
+		$rel_tags_by_id[(int) $term->object_id][] = $term;
+	}
+
+	foreach ($rel_tags_by_id as $pid => $tag_terms) {
+		usort($tag_terms, static function ($a, $b) {
+			return (int) $b->count <=> (int) $a->count;
+		});
+		$rel_tags_by_id[$pid] = array_map(
+			static function ($t) { return (string) $t->name; },
+			array_slice($tag_terms, 0, 2)
+		);
+	}
+}
+
+$has_yith_related = function_exists('shortcode_exists') && shortcode_exists('yith_wcwl_add_to_wishlist');
 
 $badge_color = '#000000';
 ?>
@@ -103,16 +129,7 @@ $badge_color = '#000000';
 					];
 				}
 
-				$rel_tag_names = wp_get_post_terms(
-					$rel_id,
-					'product_tag',
-					[
-						'fields'  => 'names',
-						'orderby' => 'count',
-						'order'   => 'DESC',
-					]
-				);
-				$rel_tag_names = is_array($rel_tag_names) ? array_slice(array_values($rel_tag_names), 0, 2) : [];
+			$rel_tag_names = $rel_tags_by_id[$rel_id] ?? [];
 		?>
 		<li>
 		<article class="home-bestsellers__card">
@@ -162,7 +179,7 @@ $badge_color = '#000000';
 						</div>
 					</a>
 
-					<?php if (function_exists('shortcode_exists') && shortcode_exists('yith_wcwl_add_to_wishlist')) : ?>
+					<?php if ($has_yith_related) : ?>
 						<div class="home-bestsellers__wishlist">
 							<?php
 							echo do_shortcode(

@@ -52,8 +52,29 @@ function tersa_append_bestsellers_to_cart_block(string $block_content, array $bl
 	}
 
 	$home_page_id = (int) get_option('page_on_front');
+
+	// Gradimo fields array ručno (get_field po get_field) umjesto get_fields() jer
+	// ta funkcija u ovoj verziji ACF Free kvari interno stanje i uzrokuje fatal error.
+	$cart_bestseller_fields = [];
+	if ($home_page_id && function_exists('get_field')) {
+		$cart_bestseller_fields = [
+			'show_home_bestsellers_section_1'     => get_field('show_home_bestsellers_section_1', $home_page_id),
+			'show_home_bestsellers_section'       => get_field('show_home_bestsellers_section', $home_page_id),
+			'home_bestsellers_section_title_1'    => get_field('home_bestsellers_section_title_1', $home_page_id),
+			'home_bestsellers_section_title'      => get_field('home_bestsellers_section_title', $home_page_id),
+			'home_bestsellers_badge_color_1'      => get_field('home_bestsellers_badge_color_1', $home_page_id),
+			'home_bestsellers_badge_color'        => get_field('home_bestsellers_badge_color', $home_page_id),
+			'home_bestsellers_product_tag_slug_1' => get_field('home_bestsellers_product_tag_slug_1', $home_page_id),
+			'home_bestsellers_product_tag_slug'   => get_field('home_bestsellers_product_tag_slug', $home_page_id),
+		];
+	}
+
 	ob_start();
-	get_template_part('template-parts/home/bestsellers', null, ['page_id' => $home_page_id, 'instance' => 1]);
+	get_template_part('template-parts/home/bestsellers', null, [
+		'page_id'  => $home_page_id,
+		'instance' => 1,
+		'fields'   => $cart_bestseller_fields,
+	]);
 	$bestsellers = (string) ob_get_clean();
 
 	if (trim($bestsellers) === '') {

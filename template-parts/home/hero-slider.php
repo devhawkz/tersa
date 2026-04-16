@@ -7,14 +7,15 @@ if (!function_exists('get_field')) {
 	return;
 }
 
-$page_id = get_queried_object_id();
+$page_id = isset($args['page_id']) ? (int) $args['page_id'] : get_queried_object_id();
 
 if (!$page_id) {
 	return;
 }
 
-$fields = get_fields($page_id);
-$fields = is_array($fields) ? $fields : [];
+$fields = isset($args['fields']) && is_array($args['fields'])
+	? $args['fields']
+	: (get_fields($page_id) ?: []);
 
 $show_slider = !empty($fields['show_home_hero_slider']);
 

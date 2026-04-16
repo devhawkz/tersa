@@ -14,8 +14,9 @@ if (isset($args) && is_array($args) && isset($args['instance'])) {
 	$instance = max(1, (int) $args['instance']);
 }
 
-$fields = function_exists('get_field') ? get_fields($page_id) : [];
-$fields = is_array($fields) ? $fields : [];
+$fields = isset($args['fields']) && is_array($args['fields'])
+	? $args['fields']
+	: (function_exists('get_fields') ? (get_fields($page_id) ?: []) : []);
 
 $get_acf_value = static function (array $source, string $key, $fallback = null) {
 	return array_key_exists($key, $source) ? $source[$key] : $fallback;

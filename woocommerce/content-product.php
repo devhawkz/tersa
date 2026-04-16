@@ -170,7 +170,13 @@ $short_description = wp_kses_post(
 				</div>
 			</a>
 
-			<?php if (function_exists('shortcode_exists') && shortcode_exists('yith_wcwl_add_to_wishlist')) : ?>
+			<?php
+		static $has_yith_wishlist = null;
+		if ($has_yith_wishlist === null) {
+			$has_yith_wishlist = function_exists('shortcode_exists') && shortcode_exists('yith_wcwl_add_to_wishlist');
+		}
+		?>
+		<?php if ($has_yith_wishlist) : ?>
 				<div class="shop-card__wishlist">
 					<?php
 					echo do_shortcode(

@@ -4,15 +4,27 @@ if (!defined('ABSPATH')) {
 }
 
 get_header();
+
+// Jedan get_fields() poziv za cijelu naslovnicu — rezultat se prosljeđuje
+// svim sekcijama kroz $args kako bi svaka izbjegla vlastiti DB upit.
+$_tersa_fp_id     = function_exists('get_queried_object_id') ? get_queried_object_id() : 0;
+$_tersa_fp_fields = ($_tersa_fp_id && function_exists('get_fields'))
+	? (get_fields($_tersa_fp_id) ?: [])
+	: [];
+
+$_tersa_home_args = [
+	'page_id' => $_tersa_fp_id,
+	'fields'  => $_tersa_fp_fields,
+];
 ?>
 
 <main id="content" class="site-main" role="main">
-	<?php get_template_part('template-parts/home/hero-slider'); ?>
-	<?php get_template_part('template-parts/home/shop-by-category'); ?>
-	<?php get_template_part('template-parts/home/promo-banners'); ?>
-	<?php get_template_part('template-parts/home/bestsellers', null, ['instance' => 1]); ?>
-	<?php get_template_part('template-parts/home/promo-countdown'); ?>
-	<?php get_template_part('template-parts/home/bestsellers', null, ['instance' => 2]); ?>
+	<?php get_template_part('template-parts/home/hero-slider', null, $_tersa_home_args); ?>
+	<?php get_template_part('template-parts/home/shop-by-category', null, $_tersa_home_args); ?>
+	<?php get_template_part('template-parts/home/promo-banners', null, $_tersa_home_args); ?>
+	<?php get_template_part('template-parts/home/bestsellers', null, array_merge($_tersa_home_args, ['instance' => 1])); ?>
+	<?php get_template_part('template-parts/home/promo-countdown', null, $_tersa_home_args); ?>
+	<?php get_template_part('template-parts/home/bestsellers', null, array_merge($_tersa_home_args, ['instance' => 2])); ?>
 </main>
 
 <?php

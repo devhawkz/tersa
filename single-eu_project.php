@@ -8,25 +8,27 @@ get_header();
 while (have_posts()) :
 	the_post();
 
-	$status       = function_exists('get_field') ? get_field('eu_project_status') : '';
-	$program      = function_exists('get_field') ? get_field('eu_project_program') : '';
-	$full_title   = function_exists('get_field') ? get_field('eu_project_full_title') : '';
-	$beneficiary  = function_exists('get_field') ? get_field('eu_project_beneficiary') : '';
-	$description  = function_exists('get_field') ? get_field('eu_project_short_description') : '';
-	$total_value  = function_exists('get_field') ? get_field('eu_project_total_value') : '';
-	$eu_funding   = function_exists('get_field') ? get_field('eu_project_eu_funding') : '';
-	$start_date   = function_exists('get_field') ? get_field('eu_project_start_date') : '';
-	$end_date     = function_exists('get_field') ? get_field('eu_project_end_date') : '';
-	$contact_info = function_exists('get_field') ? get_field('eu_project_contact_info') : '';
-	$pdf          = function_exists('get_field') ? get_field('eu_project_pdf') : '';
-	$cta_label    = function_exists('get_field') ? get_field('eu_project_cta_label') : '';
-	$cta_url      = function_exists('get_field') ? get_field('eu_project_cta_url') : '';
+	$has_acf = function_exists('get_field');
 
-	$logo_one   = function_exists('get_field') ? get_field('eu_project_logos_one') : '';
-	$logo_two   = function_exists('get_field') ? get_field('eu_project_logos_two') : '';
-	$logo_three = function_exists('get_field') ? get_field('eu_project_logos_three') : '';
-	$logo_four  = function_exists('get_field') ? get_field('eu_project_logos_four') : '';
-	$logo_five  = function_exists('get_field') ? get_field('eu_project_logos_five') : '';
+	$status       = $has_acf ? get_field('eu_project_status') : '';
+	$program      = $has_acf ? get_field('eu_project_program') : '';
+	$full_title   = $has_acf ? get_field('eu_project_full_title') : '';
+	$beneficiary  = $has_acf ? get_field('eu_project_beneficiary') : '';
+	$description  = $has_acf ? get_field('eu_project_short_description') : '';
+	$total_value  = $has_acf ? get_field('eu_project_total_value') : '';
+	$eu_funding   = $has_acf ? get_field('eu_project_eu_funding') : '';
+	$start_date   = $has_acf ? get_field('eu_project_start_date') : '';
+	$end_date     = $has_acf ? get_field('eu_project_end_date') : '';
+	$contact_info = $has_acf ? get_field('eu_project_contact_info') : '';
+	$pdf          = $has_acf ? get_field('eu_project_pdf') : '';
+	$cta_label    = $has_acf ? get_field('eu_project_cta_label') : '';
+	$cta_url      = $has_acf ? get_field('eu_project_cta_url') : '';
+
+	$logo_one   = $has_acf ? get_field('eu_project_logos_one') : '';
+	$logo_two   = $has_acf ? get_field('eu_project_logos_two') : '';
+	$logo_three = $has_acf ? get_field('eu_project_logos_three') : '';
+	$logo_four  = $has_acf ? get_field('eu_project_logos_four') : '';
+	$logo_five  = $has_acf ? get_field('eu_project_logos_five') : '';
 
 	$logos = array_filter([
 		$logo_one,

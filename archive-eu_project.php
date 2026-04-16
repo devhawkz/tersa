@@ -28,45 +28,47 @@ get_header();
 		<div class="container container--narrow">
 			<?php if (have_posts()) : ?>
 				<div class="eu-projects-archive__grid">
-					<?php
-					while (have_posts()) :
-						the_post();
+				<?php
+				$has_acf = function_exists('get_field');
 
-						$card_title = function_exists('get_field') ? get_field('eu_project_card_title') : '';
-						$card_desc  = function_exists('get_field') ? get_field('eu_project_card_description') : '';
-						$status     = function_exists('get_field') ? get_field('eu_project_status') : '';
-						$program    = function_exists('get_field') ? get_field('eu_project_program') : '';
-						$start_date = function_exists('get_field') ? get_field('eu_project_start_date') : '';
-						$end_date   = function_exists('get_field') ? get_field('eu_project_end_date') : '';
+				$format_date = static function ($date_value) {
+					if (empty($date_value)) {
+						return '';
+					}
 
-						$display_title = !empty($card_title) ? $card_title : get_the_title();
+					if (preg_match('/^\d{2}\.\d{2}\.\d{4}\.?$/', $date_value)) {
+						return $date_value;
+					}
 
-						if (!empty($card_desc)) {
-							$display_desc = $card_desc;
-						} elseif (has_excerpt()) {
-							$display_desc = get_the_excerpt();
-						} else {
-							$display_desc = wp_trim_words(wp_strip_all_tags(get_the_content()), 22);
-						}
+					$timestamp = strtotime($date_value);
+					if (!$timestamp) {
+						return $date_value;
+					}
 
-						$format_date = static function ($date_value) {
-							if (empty($date_value)) {
-								return '';
-							}
+					return date_i18n('d.m.Y.', $timestamp);
+				};
 
-							if (preg_match('/^\d{2}\.\d{2}\.\d{4}\.?$/', $date_value)) {
-								return $date_value;
-							}
+				while (have_posts()) :
+					the_post();
 
-							$timestamp = strtotime($date_value);
-							if (!$timestamp) {
-								return $date_value;
-							}
+					$card_title = $has_acf ? get_field('eu_project_card_title') : '';
+					$card_desc  = $has_acf ? get_field('eu_project_card_description') : '';
+					$status     = $has_acf ? get_field('eu_project_status') : '';
+					$program    = $has_acf ? get_field('eu_project_program') : '';
+					$start_date = $has_acf ? get_field('eu_project_start_date') : '';
+					$end_date   = $has_acf ? get_field('eu_project_end_date') : '';
 
-							return date_i18n('d.m.Y.', $timestamp);
-						};
+					$display_title = !empty($card_title) ? $card_title : get_the_title();
 
-						$start_date_formatted = $format_date($start_date);
+					if (!empty($card_desc)) {
+						$display_desc = $card_desc;
+					} elseif (has_excerpt()) {
+						$display_desc = get_the_excerpt();
+					} else {
+						$display_desc = wp_trim_words(wp_strip_all_tags(get_the_content()), 22);
+					}
+
+					$start_date_formatted = $format_date($start_date);
 						$end_date_formatted   = $format_date($end_date);
 
 						$period = '';

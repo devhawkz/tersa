@@ -146,16 +146,20 @@ document.addEventListener('DOMContentLoaded', () => {
     const countdowns = document.querySelectorAll('.js-home-promo-countdown');
 
     if (countdowns.length) {
-      const updateCountdown = (container) => {
+      const countdownTimers = [];
+
+      const updateCountdown = (container, stopTimer) => {
         const endValue = container.getAttribute('data-end');
 
         if (!endValue) {
+          stopTimer();
           return;
         }
 
         const endDate = new Date(endValue).getTime();
 
         if (Number.isNaN(endDate)) {
+          stopTimer();
           return;
         }
 
@@ -176,11 +180,39 @@ document.addEventListener('DOMContentLoaded', () => {
         if (hoursEl) hoursEl.textContent = String(hours).padStart(2, '0');
         if (minutesEl) minutesEl.textContent = String(minutes).padStart(2, '0');
         if (secondsEl) secondsEl.textContent = String(seconds).padStart(2, '0');
+
+        if (diff === 0) {
+          stopTimer();
+        }
       };
 
       countdowns.forEach((countdown) => {
-        updateCountdown(countdown);
-        window.setInterval(() => updateCountdown(countdown), 1000);
+        let timerId = null;
+
+        const stop = () => {
+          if (timerId !== null) {
+            window.clearInterval(timerId);
+            timerId = null;
+          }
+        };
+
+        const start = () => {
+          stop();
+          timerId = window.setInterval(() => updateCountdown(countdown, stop), 1000);
+        };
+
+        updateCountdown(countdown, stop);
+        start();
+
+        countdownTimers.push({ start, stop });
+      });
+
+      document.addEventListener('visibilitychange', () => {
+        if (document.hidden) {
+          countdownTimers.forEach(({ stop }) => stop());
+        } else {
+          countdownTimers.forEach(({ start }) => start());
+        }
       });
     }
   });

@@ -189,3 +189,26 @@ function tersa_modify_archive_query(WP_Query $query) {
 	$query->set('meta_query', $meta_query);
 }
 add_action('pre_get_posts', 'tersa_modify_archive_query', 20);
+
+/**
+ * Prima product_tag term cache za sve proizvode na tekućoj stranici odjednom,
+ * prije nego što loop počne. WP_Query core to radi globalno za sve taksonomije,
+ * ali ovo garantira da je product_tag cachiran i izbjegava per-product DB upite
+ * u content-product.php kad core cache nije grijan (npr. custom query konteksti).
+ * update_object_term_cache je no-op za ID-eve koji su već u cacheu.
+ */
+function tersa_prime_product_tag_term_cache(): void {
+	global $wp_query;
+
+	if (empty($wp_query->posts) || !is_array($wp_query->posts)) {
+		return;
+	}
+
+	$ids = wp_list_pluck($wp_query->posts, 'ID');
+	if (empty($ids)) {
+		return;
+	}
+
+	update_object_term_cache($ids, 'product');
+}
+add_action('woocommerce_before_shop_loop', 'tersa_prime_product_tag_term_cache', 5);

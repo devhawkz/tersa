@@ -122,6 +122,14 @@ function tersa_get_global_settings_slug(): string {
  * @return int
  */
 function tersa_get_global_settings_page_id(): int {
-	$page = get_page_by_path(tersa_get_global_settings_slug());
-	return $page ? (int) $page->ID : 0;
+	static $cached_id = null;
+
+	if ($cached_id !== null) {
+		return $cached_id;
+	}
+
+	$page      = get_page_by_path(tersa_get_global_settings_slug());
+	$cached_id = $page ? (int) $page->ID : 0;
+
+	return $cached_id;
 }
