@@ -41,6 +41,13 @@ function tersa_enqueue_assets() {
 			['tersa-base', 'tersa-layout'],
 			$theme_version
 		);
+
+		wp_enqueue_style(
+			'tersa-bestsellers',
+			$theme_uri . '/assets/css/bestsellers.css',
+			['tersa-base', 'tersa-layout'],
+			$theme_version
+		);
 	
 		wp_enqueue_script(
 			'tersa-home',
@@ -89,8 +96,8 @@ function tersa_enqueue_assets() {
 
 	if (function_exists('is_product') && is_product()) {
 		wp_enqueue_style(
-			'tersa-home',
-			$theme_uri . '/assets/css/home.css',
+			'tersa-bestsellers',
+			$theme_uri . '/assets/css/bestsellers.css',
 			['tersa-base', 'tersa-layout'],
 			$theme_version
 		);
@@ -98,7 +105,7 @@ function tersa_enqueue_assets() {
 		wp_enqueue_style(
 			'tersa-product',
 			$theme_uri . '/assets/css/product.css',
-			['tersa-base', 'tersa-layout', 'tersa-home'],
+			['tersa-base', 'tersa-layout', 'tersa-bestsellers'],
 			$theme_version
 		);
 	
@@ -113,8 +120,8 @@ function tersa_enqueue_assets() {
 
 	if (function_exists('is_cart') && is_cart()) {
 		wp_enqueue_style(
-			'tersa-home',
-			$theme_uri . '/assets/css/home.css',
+			'tersa-bestsellers',
+			$theme_uri . '/assets/css/bestsellers.css',
 			['tersa-base', 'tersa-layout'],
 			$theme_version
 		);
