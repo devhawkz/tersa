@@ -12,11 +12,11 @@ function tersa_enqueue_assets() {
 	wp_enqueue_style('tersa-header', $theme_uri . '/assets/css/header.css', ['tersa-base'], $theme_version);
 	wp_enqueue_style('tersa-footer', $theme_uri . '/assets/css/footer.css', ['tersa-base'], $theme_version);
 
-	// Sidebar CSS — učitava se samo na stranicama koje realno prikazuju sidebar:
-	// WooCommerce shop/kategorija/tag/taxonomy, ostali archivi, i search rezultati.
+	// Sidebar CSS — učitava se samo na stranicama koje realno prikazuju sidebar.
+	// EU project archive/single su isključeni jer ti templati ne pozivaju get_sidebar().
 	$needs_sidebar = (
 		(function_exists('is_shop') && (is_shop() || is_product_category() || is_product_tag() || is_product_taxonomy()))
-		|| is_archive()
+		|| (is_archive() && !is_post_type_archive('eu_project'))
 		|| is_search()
 	);
 	if ($needs_sidebar) {

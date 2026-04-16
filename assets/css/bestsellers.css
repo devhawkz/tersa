@@ -274,7 +274,7 @@
 }
 
 .home-bestsellers.cart .home-bestsellers__cart-wrap a {
-  color: #fff;
+  color: #fff!important;
 }
 
 /* Sakrij WooCommerce "Pogledaj košaricu" link koji se ubacuje posle klika na Add to cart */
