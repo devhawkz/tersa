@@ -52,9 +52,25 @@ if (!is_wp_error($rel_terms_raw) && is_array($rel_terms_raw)) {
 	}
 }
 
-$has_yith_related = function_exists('shortcode_exists') && shortcode_exists('yith_wcwl_add_to_wishlist');
+$has_yith_related  = function_exists('shortcode_exists') && shortcode_exists('yith_wcwl_add_to_wishlist');
+$rel_label_options = function_exists('pll__') ? pll__('Vidi opcije') : 'Vidi opcije';
 
 $badge_color = '#000000';
+
+// Jedan WP upit za sve related proizvode umjesto N pojedinačnih wc_get_product() poziva.
+$rel_products_batch = wc_get_products([
+	'include' => $related_ids,
+	'orderby' => 'post__in',
+	'order'   => 'ASC',
+	'limit'   => count($related_ids),
+	'status'  => 'publish',
+]);
+
+$rel_products_map = [];
+foreach ($rel_products_batch as $_p) {
+	$rel_products_map[$_p->get_id()] = $_p;
+}
+unset($rel_products_batch, $_p);
 ?>
 
 <section class="product-related" aria-labelledby="product-related-title">
@@ -65,7 +81,7 @@ $badge_color = '#000000';
 
 		<ul class="home-bestsellers__grid" role="list">
 			<?php foreach ($related_ids as $related_id) :
-				$rel_product = wc_get_product($related_id);
+				$rel_product = $rel_products_map[$related_id] ?? null;
 
 				if (!$rel_product instanceof WC_Product) {
 					continue;
@@ -108,9 +124,7 @@ $badge_color = '#000000';
 					$rel_button_classes[] = 'ajax_add_to_cart';
 				}
 
-				$rel_label_options = function_exists('pll__') ? pll__('Vidi opcije') : 'Vidi opcije';
-
-				if ($rel_has_variants) {
+			if ($rel_has_variants) {
 					$rel_button_attrs = [
 						'href'       => $rel_url,
 						'class'      => implode(' ', array_map('sanitize_html_class', $rel_button_classes)),

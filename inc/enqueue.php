@@ -11,7 +11,17 @@ function tersa_enqueue_assets() {
 	wp_enqueue_style('tersa-layout', $theme_uri . '/assets/css/layout.css', ['tersa-base'], $theme_version);
 	wp_enqueue_style('tersa-header', $theme_uri . '/assets/css/header.css', ['tersa-base'], $theme_version);
 	wp_enqueue_style('tersa-footer', $theme_uri . '/assets/css/footer.css', ['tersa-base'], $theme_version);
-	wp_enqueue_style('tersa-sidebar', $theme_uri . '/assets/css/sidebar.css', ['tersa-base'], $theme_version);
+
+	// Sidebar CSS — učitava se samo na stranicama koje realno prikazuju sidebar:
+	// WooCommerce shop/kategorija/tag/taxonomy, ostali archivi, i search rezultati.
+	$needs_sidebar = (
+		(function_exists('is_shop') && (is_shop() || is_product_category() || is_product_tag() || is_product_taxonomy()))
+		|| is_archive()
+		|| is_search()
+	);
+	if ($needs_sidebar) {
+		wp_enqueue_style('tersa-sidebar', $theme_uri . '/assets/css/sidebar.css', ['tersa-base'], $theme_version);
+	}
 
 	//contact page style
 	if (is_page_template('page-templates/template-contact.php')) {
@@ -95,17 +105,26 @@ function tersa_enqueue_assets() {
 	}
 
 	if (function_exists('is_product') && is_product()) {
-		wp_enqueue_style(
-			'tersa-bestsellers',
-			$theme_uri . '/assets/css/bestsellers.css',
-			['tersa-base', 'tersa-layout'],
-			$theme_version
-		);
+		// Provjeri transient za related products — ako je prazan niz, sekcija se neće prikazati
+		// i bestsellers.css nije potreban. false = transient nije postavljen (prvi posjet) → učitaj CSS.
+		$product_related_cache = get_transient('tersa_related_' . get_queried_object_id());
+		$has_related_products  = ($product_related_cache === false) || !empty($product_related_cache);
+
+		if ($has_related_products) {
+			wp_enqueue_style(
+				'tersa-bestsellers',
+				$theme_uri . '/assets/css/bestsellers.css',
+				['tersa-base', 'tersa-layout'],
+				$theme_version
+			);
+		}
 
 		wp_enqueue_style(
 			'tersa-product',
 			$theme_uri . '/assets/css/product.css',
-			['tersa-base', 'tersa-layout', 'tersa-bestsellers'],
+			$has_related_products
+				? ['tersa-base', 'tersa-layout', 'tersa-bestsellers']
+				: ['tersa-base', 'tersa-layout'],
 			$theme_version
 		);
 	

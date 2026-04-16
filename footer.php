@@ -4,14 +4,6 @@ if (!defined('ABSPATH')) {
 }
 
 $site_name = get_bloginfo('name');
-$settings_page_id = function_exists('tersa_get_global_settings_page_id') ? tersa_get_global_settings_page_id() : 0;
-$get_option = function_exists('get_field') ? function ($key, $fallback = '') use ($settings_page_id) {
-	if (!$settings_page_id) {
-		return $fallback;
-	}
-	$value = get_field($key, $settings_page_id);
-	return (is_string($value) && trim($value) !== '') ? $value : $fallback;
-} : null;
 
 /**
  * Footer logo:
@@ -39,12 +31,24 @@ if (!$footer_logo_markup && function_exists('tersa_get_theme_fallback_logo_marku
 	$footer_logo_markup = tersa_get_theme_fallback_logo_markup('site-footer__logo-image', 'lazy', 'async', '');
 }
 
-$footer_settings = function_exists('tersa_get_footer_settings') ? tersa_get_footer_settings() : ['footer_newsletter_heading' => '', 'footer_newsletter_text' => ''];
-$company_name = $get_option ? $get_option('company_name', 'Tersa d.o.o.') : 'Tersa d.o.o.';
-$company_activity = $get_option ? $get_option('company_activity', __('Prerada drva i trgovina drvnim proizvodima', 'tersa-shop')) : __('Prerada drva i trgovina drvnim proizvodima', 'tersa-shop');
-$company_address = $get_option ? $get_option('company_address', __('Nikole Tesle 71, 31553 Črnk​ovci', 'tersa-shop')) : __('Nikole Tesle 71, 31553 Črnk​ovci', 'tersa-shop');
-$company_email = $get_option ? $get_option('company_email', 'tersa@tersa.hr') : 'tersa@tersa.hr';
-$footer_newsletter_shortcode = $get_option ? $get_option('footer_newsletter_cf7_shortcode', '[contact-form-7 id="02a3794" title="Contact form 1"]') : '[contact-form-7 id="02a3794" title="Contact form 1"]';
+$footer_settings  = function_exists('tersa_get_footer_settings') ? tersa_get_footer_settings() : [];
+$company_settings = function_exists('tersa_get_company_settings') ? tersa_get_company_settings() : [];
+
+$company_name    = !empty($company_settings['company_name'])
+	? $company_settings['company_name']
+	: 'Tersa d.o.o.';
+$company_activity = !empty($company_settings['company_activity'])
+	? $company_settings['company_activity']
+	: __('Prerada drva i trgovina drvnim proizvodima', 'tersa-shop');
+$company_address  = !empty($company_settings['company_address'])
+	? $company_settings['company_address']
+	: __('Nikole Tesle 71, 31553 Črnk​ovci', 'tersa-shop');
+$company_email    = !empty($company_settings['company_email'])
+	? $company_settings['company_email']
+	: 'tersa@tersa.hr';
+$footer_newsletter_shortcode = !empty($company_settings['footer_newsletter_cf7_shortcode'])
+	? $company_settings['footer_newsletter_cf7_shortcode']
+	: '[contact-form-7 id="02a3794" title="Contact form 1"]';
 
 $about_fallback = [
 	[

@@ -794,6 +794,8 @@ document.addEventListener('DOMContentLoaded', function () {
     });
   }
 
+  // ─── PHASE 1: critical bindings (run immediately on DOMContentLoaded) ────────
+
   if (menuToggle && mobileNavigation) {
     menuToggle.addEventListener('click', function () {
       if (menuToggle.getAttribute('aria-expanded') === 'true') {
@@ -823,16 +825,6 @@ document.addEventListener('DOMContentLoaded', function () {
   searchCloseButtons.forEach(function (button) {
     button.addEventListener('click', function () {
       closeSearch();
-    });
-  });
-
-  if (cartToggle && cartOverlay) {
-    cartToggle.addEventListener('click', toggleCart);
-  }
-
-  cartCloseButtons.forEach(function (button) {
-    button.addEventListener('click', function () {
-      closeCart();
     });
   });
 
@@ -870,29 +862,60 @@ document.addEventListener('DOMContentLoaded', function () {
   initDesktopSubmenus();
   initMobileSubmenus();
 
-  // WooCommerce fireuje `added_to_cart` event posle AJAX add-to-cart klika.
+  // ─── PHASE 2: cart system (lazy init) ─────────────────────────────────────
+  //
+  // Cart close buttons i mini-cart qty akcije ne trebaju biti vezani odmah —
+  // korisnik mora prvo otvoriti cart drawer. Vežemo ih jednom, pri prvoj
+  // interakciji s košaricom (toggle klik, WC added_to_cart event, ili idle).
+
+  var cartSystemReady = false;
+
+  function ensureCartSystem() {
+    if (cartSystemReady) {
+      return;
+    }
+    cartSystemReady = true;
+
+    cartCloseButtons.forEach(function (button) {
+      button.addEventListener('click', function () {
+        closeCart();
+      });
+    });
+
+    bindMiniCartQtyActions();
+  }
+
+  // Cart toggle — init sustav i otvori/zatvori drawer.
+  if (cartToggle && cartOverlay) {
+    cartToggle.addEventListener('click', function (event) {
+      ensureCartSystem();
+      toggleCart(event);
+    });
+  }
+
+  // WooCommerce events — vežemo odmah jer added_to_cart može okidati bez
+  // otvaranja drawera (klik "Dodaj u košaricu" na shop/product stranici).
   if (window.jQuery) {
     window.jQuery(document.body).on('added_to_cart', function () {
-      // Odmah ukloni šta god je već tu, ali WC JS dodaje link malo kasnije pa ponovi čišćenje.
+      ensureCartSystem();
       removeWooNotices();
       setTimeout(removeWooNotices, 0);
       setTimeout(removeWooNotices, 200);
       refreshCartDrawerAndBadge();
     });
 
-    // WC event koji se okida kada WC JS završi ažuriranje dugmeta (posle inserted 'added_to_cart' anchor).
     window.jQuery(document.body).on('wc_cart_button_updated', function () {
       removeWooNotices();
     });
 
-    // Osveži drawer + badge posle uklanjanja iz košarice ili ažuriranja totals-a.
-    // Ovo obuhvata i slučaj kada količinu menjate preko input/selecta u drawer-u.
     window.jQuery(document.body).on('removed_from_cart updated_cart_totals wc_fragments_loaded wc_fragments_refreshed updated_wc_div', function () {
+      ensureCartSystem();
       removeWooNotices();
       refreshCartDrawerAndBadge();
     });
   } else {
     document.body.addEventListener('added_to_cart', function () {
+      ensureCartSystem();
       removeWooNotices();
       setTimeout(removeWooNotices, 0);
       setTimeout(removeWooNotices, 200);
@@ -900,5 +923,10 @@ document.addEventListener('DOMContentLoaded', function () {
     });
   }
 
-  bindMiniCartQtyActions();
+  // Sigurnosni fallback: ako korisnik nikad ne otvori drawer niti doda proizvod,
+  // init se svejedno izvršava kada browser odradi kritični posao (ili nakon 2s).
+  var scheduleIdle = window.requestIdleCallback
+    || function (fn, opts) { setTimeout(fn, (opts && opts.timeout) || 300); };
+
+  scheduleIdle(ensureCartSystem, { timeout: 2000 });
 });

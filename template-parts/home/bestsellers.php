@@ -196,6 +196,9 @@ if (!empty($product_ids)) {
 
 		<ul class="home-bestsellers__grid" role="list">
 			<?php
+			$has_yith_bestsellers  = function_exists('shortcode_exists') && shortcode_exists('yith_wcwl_add_to_wishlist');
+			$button_label_options  = $translate('Vidi opcije');
+
 			while ($query->have_posts()) :
 				$query->the_post();
 
@@ -245,9 +248,7 @@ if (!empty($product_ids)) {
 					$button_classes[] = 'ajax_add_to_cart';
 				}
 
-				$button_label_options = $translate('Vidi opcije');
-
-				if ($has_multiple_variants) {
+			if ($has_multiple_variants) {
 					$button_attributes = [
 						'href'       => $product_url,
 						'class'      => implode(' ', array_map('sanitize_html_class', $button_classes)),
@@ -324,7 +325,7 @@ if (!empty($product_ids)) {
 							</div>
 						</a>
 
-						<?php if (function_exists('shortcode_exists') && shortcode_exists('yith_wcwl_add_to_wishlist')) : ?>
+						<?php if ($has_yith_bestsellers) : ?>
 							<div class="home-bestsellers__wishlist">
 								<?php
 								static $wishlist_markup_cache = [];
