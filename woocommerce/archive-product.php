@@ -276,9 +276,9 @@ $reset_url = function_exists('tersa_get_archive_reset_url')
 					]);
 					?>
 				<?php else : ?>
-					<div class="shop-archive__empty">
-						<p><?php echo esc_html__('No products found for the selected filters.', 'tersa-shop'); ?></p>
-					</div>
+				<div class="shop-archive__empty">
+					<p><?php echo esc_html(function_exists('pll__') ? pll__('Nema pronađenih proizvoda za odabrane filtere.') : __('Nema pronađenih proizvoda za odabrane filtere.', 'tersa-shop')); ?></p>
+				</div>
 				<?php endif; ?>
 			</section>
 		</div>

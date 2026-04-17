@@ -212,3 +212,16 @@ function tersa_prime_product_tag_term_cache(): void {
 	update_object_term_cache($ids, 'product');
 }
 add_action('woocommerce_before_shop_loop', 'tersa_prime_product_tag_term_cache', 5);
+
+/**
+ * Registruje statične shop UI stringove za Polylang String translations.
+ * Pojavljuju se u Polylang → Languages → String translations → Tersa Shop.
+ */
+function tersa_register_shop_ui_strings(): void {
+	if (!function_exists('pll_register_string')) {
+		return;
+	}
+
+	pll_register_string('shop_no_products_found', 'Nema pronađenih proizvoda za odabrane filtere.', 'Tersa Shop');
+}
+add_action('init', 'tersa_register_shop_ui_strings');
