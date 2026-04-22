@@ -35,7 +35,9 @@ if (!class_exists('WooCommerce')) {
 
 			<div class="site-header__cart-body">
 				<div class="widget_shopping_cart_content">
-					<?php woocommerce_mini_cart(); ?>
+					<div class="site-header__cart-loading" data-cart-loading-message>
+						<?php esc_html_e('Učitavanje košarice...', 'tersa-shop'); ?>
+					</div>
 				</div>
 			</div>
 		</div>

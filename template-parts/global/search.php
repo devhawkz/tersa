@@ -37,6 +37,8 @@ if (!defined('ABSPATH')) {
 			<div class="site-header__search-body">
 				<?php if (shortcode_exists('aws_search_form')) : ?>
 					<?php echo do_shortcode('[aws_search_form]'); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
+				<?php elseif (function_exists('woocommerce_product_search')) : ?>
+					<?php woocommerce_product_search(); ?>
 				<?php endif; ?>
 			</div>
 		</div>

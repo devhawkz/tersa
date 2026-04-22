@@ -195,6 +195,9 @@ function tersa_enqueue_assets() {
 		'openSubmenuFor' => function_exists('pll__')
 			? pll__('Otvori podizbornik za %s')
 			: __('Otvori podizbornik za %s', 'tersa-shop'),
+		'cartLoadError' => function_exists('pll__')
+			? pll__('Greška pri učitavanju košarice.')
+			: __('Greška pri učitavanju košarice.', 'tersa-shop'),
 	]);
 }
 add_action('wp_enqueue_scripts', 'tersa_enqueue_assets');

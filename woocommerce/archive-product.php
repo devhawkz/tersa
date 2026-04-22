@@ -270,6 +270,7 @@ $reset_url = function_exists('tersa_get_archive_reset_url')
 
 					<?php
 					the_posts_pagination([
+						'screen_reader_text' => __('Navigacija kroz proizvode', 'tersa-shop'),
 						'mid_size'  => 1,
 						'prev_text' => function_exists('tersa_pagination_prev_text') ? tersa_pagination_prev_text() : __('Prethodna', 'tersa-shop'),
 						'next_text' => function_exists('tersa_pagination_next_text') ? tersa_pagination_next_text() : __('Sljedeća', 'tersa-shop'),

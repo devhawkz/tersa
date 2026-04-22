@@ -88,10 +88,11 @@ $phone_href_second = preg_replace('/\s+/', '', $phone_second);
 					</h2>
 
 					<div class="contact-card__form-wrap">
-						<?php if (function_exists('do_shortcode')) :
-							echo do_shortcode($contact_cf7_shortcode);
-                            
-						endif; ?>
+						<?php
+						if (function_exists('tersa_safe_cf7_shortcode_output')) {
+							echo wp_kses_post(tersa_safe_cf7_shortcode_output((string) $contact_cf7_shortcode));
+						}
+						?>
 					</div>
 				</div>
 			</div>

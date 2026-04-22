@@ -92,12 +92,7 @@ if ($product->is_type('variable') && !empty($attachment_ids)) {
 }
 ?>
 
-<?php
-// Suppress WC's default notices output here — the cart drawer handles visual feedback.
-// Plugin callbacks on this hook still fire normally.
-remove_action('woocommerce_before_single_product', 'woocommerce_output_all_notices', 10);
-do_action('woocommerce_before_single_product');
-?>
+<?php do_action('woocommerce_before_single_product'); ?>
 
 <div id="product-<?php the_ID(); ?>" <?php wc_product_class('product-single', $product); ?>>
 	<?php

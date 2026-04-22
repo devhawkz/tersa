@@ -20,6 +20,7 @@ document.addEventListener('DOMContentLoaded', function () {
   var searchObservers = [];
   var mobileNavPopulated = false;
   var mobileNavStack = [];
+  var cartDrawerHydrated = false;
 
   var FOCUSABLE_SELECTOR = [
     'a[href]:not([tabindex="-1"])',
@@ -583,6 +584,10 @@ document.addEventListener('DOMContentLoaded', function () {
     cartToggle.setAttribute('aria-expanded', 'true');
     cartToggle.classList.add('is-active');
 
+    if (!cartDrawerHydrated) {
+      refreshCartDrawerAndBadge();
+    }
+
     lockScroll();
     document.addEventListener('keydown', trapCart);
 
@@ -654,12 +659,9 @@ document.addEventListener('DOMContentLoaded', function () {
       el.remove();
     });
 
-    // Classic WC notice wrapper — success/info/error messages.
+    // Uklanjamo samo success poruke da ne bismo sakrili greške korisniku.
     document.querySelectorAll([
       '.woocommerce-notices-wrapper .woocommerce-message',
-      '.woocommerce-notices-wrapper .woocommerce-info',
-      '.woocommerce-notices-wrapper .woocommerce-success',
-      '.woocommerce-notices-wrapper .woocommerce-error',
       '.woocommerce-notices-wrapper .is-success',
       // WC Blocks notice banner (React-rendered, WC 8+)
       '.wc-block-components-notice-banner.is-success',
@@ -669,7 +671,7 @@ document.addEventListener('DOMContentLoaded', function () {
     });
 
     document.querySelectorAll('.woocommerce-notices-wrapper').forEach(function (wrapper) {
-      if (!wrapper.querySelector('.woocommerce-message, .woocommerce-info, .woocommerce-success, .woocommerce-error')) {
+      if (!wrapper.querySelector('.woocommerce-message, .woocommerce-info, .woocommerce-success, .woocommerce-error, [role="alert"]')) {
         wrapper.innerHTML = '';
       }
     });
@@ -703,12 +705,19 @@ document.addEventListener('DOMContentLoaded', function () {
         }
 
         updateCartDrawerContent(data.data.mini_cart_html, data.data.cart_count);
+        cartDrawerHydrated = true;
 
         // Ukloni eventualni notice koji se pojavi kasnije u istom tick-u.
         setTimeout(removeWooNotices, 50);
       })
       .catch(function (error) {
         console.error(error);
+        var cartContent = document.querySelector('#cart-drawer .widget_shopping_cart_content');
+        if (cartContent && !cartDrawerHydrated) {
+          cartContent.textContent = (window.tersaHeaderI18n && window.tersaHeaderI18n.cartLoadError)
+            ? window.tersaHeaderI18n.cartLoadError
+            : 'Greška pri učitavanju košarice.';
+        }
       })
       .finally(function () {
         isRefreshingCartDrawer = false;

@@ -8,7 +8,7 @@ if (!function_exists('woocommerce_breadcrumb')) {
 }
 ?>
 
-<nav class="tersa-breadcrumbs" aria-label="<?php esc_attr_e('Breadcrumb', 'tersa-shop'); ?>" aria-hidden="false" style="display:none;">
+<nav class="tersa-breadcrumbs" aria-label="<?php esc_attr_e('Breadcrumb', 'tersa-shop'); ?>">
 	<?php
 	woocommerce_breadcrumb([
 		'delimiter'   => ' / ',

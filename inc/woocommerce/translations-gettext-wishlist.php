@@ -14,6 +14,9 @@ function tersa_yith_wishlist_gettext_override($translated, $text, $domain) {
 	if ($domain !== 'yith-woocommerce-wishlist' && $domain !== 'woocommerce') {
 		return $translated;
 	}
+	if (is_admin()) {
+		return $translated;
+	}
 
 	if ($domain === 'woocommerce') {
 		$skip_overlap = in_array($text, ['Stock', 'in stock', 'Add to cart'], true);

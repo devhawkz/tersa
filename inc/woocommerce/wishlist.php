@@ -48,10 +48,12 @@ function tersa_yith_wcwl_ajax_add_response(array $response): array {
 	$wishlist_title = function_exists('pll__') ? pll__('Moja lista želja') : 'Moja lista želja';
 
 	if ($product_name !== '') {
+		$safe_product_name   = esc_html(wp_strip_all_tags((string) $product_name));
+		$safe_wishlist_title = esc_html((string) $wishlist_title);
 		$hr = function_exists('pll__')
 			? pll__('"%s" je dodano na vašu listu "%s"!')
 			: '"%s" je dodano na vašu listu "%s"!';
-		$response['message'] = sprintf($hr, $product_name, $wishlist_title);
+		$response['message'] = sprintf($hr, $safe_product_name, $safe_wishlist_title);
 	}
 
 	return $response;

@@ -13,12 +13,14 @@ require_once get_template_directory() . '/inc/customizer.php';
 // Helpers
 require_once get_template_directory() . '/inc/header-helpers.php';
 require_once get_template_directory() . '/inc/footer-helpers.php';
+require_once get_template_directory() . '/inc/shortcodes.php';
 
 // WooCommerce
 require_once get_template_directory() . '/inc/woocommerce.php';
 
 // SEO / Schema
  require_once get_template_directory() . '/inc/schema.php';
+require_once get_template_directory() . '/inc/seo-facets.php';
 
 // Performance
 require_once get_template_directory() . '/inc/performance.php';

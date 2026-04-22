@@ -12,30 +12,36 @@ function tersa_woocommerce_gettext_override($translated, $text, $domain) {
 	if ($domain !== 'woocommerce') {
 		return $translated;
 	}
+	if (is_admin()) {
+		return $translated;
+	}
 
 	switch ($text) {
 		case 'No products in the cart.':
-			$hr = 'Trenutačno nema proizvoda u košarici.';
+			$hr = 'Trenutno nema proizvoda u košarici.';
 			return function_exists('pll__') ? pll__($hr) : $hr;
 		case 'Stock':
 			$hr = 'Zalihe';
 			return function_exists('pll__') ? pll__($hr) : $hr;
 		case 'Subtotal':
-			return 'Međuzbir';
+			$hr = 'Međuzbir';
+			return function_exists('pll__') ? pll__($hr) : __($hr, 'tersa-shop');
 		case 'Checkout':
-			return 'Blagajna';
+			$hr = 'Blagajna';
+			return function_exists('pll__') ? pll__($hr) : __($hr, 'tersa-shop');
 		case 'Add to cart':
 			if ($translated !== $text) {
 				return $translated;
 			}
 			return function_exists('tersa_pll_wishlist') ? tersa_pll_wishlist('add_to_cart') : $translated;
 		case 'View cart':
-			return 'Pogledaj košaricu';
+			$hr = 'Pogledaj košaricu';
+			return function_exists('pll__') ? pll__($hr) : __($hr, 'tersa-shop');
 		case '%s in stock':
-			$hr = '%s na zalihima';
+			$hr = '%s na stanju';
 			return function_exists('pll__') ? pll__($hr) : $hr;
 		case 'in stock':
-			$hr = 'na zalihima';
+			$hr = 'na stanju';
 			return function_exists('pll__') ? pll__($hr) : $hr;
 		case 'Weight':
 			$hr = 'Težina';

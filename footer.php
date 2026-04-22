@@ -185,8 +185,8 @@ $legal_fallback = [
 						// Stilove primenjuješ tako što u CF7 form template-u dodaš klase
 						// npr. text polju: [email* your-email class:site-footer__newsletter-input]
 						// i dugmetu: [submit class:site-footer__newsletter-button \"Prijavi se\"]
-					if (function_exists('do_shortcode')) {
-						echo wp_kses_post(do_shortcode($footer_newsletter_shortcode));
+					if (function_exists('tersa_safe_cf7_shortcode_output')) {
+						echo wp_kses_post(tersa_safe_cf7_shortcode_output((string) $footer_newsletter_shortcode));
 					}
 						?>
 					</section>
