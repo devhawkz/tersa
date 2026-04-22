@@ -33,13 +33,13 @@ if (!class_exists('WooCommerce')) {
 				</button>
 			</div>
 
-			<div class="site-header__cart-body">
-				<div class="widget_shopping_cart_content">
-					<div class="site-header__cart-loading" data-cart-loading-message>
-						<?php esc_html_e('Učitavanje košarice...', 'tersa-shop'); ?>
-					</div>
+		<div class="site-header__cart-body">
+			<div class="widget_shopping_cart_content">
+				<div class="site-header__cart-loading" data-cart-loading-message>
+					<?php esc_html_e('Učitavanje košarice...', 'tersa-shop'); ?>
 				</div>
 			</div>
+		</div>
 		</div>
 	</div>
 </div>

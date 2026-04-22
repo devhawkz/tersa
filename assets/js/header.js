@@ -973,4 +973,18 @@ document.addEventListener('DOMContentLoaded', function () {
   }
 
   bindMiniCartQtyActions();
+
+  // Hover/focus prefetch na cart ikonicu:
+  // AJAX fetch kreće čim korisnik pomjeri miš prema dugmetu (tipično 100-200ms
+  // prije klika), pa je sadržaj spreman do trenutka otvaranja drawera.
+  if (cartToggle && window.tersaCartDrawer) {
+    function prefetchCart() {
+      if (!cartDrawerHydrated) {
+        refreshCartDrawerAndBadge();
+      }
+    }
+    cartToggle.addEventListener('mouseenter', prefetchCart, { once: true });
+    cartToggle.addEventListener('focusin',    prefetchCart, { once: true });
+    cartToggle.addEventListener('touchstart', prefetchCart, { once: true, passive: true });
+  }
 });
