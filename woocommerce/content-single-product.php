@@ -204,7 +204,7 @@ do_action('woocommerce_before_single_product');
 						'wrap_after'  => '</ol>',
 						'before'      => '<li class="product-single__breadcrumb-item">',
 						'after'       => '</li>',
-						'home'        => esc_html__('Naslovna', 'tersa-shop'),
+						'home'        => esc_html__('Naslovnica', 'tersa-shop'),
 					]);
 					?>
 				</nav>
@@ -222,7 +222,10 @@ do_action('woocommerce_before_single_product');
 					<div class="product-single__stock">
 						
 						<span class="product-single__stock-value<?php echo $is_in_stock ? ' is-in-stock' : ' is-out-of-stock'; ?>">
-							<?php echo esc_html($is_in_stock ? __('Na stanju', 'tersa-shop') : __('Trenutačno nedostupno', 'tersa-shop')); ?>
+							<?php
+					$_t_stock = function_exists('pll__') ? 'pll__' : function (string $s): string { return __($s, 'tersa-shop'); };
+					echo esc_html($is_in_stock ? $_t_stock('Na stanju') : $_t_stock('Trenutačno nedostupno'));
+					?>
 						</span>
 					</div>
 				</div>

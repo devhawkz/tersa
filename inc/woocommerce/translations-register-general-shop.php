@@ -21,6 +21,8 @@ function tersa_pll_register_general_shop_strings(): void {
 	pll_register_string('tersa_badge_na_akciji', 'Na akciji', 'Tersa – proizvod (badge)', ['multiline' => false]);
 	pll_register_string('tersa_stock_na_zalihi', '%s na stanju', 'Tersa – proizvod (stanje)', ['multiline' => false]);
 	pll_register_string('tersa_stock_na_zalihi_simple', 'na stanju', 'Tersa – proizvod (stanje)', ['multiline' => false]);
+	pll_register_string('tersa_stock_in_stock', 'Na stanju', 'Tersa – proizvod (stanje)', ['multiline' => false]);
+	pll_register_string('tersa_stock_out_of_stock', 'Trenutačno nedostupno', 'Tersa – proizvod (stanje)', ['multiline' => false]);
 
 	pll_register_string('tersa_product_weight', 'Težina', 'Tersa – proizvod (dodatne informacije)', ['multiline' => false]);
 	pll_register_string('tersa_product_dimensions', 'Dimenzije', 'Tersa – proizvod (dodatne informacije)', ['multiline' => false]);

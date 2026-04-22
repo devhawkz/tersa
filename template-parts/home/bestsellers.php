@@ -356,7 +356,7 @@ if (!empty($product_ids)) {
 									);
 								}
 
-								echo $wishlist_markup_cache[$wishlist_key];
+								echo wp_kses_post($wishlist_markup_cache[$wishlist_key]);
 								?>
 							</div>
 						<?php endif; ?>
