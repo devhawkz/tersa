@@ -33,6 +33,12 @@ function tersa_theme_setup() {
 
 	
 
+	// Block Editor (Gutenberg) podrška
+	add_theme_support('align-wide');         // wide/full blokovi
+	add_theme_support('editor-styles');      // tema može dodati editor.css
+	add_theme_support('wp-block-styles');    // default WP block stilovi
+	add_theme_support('responsive-embeds'); // responzivni embeds
+
 	// WooCommerce podrška — uklanja "Your theme does not support WooCommerce" poruku
 	add_theme_support('woocommerce');
 	add_theme_support('wc-product-gallery-zoom');
@@ -60,13 +66,26 @@ function tersa_theme_setup() {
 	
 
 	register_nav_menus([
-		'primary'         => __('Primary menu', 'tersa-shop'),
-		'footer_about'    => __('Footer About menu', 'tersa-shop'),
-		'footer_services' => __('Footer Services menu', 'tersa-shop'),
-		'footer_legal'    => __('Footer Legal menu', 'tersa-shop'),
+		'primary'      => __('Primary menu', 'tersa-shop'),
+		'footer_about' => __('Footer About menu', 'tersa-shop'),
+		'footer_legal' => __('Footer Legal menu', 'tersa-shop'),
 	]);
 }
 add_action('after_setup_theme', 'tersa_theme_setup');
+
+/**
+ * Eksplicitno uključuje Gutenberg block editor za stranice (post_type = 'page').
+ * Prioritet 20 nadpisuje Classic Editor plugin (koji koristi prioritet 10)
+ * ako je opcija "Default editor for all users" postavljena na Classic Editor.
+ */
+add_filter(
+	'use_block_editor_for_post_type',
+	static function (bool $use, string $post_type): bool {
+		return $post_type === 'page' ? true : $use;
+	},
+	20,
+	2
+);
 
 
 function tersa_register_sidebars() {

@@ -5,18 +5,18 @@ if (!defined('ABSPATH')) {
 
 function tersa_register_eu_projects_cpt() {
 	$labels = [
-		'name'               => __('EU Projects', 'tersa-shop'),
-		'singular_name'      => __('EU Project', 'tersa-shop'),
-		'menu_name'          => __('EU Projects', 'tersa-shop'),
-		'add_new'            => __('Add New', 'tersa-shop'),
-		'add_new_item'       => __('Add New EU Project', 'tersa-shop'),
-		'edit_item'          => __('Edit EU Project', 'tersa-shop'),
-		'new_item'           => __('New EU Project', 'tersa-shop'),
-		'view_item'          => __('View EU Project', 'tersa-shop'),
-		'all_items'          => __('All EU Projects', 'tersa-shop'),
-		'search_items'       => __('Search EU Projects', 'tersa-shop'),
-		'not_found'          => __('No EU projects found.', 'tersa-shop'),
-		'not_found_in_trash' => __('No EU projects found in Trash.', 'tersa-shop'),
+		'name'               => __('EU Projekti', 'tersa-shop'),
+		'singular_name'      => __('EU Projekt', 'tersa-shop'),
+		'menu_name'          => __('EU Projekti', 'tersa-shop'),
+		'add_new'            => __('Dodaj novi', 'tersa-shop'),
+		'add_new_item'       => __('Dodaj novi EU projekt', 'tersa-shop'),
+		'edit_item'          => __('Uredi EU projekt', 'tersa-shop'),
+		'new_item'           => __('Novi EU projekt', 'tersa-shop'),
+		'view_item'          => __('Pogledaj EU projekt', 'tersa-shop'),
+		'all_items'          => __('Svi EU projekti', 'tersa-shop'),
+		'search_items'       => __('Traži EU projekte', 'tersa-shop'),
+		'not_found'          => __('Nema EU projekata.', 'tersa-shop'),
+		'not_found_in_trash' => __('Nema EU projekata u smeću.', 'tersa-shop'),
 	];
 
 	$args = [

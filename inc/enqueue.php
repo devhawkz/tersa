@@ -13,13 +13,18 @@ function tersa_enqueue_assets() {
 	wp_enqueue_style('tersa-footer', $theme_uri . '/assets/css/footer.css', ['tersa-base'], $theme_version);
 
 	// Sidebar CSS — učitava se samo na stranicama koje realno prikazuju sidebar.
-	// EU project archive/single su isključeni jer ti templati ne pozivaju get_sidebar().
-	$needs_sidebar = (
+	// EU project archive/single isključeni jer ne pozivaju get_sidebar().
+	// Za page.php, index.php, 404.php sidebar je isključen po defaultu —
+	// aktiviraj filterom: add_filter('tersa_sidebar_on_general_pages', '__return_true');
+	$needs_sidebar_shop = (
 		(function_exists('is_shop') && (is_shop() || is_product_category() || is_product_tag() || is_product_taxonomy()))
 		|| (is_archive() && !is_post_type_archive('eu_project'))
 		|| is_search()
 	);
-	if ($needs_sidebar) {
+	$needs_sidebar_general = (bool) apply_filters('tersa_sidebar_on_general_pages', false)
+		&& (is_page() || is_home() || is_404());
+
+	if ($needs_sidebar_shop || $needs_sidebar_general) {
 		wp_enqueue_style('tersa-sidebar', $theme_uri . '/assets/css/sidebar.css', ['tersa-base'], $theme_version);
 	}
 

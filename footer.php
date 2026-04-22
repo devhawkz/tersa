@@ -71,29 +71,6 @@ $about_fallback = [
 	],
 ];
 
-$services_fallback = [
-	[
-		'label' => __('Contact Us', 'tersa-shop'),
-		'url'   => $_pll_url('kontakt'),
-	],
-	[
-		'label' => __('Customer Service', 'tersa-shop'),
-		'url'   => $_pll_url('kontakt'),
-	],
-	[
-		'label' => __('Find Store', 'tersa-shop'),
-		'url'   => $_pll_url('kontakt'),
-	],
-	[
-		'label' => __('Book appointment', 'tersa-shop'),
-		'url'   => $_pll_url('kontakt'),
-	],
-	[
-		'label' => __('Shipping & Returns', 'tersa-shop'),
-		'url'   => $_pll_url('dostava-i-povrat'),
-	],
-];
-
 $legal_fallback = [
 	[
 		'label' => __('Privacy Policy', 'tersa-shop'),
