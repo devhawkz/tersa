@@ -654,8 +654,17 @@ document.addEventListener('DOMContentLoaded', function () {
       el.remove();
     });
 
-    // WooCommerce server-side notice wrapper.
-    document.querySelectorAll('.woocommerce-notices-wrapper .woocommerce-message, .woocommerce-notices-wrapper .woocommerce-info, .woocommerce-notices-wrapper .woocommerce-success, .woocommerce-notices-wrapper .woocommerce-error, .woocommerce-notices-wrapper .is-success').forEach(function (el) {
+    // Classic WC notice wrapper — success/info/error messages.
+    document.querySelectorAll([
+      '.woocommerce-notices-wrapper .woocommerce-message',
+      '.woocommerce-notices-wrapper .woocommerce-info',
+      '.woocommerce-notices-wrapper .woocommerce-success',
+      '.woocommerce-notices-wrapper .woocommerce-error',
+      '.woocommerce-notices-wrapper .is-success',
+      // WC Blocks notice banner (React-rendered, WC 8+)
+      '.wc-block-components-notice-banner.is-success',
+      '.wc-block-store-notice.is-success'
+    ].join(', ')).forEach(function (el) {
       el.remove();
     });
 

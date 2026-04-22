@@ -105,9 +105,10 @@ if (empty($slides)) {
 								</div>
 							<?php endif; ?>
 
-						<p class="home-hero__title">
+						<?php $title_tag = $is_active ? 'h1' : 'p'; ?>
+						<<?php echo $title_tag; ?> class="home-hero__title">
 							<?php echo nl2br(esc_html($title)); ?>
-						</p>
+						</<?php echo $title_tag; ?>>
 
 							<p class="home-hero__description">
 								<?php echo nl2br(esc_html($description)); ?>

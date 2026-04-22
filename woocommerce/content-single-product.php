@@ -92,7 +92,19 @@ if ($product->is_type('variable') && !empty($attachment_ids)) {
 }
 ?>
 
+<?php
+// Suppress WC's default notices output here — the cart drawer handles visual feedback.
+// Plugin callbacks on this hook still fire normally.
+remove_action('woocommerce_before_single_product', 'woocommerce_output_all_notices', 10);
+do_action('woocommerce_before_single_product');
+?>
+
 <div id="product-<?php the_ID(); ?>" <?php wc_product_class('product-single', $product); ?>>
+	<?php
+	// Prevent WC's default image output — custom gallery is handled above.
+	remove_action('woocommerce_before_single_product_summary', 'woocommerce_show_product_images', 20);
+	do_action('woocommerce_before_single_product_summary');
+	?>
 	<div class="product-single__inner">
 		<div class="product-single__gallery-column">
 			<div class="product-single__gallery">
@@ -339,8 +351,18 @@ if ($product->is_type('variable') && !empty($attachment_ids)) {
 				<?php endif; ?>
 			</div>
 		</div>
+	<?php
+	// Remove WC default tab output (custom accordions used instead) and default related products
+	// (custom template-parts/product/related-products.php used instead).
+	// Upsells remain at priority 15 and will render here.
+	remove_action('woocommerce_after_single_product_summary', 'woocommerce_output_product_data_tabs', 10);
+	remove_action('woocommerce_after_single_product_summary', 'woocommerce_output_related_products', 20);
+	do_action('woocommerce_after_single_product_summary');
+	?>
 	</div>
 </div>
+
+<?php do_action('woocommerce_after_single_product'); ?>
 
 <?php
 get_template_part(

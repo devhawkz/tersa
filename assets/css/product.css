@@ -918,5 +918,8 @@
       pointer-events: auto;
     }
   }
+  .woocommerce span.onsale{
+    display: none;
+  }
 
   
