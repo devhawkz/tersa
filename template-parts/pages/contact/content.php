@@ -88,11 +88,13 @@ $phone_href_second = preg_replace('/\s+/', '', $phone_second);
 					</h2>
 
 					<div class="contact-card__form-wrap">
-						<?php
-						if (function_exists('tersa_safe_cf7_shortcode_output')) {
-							echo wp_kses_post(tersa_safe_cf7_shortcode_output((string) $contact_cf7_shortcode));
-						}
-						?>
+					<?php
+					if (function_exists('tersa_safe_cf7_shortcode_output')) {
+						// tersa_safe_cf7_shortcode_output() validateira strogi regex — samo CF7 shortcode.
+						// wp_kses_post() bi uklonilo <form> elemente pa ga ne koristimo ovdje.
+						echo tersa_safe_cf7_shortcode_output((string) $contact_cf7_shortcode); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+					}
+					?>
 					</div>
 				</div>
 			</div>

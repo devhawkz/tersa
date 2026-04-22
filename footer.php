@@ -184,7 +184,9 @@ $legal_fallback = [
 						// npr. text polju: [email* your-email class:site-footer__newsletter-input]
 						// i dugmetu: [submit class:site-footer__newsletter-button \"Prijavi se\"]
 					if (function_exists('tersa_safe_cf7_shortcode_output')) {
-						echo wp_kses_post(tersa_safe_cf7_shortcode_output((string) $footer_newsletter_shortcode));
+						// tersa_safe_cf7_shortcode_output() validateira strogi regex — samo CF7 shortcode.
+						// wp_kses_post() bi uklonilo <form> elemente pa ga ne koristimo ovdje.
+						echo tersa_safe_cf7_shortcode_output((string) $footer_newsletter_shortcode); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 					}
 						?>
 					</section>
