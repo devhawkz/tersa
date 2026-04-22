@@ -100,8 +100,8 @@ if (false === $cached_post_ids) {
 			'posts_per_page'         => 4,
 			'no_found_rows'          => true,
 			'ignore_sticky_posts'    => true,
-			'update_post_meta_cache' => true,
-			'update_post_term_cache' => true,
+			'update_post_meta_cache' => false,
+			'update_post_term_cache' => false,
 			'fields'                 => 'ids',
 			'tax_query'              => [
 				[
@@ -128,27 +128,10 @@ if (false === $cached_post_ids) {
 if (empty($cached_post_ids)) {
 	return;
 }
-
-$query = new WP_Query([
-	'post_type'              => 'product',
-	'post_status'            => 'publish',
-	'post__in'               => $cached_post_ids,
-	'orderby'                => 'post__in',
-	'fields'                 => 'ids',
-	'no_found_rows'          => true,
-	'ignore_sticky_posts'    => true,
-	'update_post_meta_cache' => true,
-	'update_post_term_cache' => true,
-]);
-
-if (!$query->have_posts()) {
-	wp_reset_postdata();
-	return;
-}
 ?>
 
 <?php
-$product_ids = array_map('intval', $query->posts);
+$product_ids = array_map('intval', $cached_post_ids);
 $product_tags_by_id = [];
 
 if (!empty($product_ids)) {
@@ -213,13 +196,9 @@ if (!empty($product_ids)) {
 
 		<ul class="home-bestsellers__grid" role="list">
 			<?php
-			$has_yith_bestsellers  = function_exists('shortcode_exists') && shortcode_exists('yith_wcwl_add_to_wishlist');
 			$button_label_options  = $translate('Vidi opcije');
-
-			while ($query->have_posts()) :
-				$query->the_post();
-
-				$product = $bestsellers_products_map[get_the_ID()] ?? null;
+			foreach ($product_ids as $iter_product_id) :
+				$product = $bestsellers_products_map[$iter_product_id] ?? null;
 
 				if (!$product instanceof WC_Product) {
 					continue;
@@ -342,23 +321,14 @@ if (!empty($product_ids)) {
 							</div>
 						</a>
 
-						<?php if ($has_yith_bestsellers) : ?>
+						<?php
+						$bestseller_wishlist_markup = function_exists('tersa_get_wishlist_button_markup')
+							? tersa_get_wishlist_button_markup($product_id, 'home-bestsellers__wishlist-link')
+							: '';
+						?>
+						<?php if ($bestseller_wishlist_markup !== '') : ?>
 							<div class="home-bestsellers__wishlist">
-								<?php
-								static $wishlist_markup_cache = [];
-								$wishlist_key = (string) $product_id;
-
-								if (!isset($wishlist_markup_cache[$wishlist_key])) {
-									$wishlist_markup_cache[$wishlist_key] = do_shortcode(
-										sprintf(
-											'[yith_wcwl_add_to_wishlist product_id="%d" link_classes="home-bestsellers__wishlist-link"]',
-											$product_id
-										)
-									);
-								}
-
-								echo wp_kses_post($wishlist_markup_cache[$wishlist_key]);
-								?>
+								<?php echo wp_kses_post($bestseller_wishlist_markup); ?>
 							</div>
 						<?php endif; ?>
 
@@ -412,9 +382,7 @@ if (!empty($product_ids)) {
 					</div>
 			</article>
 			</li>
-		<?php endwhile; ?>
+		<?php endforeach; ?>
 		</ul>
 	</div>
 </section>
-
-<?php wp_reset_postdata(); ?>

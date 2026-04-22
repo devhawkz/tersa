@@ -465,6 +465,7 @@
   .woocommerce-message, .woocommerce-error, .woocommerce-info{
     text-align: center;
     width: 85%;
+    margin: 20px auto;
   }
   
   .woocommerce-message > a{

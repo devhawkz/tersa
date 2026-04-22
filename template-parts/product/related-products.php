@@ -53,7 +53,6 @@ if (!is_wp_error($rel_terms_raw) && is_array($rel_terms_raw)) {
 	}
 }
 
-$has_yith_related  = function_exists('shortcode_exists') && shortcode_exists('yith_wcwl_add_to_wishlist');
 $rel_label_options = function_exists('pll__') ? pll__('Vidi opcije') : 'Vidi opcije';
 
 $badge_color = '#000000';
@@ -194,16 +193,14 @@ unset($rel_products_batch, $_p);
 						</div>
 					</a>
 
-					<?php if ($has_yith_related) : ?>
+					<?php
+					$related_wishlist_markup = function_exists('tersa_get_wishlist_button_markup')
+						? tersa_get_wishlist_button_markup($rel_id, 'home-bestsellers__wishlist-link')
+						: '';
+					?>
+					<?php if ($related_wishlist_markup !== '') : ?>
 						<div class="home-bestsellers__wishlist">
-							<?php
-							echo do_shortcode(
-								sprintf(
-									'[yith_wcwl_add_to_wishlist product_id="%d" link_classes="home-bestsellers__wishlist-link"]',
-									$rel_id
-								)
-							);
-							?>
+							<?php echo wp_kses_post($related_wishlist_markup); ?>
 						</div>
 					<?php endif; ?>
 

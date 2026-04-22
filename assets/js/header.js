@@ -81,6 +81,32 @@ document.addEventListener('DOMContentLoaded', function () {
   var trapCart = createFocusTrap(cartPanel);
   var trapMobile = createFocusTrap(mobileNavigation);
 
+  function getCartAjaxUrl() {
+    if (!window.tersaCartDrawer) {
+      return '/wp-admin/admin-ajax.php';
+    }
+
+    var relative = window.tersaCartDrawer.ajaxUrlRelative;
+    if (typeof relative === 'string' && relative.charAt(0) === '/') {
+      return relative;
+    }
+
+    var configured = window.tersaCartDrawer.ajaxUrl;
+    if (typeof configured !== 'string' || configured.trim() === '') {
+      return '/wp-admin/admin-ajax.php';
+    }
+
+    try {
+      var parsed = new URL(configured, window.location.href);
+      if (parsed.origin !== window.location.origin) {
+        return '/wp-admin/admin-ajax.php';
+      }
+      return parsed.pathname + parsed.search;
+    } catch (e) {
+      return '/wp-admin/admin-ajax.php';
+    }
+  }
+
   function revealOverlay(overlay) {
     if (!overlay) {
       return;
@@ -679,6 +705,14 @@ document.addEventListener('DOMContentLoaded', function () {
 
   function refreshCartDrawerAndBadge() {
     if (!window.tersaCartDrawer || isRefreshingCartDrawer) {
+      if (!window.tersaCartDrawer && !cartDrawerHydrated) {
+        var missingConfigContent = document.querySelector('#cart-drawer .widget_shopping_cart_content');
+        if (missingConfigContent) {
+          missingConfigContent.textContent = (window.tersaHeaderI18n && window.tersaHeaderI18n.cartLoadError)
+            ? window.tersaHeaderI18n.cartLoadError
+            : 'Greška pri učitavanju košarice.';
+        }
+      }
       return;
     }
 
@@ -689,18 +723,28 @@ document.addEventListener('DOMContentLoaded', function () {
     body.append('action', 'tersa_get_cart_drawer_fragments');
     body.append('nonce', window.tersaCartDrawer.nonce);
 
-    fetch(window.tersaCartDrawer.ajaxUrl, {
+    fetch(getCartAjaxUrl(), {
       method: 'POST',
+      credentials: 'same-origin',
       headers: {
         'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8'
       },
       body: body.toString()
     })
       .then(function (response) {
+        if (!response.ok) {
+          throw new Error('Cart drawer request failed: ' + response.status);
+        }
         return response.json();
       })
       .then(function (data) {
-        if (!data || !data.success) {
+        if (!data || !data.success || !data.data || typeof data.data.mini_cart_html !== 'string') {
+          var invalidContent = document.querySelector('#cart-drawer .widget_shopping_cart_content');
+          if (invalidContent && !cartDrawerHydrated) {
+            invalidContent.textContent = (window.tersaHeaderI18n && window.tersaHeaderI18n.cartLoadError)
+              ? window.tersaHeaderI18n.cartLoadError
+              : 'Greška pri učitavanju košarice.';
+          }
           return;
         }
 
@@ -769,7 +813,7 @@ document.addEventListener('DOMContentLoaded', function () {
       body.append('cart_item_key', cartItemKey);
       body.append('quantity', String(nextQty));
 
-      fetch(window.tersaCartDrawer.ajaxUrl, {
+      fetch(getCartAjaxUrl(), {
         method: 'POST',
         headers: {
           'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8'

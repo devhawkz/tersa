@@ -171,21 +171,13 @@ $short_description = wp_kses_post(
 			</a>
 
 			<?php
-		static $has_yith_wishlist = null;
-		if ($has_yith_wishlist === null) {
-			$has_yith_wishlist = function_exists('shortcode_exists') && shortcode_exists('yith_wcwl_add_to_wishlist');
-		}
-		?>
-		<?php if ($has_yith_wishlist) : ?>
+			$wishlist_markup = function_exists('tersa_get_wishlist_button_markup')
+				? tersa_get_wishlist_button_markup($product_id, 'shop-card__wishlist-link')
+				: '';
+			?>
+		<?php if ($wishlist_markup !== '') : ?>
 				<div class="shop-card__wishlist">
-					<?php
-					echo do_shortcode(
-						sprintf(
-							'[yith_wcwl_add_to_wishlist product_id="%d" link_classes="shop-card__wishlist-link"]',
-							$product_id
-						)
-					);
-					?>
+					<?php echo wp_kses_post($wishlist_markup); ?>
 				</div>
 			<?php endif; ?>
 

@@ -37,7 +37,8 @@ add_action('wp_ajax_tersa_update_mini_cart_qty', 'tersa_ajax_update_mini_cart_qt
 add_action('wp_ajax_nopriv_tersa_update_mini_cart_qty', 'tersa_ajax_update_mini_cart_qty');
 
 function tersa_ajax_get_cart_drawer_fragments() {
-	check_ajax_referer('tersa_cart_nonce', 'nonce');
+	// Read-only endpoint: do not hard-fail on stale nonce from cached pages.
+	// Quantity-changing endpoints still enforce nonce checks.
 	tersa_get_cart_drawer_fragments();
 }
 add_action('wp_ajax_tersa_get_cart_drawer_fragments', 'tersa_ajax_get_cart_drawer_fragments');

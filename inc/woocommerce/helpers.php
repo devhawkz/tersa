@@ -85,3 +85,37 @@ function tersa_pagination_next_text(): string {
 	}
 	return (string) __($hr, 'tersa-shop');
 }
+
+/**
+ * Cached wishlist button markup for product cards.
+ * Avoids repeated shortcode parsing/rendering inside loops.
+ */
+function tersa_get_wishlist_button_markup(int $product_id, string $link_class): string {
+	static $has_shortcode = null;
+	static $cache = [];
+
+	if ($product_id <= 0) {
+		return '';
+	}
+
+	if ($has_shortcode === null) {
+		$has_shortcode = function_exists('shortcode_exists') && shortcode_exists('yith_wcwl_add_to_wishlist');
+	}
+
+	if (!$has_shortcode) {
+		return '';
+	}
+
+	$cache_key = $product_id . '|' . $link_class;
+	if (!isset($cache[$cache_key])) {
+		$cache[$cache_key] = (string) do_shortcode(
+			sprintf(
+				'[yith_wcwl_add_to_wishlist product_id="%d" link_classes="%s"]',
+				$product_id,
+				esc_attr($link_class)
+			)
+		);
+	}
+
+	return $cache[$cache_key];
+}
