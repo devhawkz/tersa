@@ -50,60 +50,62 @@ $footer_newsletter_shortcode = !empty($company_settings['footer_newsletter_cf7_s
 	? $company_settings['footer_newsletter_cf7_shortcode']
 	: '[contact-form-7 id="02a3794" title="Contact form 1"]';
 
+$_pll_url = function_exists('tersa_pll_page_url') ? 'tersa_pll_page_url' : function (string $s): string { return home_url('/' . $s . '/'); };
+
 $about_fallback = [
 	[
 		'label' => __('Our Story', 'tersa-shop'),
-		'url'   => home_url('/o-nama/'),
+		'url'   => $_pll_url('o-nama'),
 	],
 	[
 		'label' => __('Careers', 'tersa-shop'),
-		'url'   => home_url('/karijera/'),
+		'url'   => $_pll_url('karijera'),
 	],
 	[
 		'label' => __('Influencers', 'tersa-shop'),
-		'url'   => home_url('/suradnja/'),
+		'url'   => $_pll_url('suradnja'),
 	],
 	[
 		'label' => __('Join our team', 'tersa-shop'),
-		'url'   => home_url('/kontakt/'),
+		'url'   => $_pll_url('kontakt'),
 	],
 ];
 
 $services_fallback = [
 	[
 		'label' => __('Contact Us', 'tersa-shop'),
-		'url'   => home_url('/kontakt/'),
+		'url'   => $_pll_url('kontakt'),
 	],
 	[
 		'label' => __('Customer Service', 'tersa-shop'),
-		'url'   => home_url('/kontakt/'),
+		'url'   => $_pll_url('kontakt'),
 	],
 	[
 		'label' => __('Find Store', 'tersa-shop'),
-		'url'   => home_url('/kontakt/'),
+		'url'   => $_pll_url('kontakt'),
 	],
 	[
 		'label' => __('Book appointment', 'tersa-shop'),
-		'url'   => home_url('/kontakt/'),
+		'url'   => $_pll_url('kontakt'),
 	],
 	[
 		'label' => __('Shipping & Returns', 'tersa-shop'),
-		'url'   => home_url('/dostava-i-povrat/'),
+		'url'   => $_pll_url('dostava-i-povrat'),
 	],
 ];
 
 $legal_fallback = [
 	[
 		'label' => __('Privacy Policy', 'tersa-shop'),
-		'url'   => home_url('/politika-privatnosti/'),
+		'url'   => $_pll_url('politika-privatnosti'),
 	],
 	[
 		'label' => __('Help', 'tersa-shop'),
-		'url'   => home_url('/kontakt/'),
+		'url'   => $_pll_url('kontakt'),
 	],
 	[
 		'label' => __('FAQs', 'tersa-shop'),
-		'url'   => home_url('/faq/'),
+		'url'   => $_pll_url('faq'),
 	],
 ];
 ?>

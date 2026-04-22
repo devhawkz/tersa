@@ -79,15 +79,15 @@ if ($has_multiple_variants) {
  */
 $badges = [];
 
-$product_tag_names = wp_get_post_terms(
-	$product_id,
-	'product_tag',
-	[
-		'fields' => 'names',
-	]
-);
+// get_the_terms() hits the term object cache directly — shorter path than wp_get_post_terms()
+// when tersa_prime_product_tag_term_cache has already warmed the cache for the current loop.
+$_raw_tags         = get_the_terms($product_id, 'product_tag');
+$product_tag_names = (!is_wp_error($_raw_tags) && is_array($_raw_tags))
+	? array_map(static function ($t) { return (string) $t->name; }, $_raw_tags)
+	: [];
+unset($_raw_tags);
 
-if (is_array($product_tag_names) && !empty($product_tag_names)) {
+if (!empty($product_tag_names)) {
 	foreach ($product_tag_names as $tag_name) {
 		$normalized = sanitize_title($tag_name);
 

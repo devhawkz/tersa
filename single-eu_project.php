@@ -118,7 +118,7 @@ while (have_posts()) :
 
 	$content = get_the_content();
 	?>
-	<main id="primary" class="site-main eu-project-single">
+	<main id="main-content" class="site-main eu-project-single">
 		<section class="eu-project-single__hero">
 			<div class="container container--narrow">
 				<nav class="eu-project-breadcrumbs" aria-label="<?php esc_attr_e('Breadcrumbs', 'tersa-shop'); ?>">

@@ -189,5 +189,11 @@ function tersa_enqueue_assets() {
 		'ajaxUrl' => admin_url('admin-ajax.php'),
 		'nonce'   => wp_create_nonce('tersa_cart_nonce'),
 	]);
+
+	wp_localize_script('tersa-header-js', 'tersaHeaderI18n', [
+		'openSubmenuFor' => function_exists('pll__')
+			? pll__('Otvori podizbornik za %s')
+			: __('Otvori podizbornik za %s', 'tersa-shop'),
+	]);
 }
 add_action('wp_enqueue_scripts', 'tersa_enqueue_assets');

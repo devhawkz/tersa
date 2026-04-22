@@ -56,7 +56,7 @@ if (function_exists('get_field')) {
 	$badge_color = (string) $badge_value;
 }
 
-$section_title = !empty($section_title) ? $section_title : 'Bestsellers';
+$section_title = !empty($section_title) ? $section_title : (function_exists('pll__') ? pll__('Bestsellers') : __('Bestsellers', 'tersa-shop'));
 $badge_color   = !empty($badge_color) ? $badge_color : '#000000';
 
 $product_tag_slug = 'najprodavanije';
@@ -186,6 +186,22 @@ if (!empty($product_ids)) {
 		}
 	}
 }
+
+// Batch-load svih WC_Product objekata jednim upitom — izbjegavamo wc_get_product() po iteraciji.
+$bestsellers_products_map = [];
+if (!empty($product_ids)) {
+	$_bp_batch = wc_get_products([
+		'include' => $product_ids,
+		'orderby' => 'post__in',
+		'order'   => 'ASC',
+		'limit'   => count($product_ids),
+		'status'  => 'publish',
+	]);
+	foreach ($_bp_batch as $_bp) {
+		$bestsellers_products_map[$_bp->get_id()] = $_bp;
+	}
+	unset($_bp_batch, $_bp);
+}
 ?>
 
 <section class="home-bestsellers cart" aria-labelledby="home-bestsellers-title">
@@ -202,7 +218,7 @@ if (!empty($product_ids)) {
 			while ($query->have_posts()) :
 				$query->the_post();
 
-				$product = wc_get_product(get_the_ID());
+				$product = $bestsellers_products_map[get_the_ID()] ?? null;
 
 				if (!$product instanceof WC_Product) {
 					continue;

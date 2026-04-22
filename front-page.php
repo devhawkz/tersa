@@ -18,7 +18,7 @@ $_tersa_home_args = [
 ];
 ?>
 
-<main id="content" class="site-main" role="main">
+<main id="main-content" class="site-main" role="main">
 	<?php get_template_part('template-parts/home/hero-slider', null, $_tersa_home_args); ?>
 	<?php get_template_part('template-parts/home/shop-by-category', null, $_tersa_home_args); ?>
 	<?php get_template_part('template-parts/home/promo-banners', null, $_tersa_home_args); ?>

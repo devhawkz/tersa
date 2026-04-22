@@ -44,8 +44,8 @@ function tersa_get_allowed_catalog_orderby(): array {
 	return [
 		'date'       => $t('Sortiraj po najnovijim'),
 		'menu_order' => $t('Zadano sortiranje'),
-		'price'      => $t('Sortiraj po cijeni: od niske prema viskoj'),
-		'price-desc' => $t('Sortiraj po cijeni: od visoke prema niskoj'),
+		'price'      => $t('Sortiraj po cijeni: nisko na visoko'),
+		'price-desc' => $t('Sortiraj po cijeni: visoko na nisko'),
 		'popularity' => $t('Sortiraj po popularnosti'),
 		'rating'     => $t('Sortiraj po ocjeni'),
 	];

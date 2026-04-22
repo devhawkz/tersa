@@ -12,9 +12,13 @@ if (!defined('ABSPATH')) {
 function tersa_woocommerce_product_tabs_override($tabs) {
 	global $product;
 
+	$_t = function (string $str): string {
+		return function_exists('pll__') ? pll__($str) : __($str, 'tersa-shop');
+	};
+
 	$hr_titles = [
-		'description'            => 'Opis',
-		'additional_information' => 'Dodatne informacije',
+		'description'            => $_t('Opis'),
+		'additional_information' => $_t('Dodatne informacije'),
 	];
 
 	foreach ($hr_titles as $key => $title) {

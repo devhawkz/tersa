@@ -4,7 +4,7 @@ defined('ABSPATH') || exit;
 get_header();
 ?>
 
-<main id="primary" class="site-main tersa-404" role="main">
+<main id="main-content" class="site-main tersa-404" role="main">
 	<section class="tersa-404__section page-spacing" aria-labelledby="tersa-404-title">
 		<div class="container">
 			<header class="tersa-404__header">

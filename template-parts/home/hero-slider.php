@@ -105,9 +105,9 @@ if (empty($slides)) {
 								</div>
 							<?php endif; ?>
 
-							<h1 class="home-hero__title">
-								<?php echo nl2br(esc_html($title)); ?>
-							</h1>
+						<p class="home-hero__title">
+							<?php echo nl2br(esc_html($title)); ?>
+						</p>
 
 							<p class="home-hero__description">
 								<?php echo nl2br(esc_html($description)); ?>

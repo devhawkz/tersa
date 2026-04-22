@@ -13,7 +13,7 @@ function tersa_ajax_update_mini_cart_qty() {
 	check_ajax_referer('tersa_cart_nonce', 'nonce');
 
 	if (!function_exists('WC') || !WC()->cart) {
-		wp_send_json_error(['message' => 'Cart unavailable.'], 400);
+		wp_send_json_error(['message' => __('Košarica nije dostupna.', 'tersa-shop')], 400);
 	}
 
 	$cart_item_key = isset($_POST['cart_item_key']) ? wc_clean(wp_unslash($_POST['cart_item_key'])) : '';
@@ -21,7 +21,7 @@ function tersa_ajax_update_mini_cart_qty() {
 	$cart          = WC()->cart->get_cart();
 
 	if ($cart_item_key === '' || !isset($cart[$cart_item_key])) {
-		wp_send_json_error(['message' => 'Invalid cart item.'], 400);
+		wp_send_json_error(['message' => __('Nevažeći artikl u košarici.', 'tersa-shop')], 400);
 	}
 
 	if ($quantity <= 0) {

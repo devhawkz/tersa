@@ -6,7 +6,7 @@ if (!defined('ABSPATH')) {
 get_header();
 ?>
 
-<main id="primary" class="site-main eu-projects-archive">
+<main id="main-content" class="site-main eu-projects-archive">
 	<section class="eu-projects-archive__hero">
 		<div class="container container--narrow">
 		<nav class="eu-projects-archive__breadcrumbs" aria-label="<?php esc_attr_e('Breadcrumbs', 'tersa-shop'); ?>">

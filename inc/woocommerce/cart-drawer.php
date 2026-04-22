@@ -84,3 +84,22 @@ function tersa_append_bestsellers_to_cart_block(string $block_content, array $bl
 	return $block_content . $bestsellers;
 }
 add_filter('render_block', 'tersa_append_bestsellers_to_cart_block', 10, 2);
+
+/**
+ * Registrira badge sa brojem artikala u WooCommerce fragment sistem.
+ * WC's wc-add-to-cart.js uključuje ovaj fragment u odgovor za wc-ajax=add_to_cart
+ * i za wc-ajax=get_refreshed_fragments — badge se ažurira odmah, bez našeg custom AJAX-a.
+ */
+function tersa_wc_cart_badge_fragment(array $fragments): array {
+	$count = (function_exists('WC') && WC()->cart)
+		? (int) WC()->cart->get_cart_contents_count()
+		: 0;
+
+	$fragments['span.site-header__badge[data-cart-badge]'] = sprintf(
+		'<span class="site-header__badge" data-cart-badge aria-hidden="true">%s</span>',
+		esc_html($count)
+	);
+
+	return $fragments;
+}
+add_filter('woocommerce_add_to_cart_fragments', 'tersa_wc_cart_badge_fragment');

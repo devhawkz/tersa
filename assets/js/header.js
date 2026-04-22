@@ -202,7 +202,9 @@ document.addEventListener('DOMContentLoaded', function () {
 
       var nav = item.closest('.site-header__nav');
       var template = nav ? nav.getAttribute('data-submenu-label') : '';
-      var fallback = 'Open submenu for %s';
+      var fallback = (window.tersaHeaderI18n && window.tersaHeaderI18n.openSubmenuFor)
+        ? window.tersaHeaderI18n.openSubmenuFor
+        : 'Otvori podizbornik za %s';
       var labelTemplate = template || fallback;
       var label = labelTemplate.replace('%s', link.textContent.trim());
 
@@ -249,7 +251,10 @@ document.addEventListener('DOMContentLoaded', function () {
         return;
       }
 
-      var label = 'Open submenu for ' + link.textContent.trim();
+      var openSubmenuTpl = (window.tersaHeaderI18n && window.tersaHeaderI18n.openSubmenuFor)
+        ? window.tersaHeaderI18n.openSubmenuFor
+        : 'Otvori podizbornik za %s';
+      var label = openSubmenuTpl.replace('%s', link.textContent.trim());
       var toggle = buildSubmenuToggle(label);
       link.insertAdjacentElement('afterend', toggle);
     });
@@ -634,8 +639,11 @@ document.addEventListener('DOMContentLoaded', function () {
       cartContent.innerHTML = miniCartHtml;
     }
 
-    document.querySelectorAll('.site-header__icon-link--cart .site-header__badge').forEach(function (badge) {
-      badge.textContent = String(cartCount || 0);
+    // Ažuriraj badge via textContent (backup za naš custom AJAX refresh).
+    // Primarni update ide kroz WooCommerce fragment sistem (data-cart-badge outer-HTML replace).
+    var countStr = String(cartCount || 0);
+    document.querySelectorAll('span[data-cart-badge]').forEach(function (badge) {
+      badge.textContent = countStr;
     });
   }
 

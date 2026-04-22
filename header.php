@@ -27,6 +27,8 @@ $topbar_link_is_external = $data['topbar_link_is_external'];
 <body <?php body_class(); ?>>
 <?php wp_body_open(); ?>
 
+<a class="skip-link screen-reader-text" href="#main-content"><?php esc_html_e('Preskoči na sadržaj', 'tersa-shop'); ?></a>
+
 <div id="page" class="site">
 
 	<?php if ($topbar_enabled && $topbar_message) : ?>
@@ -118,9 +120,9 @@ $topbar_link_is_external = $data['topbar_link_is_external'];
 									<path d="M3 4h2l2.2 9.2a1 1 0 0 0 1 .8h8.9a1 1 0 0 0 1-.76L20 7H7"></path>
 								</svg>
 
-								<span class="site-header__badge" aria-hidden="true">
-									<?php echo esc_html($cart_count); ?>
-								</span>
+							<span class="site-header__badge" data-cart-badge aria-hidden="true">
+								<?php echo esc_html($cart_count); ?>
+							</span>
 							</a>
 						<?php endif; ?>
 

@@ -6,7 +6,7 @@ get_header();
 
 
 
-<main id="primary" class="site-main tersa-page" role="main">
+<main id="main-content" class="site-main tersa-page" role="main">
 	<section class="tersa-page__section page-spacing" aria-labelledby="tersa-page-title">
 		<div class="container">
 			<?php while (have_posts()) : the_post(); ?>

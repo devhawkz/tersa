@@ -11,7 +11,7 @@ if (!defined('ABSPATH')) {
 get_header();
 ?>
 
-<main id="primary" class="site-main contact-page">
+<main id="main-content" class="site-main contact-page">
 	<?php
 	while (have_posts()) :
 		the_post();
