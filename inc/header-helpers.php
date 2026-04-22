@@ -15,12 +15,13 @@ function tersa_get_header_settings_slug(): string {
 
 /**
  * Vraća transient key za header settings.
- * Implementirano kao funkcija (ne konstanta) da bi child tema mogla da je override-uje.
+ * Uključuje Polylang jezični sufiks kako bi svaki jezik imao vlastiti cache.
  *
  * @return string
  */
 function tersa_get_header_settings_cache_key(): string {
-	return 'tersa_header_settings';
+	$lang = function_exists('pll_current_language') ? (string) pll_current_language() : '';
+	return 'tersa_header_settings' . ($lang ? '_' . $lang : '');
 }
 
 /**
@@ -45,8 +46,17 @@ function tersa_get_header_settings(): array {
 		);
 	}
 
-	$page      = get_page_by_path(tersa_get_header_settings_slug());
-	$page_id   = $page ? (int) $page->ID : 0;
+	$page    = get_page_by_path(tersa_get_header_settings_slug());
+	$page_id = $page ? (int) $page->ID : 0;
+
+	// Polylang: dohvati prevedenu verziju settings stranice za trenutni jezik.
+	if ($page_id && function_exists('pll_get_post')) {
+		$translated_id = pll_get_post($page_id);
+		if ($translated_id) {
+			$page_id = (int) $translated_id;
+		}
+	}
+
 	$get_field = function_exists('get_field');
 
 	$settings = [
@@ -82,7 +92,14 @@ function tersa_maybe_clear_header_settings_cache(int $post_id, $post = null): vo
 		return;
 	}
 
-	delete_transient(tersa_get_header_settings_cache_key());
+	// Briše base key + sve jezičke varijante.
+	$base = 'tersa_header_settings';
+	delete_transient($base);
+	if (function_exists('pll_languages_list')) {
+		foreach ((array) pll_languages_list(['fields' => 'slug']) as $lang_slug) {
+			delete_transient($base . '_' . $lang_slug);
+		}
+	}
 }
 add_action('save_post_page', 'tersa_maybe_clear_header_settings_cache', 10, 2);
 
