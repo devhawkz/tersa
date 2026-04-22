@@ -204,9 +204,10 @@ if (!empty($product_ids)) {
 }
 ?>
 
-<section class="home-bestsellers cart" aria-labelledby="home-bestsellers-title">
+<?php $section_heading_id = 'home-bestsellers-title-' . (int) $instance; ?>
+<section class="home-bestsellers cart" aria-labelledby="<?php echo esc_attr($section_heading_id); ?>">
 	<div class="home-bestsellers__inner">
-		<h2 id="home-bestsellers-title" class="home-bestsellers__title">
+		<h2 id="<?php echo esc_attr($section_heading_id); ?>" class="home-bestsellers__title">
 			<?php echo esc_html($section_title); ?>
 		</h2>
 
@@ -316,13 +317,13 @@ if (!empty($product_ids)) {
 											'loading'  => 'lazy',
 											'decoding' => 'async',
 											'sizes'    => '(max-width: 767px) 100vw, (max-width: 1200px) 50vw, 25vw',
-											'alt'      => esc_attr($product_name),
-										]
-									);
-									?>
-								<?php endif; ?>
+									'alt'      => $product_name,
+									]
+								);
+								?>
+							<?php endif; ?>
 
-								<?php if ($hover_image_id) : ?>
+							<?php if ($hover_image_id) : ?>
 									<?php
 									echo wp_get_attachment_image(
 										$hover_image_id,

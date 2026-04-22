@@ -13,7 +13,8 @@ if ($product_id <= 0) {
 	return;
 }
 
-$transient_key = 'tersa_related_' . $product_id;
+$_rel_lang     = function_exists('pll_current_language') ? (string) pll_current_language() : '';
+$transient_key = 'tersa_related_' . $product_id . ($_rel_lang ? '_' . $_rel_lang : '');
 $related_ids   = get_transient($transient_key);
 
 if (false === $related_ids) {
@@ -172,7 +173,7 @@ unset($rel_products_batch, $_p);
 										'class'    => 'home-bestsellers__image home-bestsellers__image--primary',
 										'loading'  => 'lazy',
 										'decoding' => 'async',
-										'alt'      => esc_attr($rel_name),
+										'alt'      => $rel_name,
 									]
 								);
 							endif; ?>

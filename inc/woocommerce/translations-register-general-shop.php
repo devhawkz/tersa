@@ -44,6 +44,28 @@ function tersa_pll_register_general_shop_strings(): void {
 
 	pll_register_string('tersa_pagination_previous', 'Prethodna', 'Tersa – paginacija (arhiva)', ['multiline' => false]);
 	pll_register_string('tersa_pagination_next', 'Sljedeća', 'Tersa – paginacija (arhiva)', ['multiline' => false]);
+
+	// Gumbi (shop kartica + related)
+	pll_register_string('tersa_btn_vidi_opcije', 'Vidi opcije', 'Tersa – gumbi', ['multiline' => false]);
+	pll_register_string('tersa_btn_dodaj_u_kosaricu', 'Dodaj u košaricu', 'Tersa – gumbi', ['multiline' => false]);
+
+	// Badge
+	pll_register_string('tersa_badge_na_snizenju', 'Na sniženju', 'Tersa – proizvod (badge)', ['multiline' => false]);
+
+	// Single product — ARIA / accessibility labeli
+	pll_register_string('tersa_product_badges_label', 'Označke proizvoda', 'Tersa – proizvod (single)', ['multiline' => false]);
+	pll_register_string('tersa_product_open_image', 'Otvori sliku proizvoda', 'Tersa – proizvod (single)', ['multiline' => false]);
+	pll_register_string('tersa_product_gallery_thumbs', 'Minijature u galeriji', 'Tersa – proizvod (single)', ['multiline' => false]);
+	pll_register_string('tersa_product_show_image', 'Prikaži sliku %d', 'Tersa – proizvod (single)', ['multiline' => false]);
+	pll_register_string('tersa_breadcrumb_nav', 'Navigacija', 'Tersa – navigacija (breadcrumb)', ['multiline' => false]);
+	pll_register_string('tersa_reviews_tab', 'Recenzije (%d)', 'Tersa – proizvod (tabovi)', ['multiline' => false]);
+
+	// Wishlist (YITH poruke)
+	pll_register_string('tersa_wishlist_title', 'Moja lista želja', 'Tersa – wishlist', ['multiline' => false]);
+	pll_register_string('tersa_wishlist_added', '"%s" je dodano na vašu listu "%s"!', 'Tersa – wishlist', ['multiline' => false]);
+
+	// Shop archive — no results
+	pll_register_string('shop_no_products_found', 'Nema pronađenih proizvoda za odabrane filtere.', 'Tersa Shop');
 }
 add_action('init', 'tersa_pll_register_general_shop_strings', 20);
 

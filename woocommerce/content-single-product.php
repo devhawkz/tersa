@@ -144,10 +144,10 @@ do_action('woocommerce_before_single_product');
 									'class'    => 'product-single__main-image',
 									'loading'  => 'eager',
 									'decoding' => 'async',
-									'alt'      => esc_attr($product_name),
-								]
-							);
-							?>
+								'alt'      => $product_name,
+							]
+						);
+						?>
 						</a>
 
 						

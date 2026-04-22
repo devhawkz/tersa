@@ -107,7 +107,8 @@ function tersa_enqueue_assets() {
 	if (function_exists('is_product') && is_product()) {
 		// Provjeri transient za related products — ako je prazan niz, sekcija se neće prikazati
 		// i bestsellers.css nije potreban. false = transient nije postavljen (prvi posjet) → učitaj CSS.
-		$product_related_cache = get_transient('tersa_related_' . get_queried_object_id());
+		$_eq_lang              = function_exists('pll_current_language') ? (string) pll_current_language() : '';
+		$product_related_cache = get_transient('tersa_related_' . get_queried_object_id() . ($_eq_lang ? '_' . $_eq_lang : ''));
 		$has_related_products  = ($product_related_cache === false) || !empty($product_related_cache);
 
 		if ($has_related_products) {

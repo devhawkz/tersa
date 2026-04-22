@@ -146,11 +146,11 @@ $short_description = wp_kses_post(
 								'class'    => 'shop-card__image shop-card__image--primary',
 								'loading'  => 'lazy',
 								'decoding' => 'async',
-								'alt'      => esc_attr($product_name),
-							]
-						);
-						?>
-					<?php endif; ?>
+							'alt'      => $product_name,
+						]
+					);
+					?>
+				<?php endif; ?>
 
 					<?php if ($hover_image_id) : ?>
 						<?php

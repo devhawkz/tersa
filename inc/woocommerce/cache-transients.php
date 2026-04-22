@@ -55,16 +55,22 @@ function tersa_purge_woocommerce_transients_on_product_save(int $post_id, $post 
 		}
 	}
 
-	// 2) RELATED: transient key ne varira po jeziku/instance-u.
-	$related_transient = '_transient_tersa_related_' . $post_id;
-	$related_timeout   = '_transient_timeout_tersa_related_' . $post_id;
+	// 2) RELATED: transient key sada varira po jeziku — brišemo sve varijante LIKE-om.
+	$related_transient_prefix = '_transient_tersa_related_' . $post_id;
+	$related_timeout_prefix   = '_transient_timeout_tersa_related_' . $post_id;
 
 	$wpdb->query(
 		$wpdb->prepare(
 			"DELETE FROM {$wpdb->options}
-			 WHERE option_name = %s OR option_name = %s",
-			$related_transient,
-			$related_timeout
+			 WHERE option_name LIKE %s ESCAPE '\\\\'",
+			tersa_sql_like_escape($related_transient_prefix) . '%'
+		)
+	);
+	$wpdb->query(
+		$wpdb->prepare(
+			"DELETE FROM {$wpdb->options}
+			 WHERE option_name LIKE %s ESCAPE '\\\\'",
+			tersa_sql_like_escape($related_timeout_prefix) . '%'
 		)
 	);
 }
