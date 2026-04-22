@@ -66,6 +66,29 @@ function tersa_pll_register_general_shop_strings(): void {
 
 	// Shop archive — no results
 	pll_register_string('shop_no_products_found', 'Nema pronađenih proizvoda za odabrane filtere.', 'Tersa Shop');
+
+	// Cart drawer JS error
+	pll_register_string('tersa_cart_load_error', 'Greška pri učitavanju košarice.', 'Tersa – WooCommerce (košarica)', ['multiline' => false]);
+
+	// Reviews ngettext format strings (inc/woocommerce/single.php)
+	pll_register_string('tersa_reviews_ngettext_single', '%1$s komentara za %2$s', 'Tersa – recenzije', ['multiline' => false]);
+	pll_register_string('tersa_reviews_ngettext_plural', '%1$s recenzija za %2$s', 'Tersa – recenzije', ['multiline' => false]);
+
+	// Footer
+	pll_register_string('tersa_footer_services_heading', 'USLUGE', 'Tersa – footer', ['multiline' => false]);
+
+	// Wishlist helper strings (inc/woocommerce/helpers.php – tersa_pll_wishlist)
+	pll_register_string('tersa_wishlist_add', 'Dodaj na listu želja', 'Tersa – wishlist', ['multiline' => false]);
+	pll_register_string('tersa_wishlist_browse', 'Pregledaj listu želja', 'Tersa – wishlist', ['multiline' => false]);
+	pll_register_string('tersa_wishlist_added_short', 'Dodano na listu želja', 'Tersa – wishlist', ['multiline' => false]);
+	pll_register_string('tersa_wishlist_remove', 'Ukloni s liste želja', 'Tersa – wishlist', ['multiline' => false]);
+	pll_register_string('tersa_wishlist_already_in', 'Proizvod je već na listi želja!', 'Tersa – wishlist', ['multiline' => false]);
+	pll_register_string('tersa_wishlist_list_title', 'Lista želja', 'Tersa – wishlist', ['multiline' => false]);
+	pll_register_string('tersa_wishlist_product_name', 'Naziv proizvoda', 'Tersa – wishlist', ['multiline' => false]);
+	pll_register_string('tersa_wishlist_price', 'Cijena', 'Tersa – wishlist', ['multiline' => false]);
+	pll_register_string('tersa_wishlist_stock_status', 'Status zaliha', 'Tersa – wishlist', ['multiline' => false]);
+	pll_register_string('tersa_wishlist_remove_product', 'Ukloni ovaj proizvod', 'Tersa – wishlist', ['multiline' => false]);
+	pll_register_string('tersa_wishlist_empty', 'Nema proizvoda na listi želja.', 'Tersa – wishlist', ['multiline' => false]);
 }
 add_action('init', 'tersa_pll_register_general_shop_strings', 20);
 

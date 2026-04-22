@@ -347,6 +347,19 @@ if ($product->is_type('variable') && !empty($attachment_ids)) {
 						<?php endforeach; ?>
 					</div>
 				<?php endif; ?>
+			<?php
+			/**
+			 * woocommerce_single_product_summary hook.
+			 *
+			 * Svi WC dodaci (Subscriptions, Product Add-ons, Bookings, Composite Products,
+			 * Points & Rewards itd.) dodaju vlastiti sadržaj na ovaj hook.
+			 * Default WC callbacki su uklonjeni u inc/woocommerce/single.php jer ih tema
+			 * renderuje ručno — ovdje se okidaju samo callback-i iz pluginova.
+			 *
+			 * @hooked (custom plugins only — defaults removed)
+			 */
+			do_action('woocommerce_single_product_summary');
+			?>
 			</div>
 		</div>
 	<?php

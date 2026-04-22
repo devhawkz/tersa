@@ -158,12 +158,13 @@ $short_description = wp_kses_post(
 							$hover_image_id,
 							'tersa-card',
 							false,
-							[
-								'class'    => 'shop-card__image shop-card__image--hover',
-								'loading'  => 'lazy',
-								'decoding' => 'async',
-								'alt'      => '',
-							]
+						[
+							'class'       => 'shop-card__image shop-card__image--hover',
+							'loading'     => 'lazy',
+							'decoding'    => 'async',
+							'alt'         => '',
+							'aria-hidden' => 'true',
+						]
 						);
 						?>
 					<?php endif; ?>

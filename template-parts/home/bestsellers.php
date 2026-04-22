@@ -308,13 +308,14 @@ if (!empty($product_ids)) {
 										$hover_image_id,
 										'tersa-bestseller',
 										false,
-										[
-											'class'    => 'home-bestsellers__image home-bestsellers__image--hover',
-											'loading'  => 'lazy',
-											'decoding' => 'async',
-											'sizes'    => '(max-width: 767px) 100vw, (max-width: 1200px) 50vw, 25vw',
-											'alt'      => '',
-										]
+								[
+									'class'       => 'home-bestsellers__image home-bestsellers__image--hover',
+									'loading'     => 'lazy',
+									'decoding'    => 'async',
+									'sizes'       => '(max-width: 767px) 100vw, (max-width: 1200px) 50vw, 25vw',
+									'alt'         => '',
+									'aria-hidden' => 'true',
+								]
 									);
 									?>
 								<?php endif; ?>

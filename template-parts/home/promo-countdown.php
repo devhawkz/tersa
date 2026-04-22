@@ -112,7 +112,7 @@ $translate = static function (string $text): string {
 				false,
 				[
 					'class'         => 'home-promo-countdown__image',
-					'alt'           => !empty($title) ? esc_attr($title) : '',
+					'alt'           => !empty($title) ? $title : '',
 					'loading'       => 'lazy',
 					'decoding'      => 'async',
 				]

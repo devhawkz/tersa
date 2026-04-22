@@ -24,9 +24,9 @@ get_header();
 						?>
 					<?php endif; ?>
 
-					<h1 id="tersa-page-title" class="tersa-page__title">
-						<?php the_title(); ?>
-					</h1>
+				<h1 id="tersa-page-title" class="tersa-page__title">
+					<?php echo esc_html(get_the_title()); ?>
+				</h1>
 				</header>
 
 				<article

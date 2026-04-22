@@ -31,6 +31,19 @@ get_header();
 				<?php
 				$has_acf = function_exists('get_field');
 
+				// Prime WP meta cache za sve postove trenutnog upita — ACF get_field()
+				// koristi get_post_meta() interno, cache eliminira N+1 DB upite.
+				global $wp_query;
+				if (!empty($wp_query->posts)) {
+					$_eu_ids = wp_list_pluck($wp_query->posts, 'ID');
+					if (function_exists('update_post_meta_cache')) {
+						update_post_meta_cache($_eu_ids);
+					} else {
+						update_meta_cache('post', $_eu_ids);
+					}
+					unset($_eu_ids);
+				}
+
 				$format_date = static function ($date_value) {
 					if (empty($date_value)) {
 						return '';
@@ -87,11 +100,12 @@ get_header();
 								href="<?php the_permalink(); ?>"
 								aria-label="<?php echo esc_attr($display_title); ?>"
 							>
-								<?php if (has_post_thumbnail()) : ?>
-									<?php the_post_thumbnail('large', [
-										'loading'  => 'lazy',
-										'decoding' => 'async',
-									]); ?>
+							<?php if (has_post_thumbnail()) : ?>
+								<?php the_post_thumbnail('large', [
+									'loading'  => 'lazy',
+									'decoding' => 'async',
+									'alt'      => '',
+								]); ?>
 								<?php else : ?>
 									<div class="eu-project-archive-card__placeholder" aria-hidden="true">
 										<span>EU</span>

@@ -42,6 +42,56 @@ function tersa_get_cart_drawer_fragments() {
 	]);
 }
 
+/**
+ * Vraća ACF polja bestsellera za cart prikaz, keširana transientom po jeziku.
+ * Koristi pll_get_post() za dohvat prevedene verzije naslovnice.
+ */
+function tersa_get_cart_bestseller_fields(): array {
+	$lang        = function_exists('pll_current_language') ? (string) pll_current_language() : '';
+	$cache_key   = 'tersa_cart_bestseller_fields' . ($lang ? '_' . $lang : '');
+	$cached      = get_transient($cache_key);
+
+	if (is_array($cached)) {
+		return $cached;
+	}
+
+	$front_id = (int) get_option('page_on_front');
+
+	// Polylang: dohvati prevedenu verziju naslovnice za trenutni jezik.
+	if ($front_id && $lang && function_exists('pll_get_post')) {
+		$translated = pll_get_post($front_id, $lang);
+		if ($translated) {
+			$front_id = (int) $translated;
+		}
+	}
+
+	if (!$front_id || !function_exists('get_field')) {
+		return [];
+	}
+
+	// Prime WP meta cache za naslovnicu — izbjegavamo 8 odvojenih DB upita.
+	if (function_exists('update_post_meta_cache')) {
+		update_post_meta_cache([$front_id]);
+	} else {
+		update_meta_cache('post', [$front_id]);
+	}
+
+	$fields = [
+		'show_home_bestsellers_section_1'     => get_field('show_home_bestsellers_section_1', $front_id),
+		'show_home_bestsellers_section'       => get_field('show_home_bestsellers_section', $front_id),
+		'home_bestsellers_section_title_1'    => get_field('home_bestsellers_section_title_1', $front_id),
+		'home_bestsellers_section_title'      => get_field('home_bestsellers_section_title', $front_id),
+		'home_bestsellers_badge_color_1'      => get_field('home_bestsellers_badge_color_1', $front_id),
+		'home_bestsellers_badge_color'        => get_field('home_bestsellers_badge_color', $front_id),
+		'home_bestsellers_product_tag_slug_1' => get_field('home_bestsellers_product_tag_slug_1', $front_id),
+		'home_bestsellers_product_tag_slug'   => get_field('home_bestsellers_product_tag_slug', $front_id),
+	];
+
+	set_transient($cache_key, $fields, 12 * HOUR_IN_SECONDS);
+
+	return $fields;
+}
+
 function tersa_append_bestsellers_to_cart_block(string $block_content, array $block): string {
 	if (($block['blockName'] ?? '') !== 'woocommerce/cart') {
 		return $block_content;
@@ -51,27 +101,20 @@ function tersa_append_bestsellers_to_cart_block(string $block_content, array $bl
 		return $block_content;
 	}
 
-	$home_page_id = (int) get_option('page_on_front');
-
-	// Gradimo fields array ručno (get_field po get_field) umjesto get_fields() jer
-	// ta funkcija u ovoj verziji ACF Free kvari interno stanje i uzrokuje fatal error.
-	$cart_bestseller_fields = [];
-	if ($home_page_id && function_exists('get_field')) {
-		$cart_bestseller_fields = [
-			'show_home_bestsellers_section_1'     => get_field('show_home_bestsellers_section_1', $home_page_id),
-			'show_home_bestsellers_section'       => get_field('show_home_bestsellers_section', $home_page_id),
-			'home_bestsellers_section_title_1'    => get_field('home_bestsellers_section_title_1', $home_page_id),
-			'home_bestsellers_section_title'      => get_field('home_bestsellers_section_title', $home_page_id),
-			'home_bestsellers_badge_color_1'      => get_field('home_bestsellers_badge_color_1', $home_page_id),
-			'home_bestsellers_badge_color'        => get_field('home_bestsellers_badge_color', $home_page_id),
-			'home_bestsellers_product_tag_slug_1' => get_field('home_bestsellers_product_tag_slug_1', $home_page_id),
-			'home_bestsellers_product_tag_slug'   => get_field('home_bestsellers_product_tag_slug', $home_page_id),
-		];
+	$front_id               = (int) get_option('page_on_front');
+	$lang                   = function_exists('pll_current_language') ? (string) pll_current_language() : '';
+	if ($front_id && $lang && function_exists('pll_get_post')) {
+		$translated = pll_get_post($front_id, $lang);
+		if ($translated) {
+			$front_id = (int) $translated;
+		}
 	}
+
+	$cart_bestseller_fields = tersa_get_cart_bestseller_fields();
 
 	ob_start();
 	get_template_part('template-parts/home/bestsellers', null, [
-		'page_id'  => $home_page_id,
+		'page_id'  => $front_id,
 		'instance' => 1,
 		'fields'   => $cart_bestseller_fields,
 	]);

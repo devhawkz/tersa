@@ -182,12 +182,13 @@ unset($rel_products_batch, $_p);
 									$rel_hover_image_id,
 									'large',
 									false,
-									[
-										'class'    => 'home-bestsellers__image home-bestsellers__image--hover',
-										'loading'  => 'lazy',
-										'decoding' => 'async',
-										'alt'      => '',
-									]
+								[
+									'class'       => 'home-bestsellers__image home-bestsellers__image--hover',
+									'loading'     => 'lazy',
+									'decoding'    => 'async',
+									'alt'         => '',
+									'aria-hidden' => 'true',
+								]
 								);
 							endif; ?>
 						</div>

@@ -186,12 +186,22 @@ $reset_url = function_exists('tersa_get_archive_reset_url')
 							? tersa_get_active_filter_values($taxonomy)
 							: [];
 
+					// Transient cache za terme filtera — izbjegava DB upit po taksonomiji na svakom requestu.
+					$_fl_lang       = function_exists('pll_current_language') ? (string) pll_current_language() : '';
+					$_fl_cache_key  = 'tersa_filter_terms_' . $taxonomy . ($_fl_lang ? '_' . $_fl_lang : '');
+					$terms          = get_transient($_fl_cache_key);
+
+					if (false === $terms) {
 						$terms = get_terms([
 							'taxonomy'   => $taxonomy,
 							'hide_empty' => true,
 							'orderby'    => 'name',
 							'order'      => 'ASC',
 						]);
+						if (!is_wp_error($terms)) {
+							set_transient($_fl_cache_key, $terms, 6 * HOUR_IN_SECONDS);
+						}
+					}
 
 						if (is_wp_error($terms) || empty($terms)) {
 							continue;
