@@ -27,3 +27,6 @@ require_once get_template_directory() . '/inc/performance.php';
 
 // Security
  require_once get_template_directory() . '/inc/security.php';
+
+// Debug logging (targeted: mail, WC gateway, tersa AJAX) — always on, /wp-content/debug.log
+require_once get_template_directory() . '/inc/debug-log.php';
