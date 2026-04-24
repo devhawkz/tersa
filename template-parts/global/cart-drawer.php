@@ -34,10 +34,21 @@ if (!class_exists('WooCommerce')) {
 			</div>
 
 		<div class="site-header__cart-body">
-			<div class="widget_shopping_cart_content">
-				<div class="site-header__cart-loading" data-cart-loading-message>
-					<?php esc_html_e('Učitavanje košarice...', 'tersa-shop'); ?>
-				</div>
+			<div class="widget_shopping_cart_content" data-cart-ssr="1">
+				<?php
+				// SSR mini-cart: prvi klik na drawer je instant, bez AJAX round-tripa.
+				// WC fragment sistem (tersa_wc_drawer_fragment) pre-hidrira ovaj markup
+				// iz sessionStorage-a na svakom sledećem page load-u.
+				if (function_exists('woocommerce_mini_cart')) {
+					woocommerce_mini_cart();
+				} else {
+					?>
+					<div class="site-header__cart-loading" data-cart-loading-message>
+						<?php esc_html_e('Učitavanje košarice...', 'tersa-shop'); ?>
+					</div>
+					<?php
+				}
+				?>
 			</div>
 		</div>
 		</div>

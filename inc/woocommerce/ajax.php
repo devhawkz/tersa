@@ -35,6 +35,9 @@ function tersa_ajax_update_mini_cart_qty() {
 }
 add_action('wp_ajax_tersa_update_mini_cart_qty', 'tersa_ajax_update_mini_cart_qty');
 add_action('wp_ajax_nopriv_tersa_update_mini_cart_qty', 'tersa_ajax_update_mini_cart_qty');
+// wc-ajax ruta (lakša od admin-ajax.php jer zaobilazi deo WP admin bootstrap-a).
+add_action('wc_ajax_tersa_update_mini_cart_qty', 'tersa_ajax_update_mini_cart_qty');
+add_action('wc_ajax_nopriv_tersa_update_mini_cart_qty', 'tersa_ajax_update_mini_cart_qty');
 
 function tersa_ajax_get_cart_drawer_fragments() {
 	// Read-only endpoint: do not hard-fail on stale nonce from cached pages.
@@ -43,3 +46,5 @@ function tersa_ajax_get_cart_drawer_fragments() {
 }
 add_action('wp_ajax_tersa_get_cart_drawer_fragments', 'tersa_ajax_get_cart_drawer_fragments');
 add_action('wp_ajax_nopriv_tersa_get_cart_drawer_fragments', 'tersa_ajax_get_cart_drawer_fragments');
+add_action('wc_ajax_tersa_get_cart_drawer_fragments', 'tersa_ajax_get_cart_drawer_fragments');
+add_action('wc_ajax_nopriv_tersa_get_cart_drawer_fragments', 'tersa_ajax_get_cart_drawer_fragments');

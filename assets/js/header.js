@@ -20,7 +20,10 @@ document.addEventListener('DOMContentLoaded', function () {
   var searchObservers = [];
   var mobileNavPopulated = false;
   var mobileNavStack = [];
-  var cartDrawerHydrated = false;
+  // Drawer se smatra hidriranim ako je PHP (SSR) ili WC fragment sistem
+  // već popunio sadržaj — u tom slučaju preskačemo AJAX poziv pri otvaranju.
+  var cartDrawerContentEl = document.querySelector('#cart-drawer .widget_shopping_cart_content');
+  var cartDrawerHydrated = !!(cartDrawerContentEl && !cartDrawerContentEl.querySelector('[data-cart-loading-message]'));
 
   var FOCUSABLE_SELECTOR = [
     'a[href]:not([tabindex="-1"])',
@@ -81,30 +84,44 @@ document.addEventListener('DOMContentLoaded', function () {
   var trapCart = createFocusTrap(cartPanel);
   var trapMobile = createFocusTrap(mobileNavigation);
 
-  function getCartAjaxUrl() {
-    if (!window.tersaCartDrawer) {
-      return '/wp-admin/admin-ajax.php';
+  function toSameOriginRelative(candidate) {
+    if (typeof candidate !== 'string' || candidate.trim() === '') {
+      return '';
+    }
+    if (candidate.charAt(0) === '/') {
+      return candidate;
+    }
+    try {
+      var parsed = new URL(candidate, window.location.href);
+      if (parsed.origin !== window.location.origin) {
+        return '';
+      }
+      return parsed.pathname + parsed.search;
+    } catch (e) {
+      return '';
+    }
+  }
+
+  // `kind` = 'fragments' | 'qty' | 'admin'
+  // Preferiramo wc-ajax (lakša ruta od admin-ajax.php); fallback je admin-ajax.
+  function getCartAjaxUrl(kind) {
+    var cfg = window.tersaCartDrawer || {};
+
+    if (kind === 'fragments') {
+      var wcFragments = toSameOriginRelative(cfg.wcAjaxFragments);
+      if (wcFragments) return wcFragments;
+    } else if (kind === 'qty') {
+      var wcQty = toSameOriginRelative(cfg.wcAjaxQty);
+      if (wcQty) return wcQty;
     }
 
-    var relative = window.tersaCartDrawer.ajaxUrlRelative;
+    var relative = cfg.ajaxUrlRelative;
     if (typeof relative === 'string' && relative.charAt(0) === '/') {
       return relative;
     }
 
-    var configured = window.tersaCartDrawer.ajaxUrl;
-    if (typeof configured !== 'string' || configured.trim() === '') {
-      return '/wp-admin/admin-ajax.php';
-    }
-
-    try {
-      var parsed = new URL(configured, window.location.href);
-      if (parsed.origin !== window.location.origin) {
-        return '/wp-admin/admin-ajax.php';
-      }
-      return parsed.pathname + parsed.search;
-    } catch (e) {
-      return '/wp-admin/admin-ajax.php';
-    }
+    var admin = toSameOriginRelative(cfg.ajaxUrl);
+    return admin || '/wp-admin/admin-ajax.php';
   }
 
   function revealOverlay(overlay) {
@@ -720,10 +737,14 @@ document.addEventListener('DOMContentLoaded', function () {
     removeWooNotices();
 
     var body = new URLSearchParams();
-    body.append('action', 'tersa_get_cart_drawer_fragments');
+    var fragmentsUrl = getCartAjaxUrl('fragments');
+    // wc-ajax route već nosi action u URL-u; admin-ajax traži `action` u body-ju.
+    if (fragmentsUrl.indexOf('wc-ajax=') === -1) {
+      body.append('action', 'tersa_get_cart_drawer_fragments');
+    }
     body.append('nonce', window.tersaCartDrawer.nonce);
 
-    fetch(getCartAjaxUrl(), {
+    fetch(fragmentsUrl, {
       method: 'POST',
       credentials: 'same-origin',
       headers: {
@@ -808,12 +829,15 @@ document.addEventListener('DOMContentLoaded', function () {
       qtyWrap.classList.add('is-loading');
 
       var body = new URLSearchParams();
-      body.append('action', 'tersa_update_mini_cart_qty');
+      var qtyUrl = getCartAjaxUrl('qty');
+      if (qtyUrl.indexOf('wc-ajax=') === -1) {
+        body.append('action', 'tersa_update_mini_cart_qty');
+      }
       body.append('nonce', window.tersaCartDrawer.nonce);
       body.append('cart_item_key', cartItemKey);
       body.append('quantity', String(nextQty));
 
-      fetch(getCartAjaxUrl(), {
+      fetch(qtyUrl, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8'

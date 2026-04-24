@@ -194,6 +194,9 @@ function tersa_enqueue_assets() {
 	wp_localize_script('tersa-header-js', 'tersaCartDrawer', [
 		'ajaxUrl'         => admin_url('admin-ajax.php'),
 		'ajaxUrlRelative' => admin_url('admin-ajax.php', 'relative'),
+		// wc-ajax endpoints — lakša ruta od admin-ajax.php (preferirano na frontend-u).
+		'wcAjaxFragments' => class_exists('WC_AJAX') ? WC_AJAX::get_endpoint('tersa_get_cart_drawer_fragments') : '',
+		'wcAjaxQty'       => class_exists('WC_AJAX') ? WC_AJAX::get_endpoint('tersa_update_mini_cart_qty') : '',
 		'nonce'           => wp_create_nonce('tersa_cart_nonce'),
 	]);
 

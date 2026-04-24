@@ -146,3 +146,25 @@ function tersa_wc_cart_badge_fragment(array $fragments): array {
 	return $fragments;
 }
 add_filter('woocommerce_add_to_cart_fragments', 'tersa_wc_cart_badge_fragment');
+
+/**
+ * Registruje kompletan mini-cart markup kao WC fragment.
+ * WC's wc-cart-fragments.js kešira fragmente u sessionStorage po cart hash-u
+ * i automatski ih primenjuje na svakom page load-u pre DOMContentLoaded,
+ * tako da otvaranje drawer-a bude instant i bez AJAX round-tripa.
+ */
+function tersa_wc_drawer_fragment(array $fragments): array {
+	if (!function_exists('woocommerce_mini_cart')) {
+		return $fragments;
+	}
+
+	ob_start();
+	woocommerce_mini_cart();
+	$mini_cart = ob_get_clean();
+
+	$fragments['#cart-drawer div.widget_shopping_cart_content'] =
+		'<div class="widget_shopping_cart_content">' . $mini_cart . '</div>';
+
+	return $fragments;
+}
+add_filter('woocommerce_add_to_cart_fragments', 'tersa_wc_drawer_fragment');
