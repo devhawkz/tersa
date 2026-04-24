@@ -7,79 +7,87 @@ if (!defined('ABSPATH')) {
  * Cache invalidation (transients) za WooCommerce.
  *
  * Handles:
- * - `tersa_bestsellers_*` transients (prod tag + instance, više jezika)
- * - `tersa_related_{product_id}` transients
+ * - `tersa_bestsellers_{tag}_{instance}` + `_{lang}` varijante
+ * - `tersa_related_{product_id}` + `_{lang}` varijante
+ * - `tersa_cart_bestseller_fields` + `_{lang}` varijante
+ * - `tersa_filter_terms_{taxonomy}` + `_{lang}` varijante
  *
- * NOTE:
- * - Woo transients se skladište kao `wp_options` ključevi sa prefiksom
- *   `_transient_` / `_transient_timeout_`.
- * - Koristimo LIKE sa ESCAPE da bismo izbegli da SQL `_` “pojede” kao wildcard.
+ * NAPOMENA O OBJECT CACHE-u:
+ * - Bez persistent object cache-a (npr. Redis/Memcached), transient se čuva
+ *   u `wp_options` pod `_transient_{key}` / `_transient_timeout_{key}`.
+ * - SA persistent object cache-om, transient se NIKAD ne ispisuje u
+ *   `wp_options` nego samo u object cache (`wp_cache_set` u grupi
+ *   `transient` / `site-transient`).
+ *
+ * Zbog toga OVAJ modul NE koristi SQL `LIKE` nad `wp_options` — radi isključivo
+ * preko `delete_transient()` sa poznatim ključevima. `delete_transient()`
+ * interno zna oba storage sloja i radi korektno u oba slučaja.
  */
 
-function tersa_sql_like_escape(string $value): string {
-	// MySQL LIKE: `_` je wildcard za 1 char, `%` wildcard za 0+ chars.
-	// Escapujemo i backslash da budemo sigurni sa ESCAPE klauzulom.
-	$value = str_replace('\\', '\\\\', $value);
-	$value = str_replace('%', '\\%', $value);
-	$value = str_replace('_', '\\_', $value);
-	return $value;
+/**
+ * Lista svih Polylang jezika + prazan string (za default/non-Polylang ključeve).
+ *
+ * @return array<int, string>
+ */
+function tersa_get_transient_lang_suffixes(): array {
+	$suffixes = [''];
+
+	if (function_exists('pll_languages_list')) {
+		$langs = (array) pll_languages_list(['fields' => 'slug']);
+		foreach ($langs as $slug) {
+			$slug = (string) $slug;
+			if ($slug !== '') {
+				$suffixes[] = '_' . $slug;
+			}
+		}
+	}
+
+	return array_values(array_unique($suffixes));
 }
 
-function tersa_purge_woocommerce_transients_on_product_save(int $post_id, $post = null, $update = null): void {
-	global $wpdb;
+/**
+ * Briše transient za bazni ključ i sve jezičke varijante.
+ */
+function tersa_delete_transient_all_langs(string $base_key): void {
+	if ($base_key === '') {
+		return;
+	}
 
-	// 1) BESTSELLERS: čistimo po tag-u + instance-u (ne “sve bestsellers” odjednom).
+	foreach (tersa_get_transient_lang_suffixes() as $suffix) {
+		delete_transient($base_key . $suffix);
+	}
+}
+
+/**
+ * Invalidacija na spremanje proizvoda:
+ * - BESTSELLERS transient za svaku (tag × instance × jezik) kombinaciju.
+ * - RELATED transient za dati product_id za svaki jezik.
+ *
+ * @param int          $post_id
+ * @param \WP_Post|null $post
+ * @param bool|null    $update
+ */
+function tersa_purge_woocommerce_transients_on_product_save(int $post_id, $post = null, $update = null): void {
+	// 1) BESTSELLERS: skup je mali i poznat — razvlačimo eksplicitno.
 	$bestseller_tag_slugs = ['najprodavanije', 'najnovije'];
 	$bestseller_instances = [1, 2];
 
 	foreach ($bestseller_tag_slugs as $tag_slug) {
 		foreach ($bestseller_instances as $instance) {
-			$transient_prefix = '_transient_tersa_bestsellers_' . $tag_slug . '_' . $instance;
-			$timeout_prefix   = '_transient_timeout_tersa_bestsellers_' . $tag_slug . '_' . $instance;
-
-			// Brišemo sve jezike/timeouts varijante koje krenu od tog prefiksa.
-			$wpdb->query(
-				$wpdb->prepare(
-					"DELETE FROM {$wpdb->options}
-					 WHERE option_name LIKE %s ESCAPE '\\\\'",
-					tersa_sql_like_escape($transient_prefix) . '%'
-				)
-			);
-			$wpdb->query(
-				$wpdb->prepare(
-					"DELETE FROM {$wpdb->options}
-					 WHERE option_name LIKE %s ESCAPE '\\\\'",
-					tersa_sql_like_escape($timeout_prefix) . '%'
-				)
-			);
+			$base_key = 'tersa_bestsellers_' . $tag_slug . '_' . $instance;
+			tersa_delete_transient_all_langs($base_key);
 		}
 	}
 
-	// 2) RELATED: transient key sada varira po jeziku — brišemo sve varijante LIKE-om.
-	$related_transient_prefix = '_transient_tersa_related_' . $post_id;
-	$related_timeout_prefix   = '_transient_timeout_tersa_related_' . $post_id;
-
-	$wpdb->query(
-		$wpdb->prepare(
-			"DELETE FROM {$wpdb->options}
-			 WHERE option_name LIKE %s ESCAPE '\\\\'",
-			tersa_sql_like_escape($related_transient_prefix) . '%'
-		)
-	);
-	$wpdb->query(
-		$wpdb->prepare(
-			"DELETE FROM {$wpdb->options}
-			 WHERE option_name LIKE %s ESCAPE '\\\\'",
-			tersa_sql_like_escape($related_timeout_prefix) . '%'
-		)
-	);
+	// 2) RELATED: ključ ovisi o product_id-u i jeziku.
+	tersa_delete_transient_all_langs('tersa_related_' . $post_id);
 }
-
 add_action('save_post_product', 'tersa_purge_woocommerce_transients_on_product_save', 10, 3);
 
 /**
- * Čisti cart bestseller fields transient kada se spasi naslovnica (front page).
- * Briše sve jezičke varijante LIKE-om.
+ * Čisti cart bestseller fields transient kada se snimi naslovnica (front page).
+ *
+ * @param int $post_id
  */
 function tersa_purge_cart_bestseller_fields_cache(int $post_id): void {
 	$front_id = (int) get_option('page_on_front');
@@ -87,48 +95,25 @@ function tersa_purge_cart_bestseller_fields_cache(int $post_id): void {
 		return;
 	}
 
-	global $wpdb;
-	$prefix  = '_transient_tersa_cart_bestseller_fields';
-	$timeout = '_transient_timeout_tersa_cart_bestseller_fields';
-
-	$wpdb->query(
-		$wpdb->prepare(
-			"DELETE FROM {$wpdb->options} WHERE option_name LIKE %s ESCAPE '\\\\'",
-			tersa_sql_like_escape($prefix) . '%'
-		)
-	);
-	$wpdb->query(
-		$wpdb->prepare(
-			"DELETE FROM {$wpdb->options} WHERE option_name LIKE %s ESCAPE '\\\\'",
-			tersa_sql_like_escape($timeout) . '%'
-		)
-	);
+	tersa_delete_transient_all_langs('tersa_cart_bestseller_fields');
 }
 add_action('save_post_page', 'tersa_purge_cart_bestseller_fields_cache', 10, 1);
 
 /**
- * Čisti filter terms transient kada se uredi termin (kategorija, atribut, tag).
- * Briše sve jezičke varijante za datu taksonomiju.
+ * Čisti filter terms transient kada se uredi/kreira/obriše termin (kategorija,
+ * atribut, tag). Taksonomija se zna iz hook argumenata — brišemo samo nju.
+ *
+ * @param int    $term_id
+ * @param int    $tt_id
+ * @param string $taxonomy
  */
 function tersa_purge_filter_terms_cache(int $term_id, int $tt_id, string $taxonomy): void {
-	global $wpdb;
-	$prefix  = '_transient_tersa_filter_terms_' . $taxonomy;
-	$timeout = '_transient_timeout_tersa_filter_terms_' . $taxonomy;
+	if ($taxonomy === '') {
+		return;
+	}
 
-	$wpdb->query(
-		$wpdb->prepare(
-			"DELETE FROM {$wpdb->options} WHERE option_name LIKE %s ESCAPE '\\\\'",
-			tersa_sql_like_escape($prefix) . '%'
-		)
-	);
-	$wpdb->query(
-		$wpdb->prepare(
-			"DELETE FROM {$wpdb->options} WHERE option_name LIKE %s ESCAPE '\\\\'",
-			tersa_sql_like_escape($timeout) . '%'
-		)
-	);
+	tersa_delete_transient_all_langs('tersa_filter_terms_' . $taxonomy);
 }
 add_action('edited_term', 'tersa_purge_filter_terms_cache', 10, 3);
 add_action('created_term', 'tersa_purge_filter_terms_cache', 10, 3);
 add_action('delete_term', 'tersa_purge_filter_terms_cache', 10, 3);
-
