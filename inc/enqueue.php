@@ -3,14 +3,42 @@ if (!defined('ABSPATH')) {
 	exit;
 }
 
-function tersa_enqueue_assets() {
-	$theme_version = wp_get_theme()->get('Version');
-	$theme_uri     = get_template_directory_uri();
+/**
+ * Vraća verzijski string za asset baziran na filemtime() — automatsko cache busting.
+ * Ako fajl ne postoji, fallback na trenutnu verziju teme (style.css).
+ *
+ * Static cache izbjegava ponovljene filesystem stat pozive za isti asset
+ * unutar istog requesta.
+ */
+function tersa_asset_ver(string $relative_path): string {
+	static $cache = [];
+	static $theme_version = null;
 
-	wp_enqueue_style('tersa-base', $theme_uri . '/assets/css/base.css', [], $theme_version);
-	wp_enqueue_style('tersa-layout', $theme_uri . '/assets/css/layout.css', ['tersa-base'], $theme_version);
-	wp_enqueue_style('tersa-header', $theme_uri . '/assets/css/header.css', ['tersa-base'], $theme_version);
-	wp_enqueue_style('tersa-footer', $theme_uri . '/assets/css/footer.css', ['tersa-base'], $theme_version);
+	if ($theme_version === null) {
+		$theme_version = (string) wp_get_theme()->get('Version');
+	}
+
+	$relative_path = ltrim($relative_path, '/');
+
+	if (isset($cache[$relative_path])) {
+		return $cache[$relative_path];
+	}
+
+	$abs_path = get_template_directory() . '/' . $relative_path;
+	$mtime    = file_exists($abs_path) ? @filemtime($abs_path) : false;
+
+	$cache[$relative_path] = $mtime ? (string) $mtime : $theme_version;
+
+	return $cache[$relative_path];
+}
+
+function tersa_enqueue_assets() {
+	$theme_uri = get_template_directory_uri();
+
+	wp_enqueue_style('tersa-base', $theme_uri . '/assets/css/base.css', [], tersa_asset_ver('assets/css/base.css'));
+	wp_enqueue_style('tersa-layout', $theme_uri . '/assets/css/layout.css', ['tersa-base'], tersa_asset_ver('assets/css/layout.css'));
+	wp_enqueue_style('tersa-header', $theme_uri . '/assets/css/header.css', ['tersa-base'], tersa_asset_ver('assets/css/header.css'));
+	wp_enqueue_style('tersa-footer', $theme_uri . '/assets/css/footer.css', ['tersa-base'], tersa_asset_ver('assets/css/footer.css'));
 
 	// Sidebar CSS — učitava se samo na stranicama koje realno prikazuju sidebar.
 	// EU project archive/single isključeni jer ne pozivaju get_sidebar().
@@ -25,7 +53,7 @@ function tersa_enqueue_assets() {
 		&& (is_page() || is_home() || is_404());
 
 	if ($needs_sidebar_shop || $needs_sidebar_general) {
-		wp_enqueue_style('tersa-sidebar', $theme_uri . '/assets/css/sidebar.css', ['tersa-base'], $theme_version);
+		wp_enqueue_style('tersa-sidebar', $theme_uri . '/assets/css/sidebar.css', ['tersa-base'], tersa_asset_ver('assets/css/sidebar.css'));
 	}
 
 	//contact page style
@@ -34,7 +62,7 @@ function tersa_enqueue_assets() {
 			'tersa-contact',
 			$theme_uri . '/assets/css/contact.css',
 			['tersa-base', 'tersa-layout'],
-			$theme_version
+			tersa_asset_ver('assets/css/contact.css')
 		);
 	}
 
@@ -44,7 +72,7 @@ function tersa_enqueue_assets() {
 			'tersa-about',
 			$theme_uri . '/assets/css/about.css',
 			['tersa-base', 'tersa-layout'],
-			$theme_version
+			tersa_asset_ver('assets/css/about.css')
 		);
 	}
 	$is_wishlist = function_exists('tersa_is_wishlist_page') && tersa_is_wishlist_page();
@@ -54,21 +82,21 @@ function tersa_enqueue_assets() {
 			'tersa-home',
 			$theme_uri . '/assets/css/home.css',
 			['tersa-base', 'tersa-layout'],
-			$theme_version
+			tersa_asset_ver('assets/css/home.css')
 		);
 
 		wp_enqueue_style(
 			'tersa-bestsellers',
 			$theme_uri . '/assets/css/bestsellers.css',
 			['tersa-base', 'tersa-layout'],
-			$theme_version
+			tersa_asset_ver('assets/css/bestsellers.css')
 		);
 	
 		wp_enqueue_script(
 			'tersa-home',
 			$theme_uri . '/assets/js/home.js',
 			[],
-			$theme_version,
+			tersa_asset_ver('assets/js/home.js'),
 			true
 		);
 	}
@@ -78,7 +106,7 @@ function tersa_enqueue_assets() {
 			'tersa-wishlist',
 			$theme_uri . '/assets/css/wishlist.css',
 			['tersa-base', 'tersa-layout'],
-			$theme_version
+			tersa_asset_ver('assets/css/wishlist.css')
 		);
 
 	}
@@ -97,14 +125,14 @@ function tersa_enqueue_assets() {
 			'tersa-shop',
 			$theme_uri . '/assets/css/shop.css',
 			['tersa-base', 'tersa-layout'],
-			$theme_version
+			tersa_asset_ver('assets/css/shop.css')
 		);
 
 		wp_enqueue_script(
 			'tersa-shop',
 			$theme_uri . '/assets/js/shop.js',
 			[],
-			$theme_version,
+			tersa_asset_ver('assets/js/shop.js'),
 			true
 		);
 	}
@@ -121,7 +149,7 @@ function tersa_enqueue_assets() {
 				'tersa-bestsellers',
 				$theme_uri . '/assets/css/bestsellers.css',
 				['tersa-base', 'tersa-layout'],
-				$theme_version
+				tersa_asset_ver('assets/css/bestsellers.css')
 			);
 		}
 
@@ -131,14 +159,14 @@ function tersa_enqueue_assets() {
 			$has_related_products
 				? ['tersa-base', 'tersa-layout', 'tersa-bestsellers']
 				: ['tersa-base', 'tersa-layout'],
-			$theme_version
+			tersa_asset_ver('assets/css/product.css')
 		);
 	
 		wp_enqueue_script(
 			'tersa-product',
 			$theme_uri . '/assets/js/product.js',
 			['jquery'],
-			$theme_version,
+			tersa_asset_ver('assets/js/product.js'),
 			true
 		);
 	}
@@ -148,14 +176,14 @@ function tersa_enqueue_assets() {
 			'tersa-bestsellers',
 			$theme_uri . '/assets/css/bestsellers.css',
 			['tersa-base', 'tersa-layout'],
-			$theme_version
+			tersa_asset_ver('assets/css/bestsellers.css')
 		);
 
 		wp_enqueue_script(
 			'tersa-home',
 			$theme_uri . '/assets/js/home.js',
 			[],
-			$theme_version,
+			tersa_asset_ver('assets/js/home.js'),
 			true
 		);
 	}
@@ -165,7 +193,7 @@ function tersa_enqueue_assets() {
 			'tersa-404',
 			$theme_uri . '/assets/css/404.css',
 			['tersa-base', 'tersa-layout'],
-			$theme_version
+			tersa_asset_ver('assets/css/404.css')
 		);
 	}
 
@@ -174,7 +202,7 @@ function tersa_enqueue_assets() {
 			'tersa-page',
 			$theme_uri . '/assets/css/page.css',
 			['tersa-base', 'tersa-layout'],
-			$theme_version
+			tersa_asset_ver('assets/css/page.css')
 		);
 	}
 
@@ -184,12 +212,12 @@ function tersa_enqueue_assets() {
 			'tersa-eu-project',
 			$theme_uri . '/assets/css/eu-project.css',
 			['tersa-base', 'tersa-layout'],
-			$theme_version
+			tersa_asset_ver('assets/css/eu-project.css')
 		);
 	}
 	
 
-	wp_enqueue_script('tersa-header-js', $theme_uri . '/assets/js/header.js', [], $theme_version, true);
+	wp_enqueue_script('tersa-header-js', $theme_uri . '/assets/js/header.js', [], tersa_asset_ver('assets/js/header.js'), true);
 
 	wp_localize_script('tersa-header-js', 'tersaCartDrawer', [
 		'ajaxUrl'         => admin_url('admin-ajax.php'),
