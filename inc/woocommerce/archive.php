@@ -76,6 +76,36 @@ function tersa_get_active_filter_values(string $taxonomy): array {
 	return array_values(array_unique($values));
 }
 
+/**
+ * Kad je na /shop/ aktivan filter za točno jednu kategoriju proizvoda,
+ * dodaj tu kategoriju u breadcrumb kako bi kontekst bio jasan
+ * (radi vizualne podudarnosti s posjetom stvarnoj kategorijskoj arhivi).
+ */
+function tersa_breadcrumb_inject_filtered_category(array $crumbs): array {
+	if (is_admin() || !function_exists('is_shop') || !is_shop()) {
+		return $crumbs;
+	}
+
+	if (!function_exists('tersa_get_active_filter_values')) {
+		return $crumbs;
+	}
+
+	$values = tersa_get_active_filter_values('product_cat');
+	if (count($values) !== 1) {
+		return $crumbs;
+	}
+
+	$term = get_term_by('slug', $values[0], 'product_cat');
+	if (!($term instanceof WP_Term)) {
+		return $crumbs;
+	}
+
+	$crumbs[] = [$term->name, ''];
+
+	return $crumbs;
+}
+add_filter('woocommerce_get_breadcrumb', 'tersa_breadcrumb_inject_filtered_category', 10, 1);
+
 function tersa_get_archive_reset_url(): string {
 	if (function_exists('wc_get_page_id')) {
 		$shop_id = wc_get_page_id('shop');

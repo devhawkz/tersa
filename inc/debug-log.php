@@ -23,6 +23,14 @@ if (!defined('ABSPATH')) {
 }
 
 /**
+ * Dani čuvanja rotiranih log fajlova (debug-YYYY-MM-DD.log).
+ * Stariji se brišu pri svakoj rotaciji.
+ */
+if (!defined('TERSA_DEBUG_LOG_RETENTION_DAYS')) {
+	define('TERSA_DEBUG_LOG_RETENTION_DAYS', 7);
+}
+
+/**
  * Fiksna destinacija za sve tema-level log poruke.
  */
 function tersa_debug_log_path(): string {
@@ -243,3 +251,93 @@ add_action('woocommerce_add_error', static function ($error): void {
 
 	tersa_debug_log('wc_add_error', $message);
 });
+
+/* ------------------------------------------------------------------------ */
+/* 5. Dnevna rotacija — /wp-content/debug-YYYY-MM-DD.log, retention 7 dana   */
+/* ------------------------------------------------------------------------ */
+
+/**
+ * Izvodi rotaciju log-a i čišćenje starih rotiranih fajlova.
+ *
+ * Korak 1: ako `debug.log` nije prazan, `rename()` u `debug-YYYY-MM-DD.log`
+ *          (atomična operacija na istom filesystem-u → nema trke sa pisanjem).
+ *          Odmah se kreira svež prazan `debug.log` istim permisijama.
+ * Korak 2: skenira se direktorij i `unlink()`-uju svi `debug-*.log` fajlovi
+ *          čiji je mtime stariji od TERSA_DEBUG_LOG_RETENTION_DAYS.
+ */
+function tersa_debug_log_rotate_run(): void {
+	$main = tersa_debug_log_path();
+	$dir  = dirname($main);
+
+	if (!is_dir($dir) || !is_writable($dir)) {
+		return;
+	}
+
+	if (is_file($main) && @filesize($main) > 0) {
+		$stamp   = gmdate('Y-m-d');
+		$rotated = $dir . '/debug-' . $stamp . '.log';
+
+		$counter = 0;
+		while (file_exists($rotated)) {
+			$counter++;
+			$rotated = $dir . '/debug-' . $stamp . '-' . $counter . '.log';
+			if ($counter > 50) {
+				return;
+			}
+		}
+
+		if (@rename($main, $rotated)) {
+			@touch($main);
+			@chmod($main, 0664);
+		}
+	}
+
+	$cutoff = time() - (TERSA_DEBUG_LOG_RETENTION_DAYS * DAY_IN_SECONDS);
+	$files  = glob($dir . '/debug-*.log') ?: [];
+
+	foreach ($files as $file) {
+		if (basename($file) === 'debug.log') {
+			continue;
+		}
+		$mtime = @filemtime($file);
+		if ($mtime !== false && $mtime < $cutoff) {
+			@unlink($file);
+		}
+	}
+}
+
+add_action('tersa_debug_log_rotate', 'tersa_debug_log_rotate_run');
+
+/**
+ * Obezbeđuje da je dnevna rotacija zakazana u WP cron-u.
+ * Zakazuje prvi put 1h posle trenutnog vremena pa `daily` nadalje.
+ */
+add_action('init', static function (): void {
+	if (!function_exists('wp_next_scheduled') || !function_exists('wp_schedule_event')) {
+		return;
+	}
+
+	if (!wp_next_scheduled('tersa_debug_log_rotate')) {
+		wp_schedule_event(time() + HOUR_IN_SECONDS, 'daily', 'tersa_debug_log_rotate');
+	}
+});
+
+/**
+ * Pri promeni teme skini zakazan event — da ne ostaje mrtav hook u bazi.
+ */
+add_action('switch_theme', static function (): void {
+	if (function_exists('wp_clear_scheduled_hook')) {
+		wp_clear_scheduled_hook('tersa_debug_log_rotate');
+	}
+});
+
+/**
+ * WP-CLI hook: `wp tersa debug-log-rotate` za manuelni trigger.
+ * Registruje se samo kad WP-CLI kontekst postoji, ne troši ništa drugde.
+ */
+if (defined('WP_CLI') && WP_CLI) {
+	\WP_CLI::add_command('tersa debug-log-rotate', static function (): void {
+		tersa_debug_log_rotate_run();
+		\WP_CLI::success('debug.log rotiran i fajlovi stariji od ' . TERSA_DEBUG_LOG_RETENTION_DAYS . ' dana obrisani.');
+	});
+}

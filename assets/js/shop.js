@@ -33,4 +33,27 @@ document.addEventListener('DOMContentLoaded', function () {
         }
       });
     });
+
+    var descriptionToggles = document.querySelectorAll('.shop-archive__description-toggle');
+
+    descriptionToggles.forEach(function (toggle) {
+      toggle.addEventListener('click', function () {
+        var wrap = toggle.closest('.shop-archive__description-wrap');
+        if (!wrap) {
+          return;
+        }
+
+        var isCollapsed = wrap.classList.contains('is-collapsed');
+        var label = toggle.querySelector('.shop-archive__description-toggle-text');
+        var moreLabel = toggle.getAttribute('data-label-more') || 'Pročitaj više';
+        var lessLabel = toggle.getAttribute('data-label-less') || 'Sažmi opis';
+
+        wrap.classList.toggle('is-collapsed');
+        toggle.setAttribute('aria-expanded', isCollapsed ? 'true' : 'false');
+
+        if (label) {
+          label.textContent = isCollapsed ? lessLabel : moreLabel;
+        }
+      });
+    });
   });

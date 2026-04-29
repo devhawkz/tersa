@@ -312,6 +312,41 @@ wp i18n make-pot . languages/tersa-shop.pot --domain=tersa-shop
 
 ---
 
+## Debug logging
+
+Modul `inc/debug-log.php` hvata ciljane greške iz kritičnih tokova:
+
+- `wp_mail_failed` — SMTP / PHPMailer greške
+- `WC_Logger` — Corvus Pay i drugi payment gateway log-ovi (proxy u `debug.log`)
+- `tersa_*` AJAX endpoint-i — fatal error-i
+- `woocommerce_checkout_order_exception` — uncaught gateway exception-i
+
+Svi zapisi idu u `/wp-content/debug.log` bez obzira na `WP_DEBUG_LOG` vrednost (koristi 3-arg `error_log()`).
+
+### Rotacija
+
+- **Dnevna** preko WP cron-a (`daily` event, hook `tersa_debug_log_rotate`).
+- `debug.log` → `debug-YYYY-MM-DD.log`, odmah se kreira svež prazan glavni log.
+- Retention: **7 dana** (konfigurabilno preko `TERSA_DEBUG_LOG_RETENTION_DAYS` konstante u `wp-config.php`).
+- Fajlovi `debug-*.log` stariji od retention perioda brišu se pri svakoj rotaciji.
+
+Manuelni rotate preko WP-CLI:
+
+```bash
+wp tersa debug-log-rotate
+```
+
+Da bi se PHP notice/warning-i iz **celog** sajta (tema + plugini) logovali, u `wp-config.php` postavi:
+
+```php
+define('WP_DEBUG', true);
+define('WP_DEBUG_LOG', true);
+define('WP_DEBUG_DISPLAY', false);
+@ini_set('display_errors', '0');
+```
+
+---
+
 ## License
 
 Proprietary / private — property of Tersa & Marsa Agency. Not for redistribution.

@@ -69,25 +69,170 @@
   
   .shop-archive__header {
     text-align: center;
-    margin-bottom: 44px;
+    margin: 0 auto 48px;
+    padding-bottom: 36px;
+    border-bottom: 1px solid rgba(58, 38, 24, 0.10);
+    max-width: 1180px;
   }
-  
+
+  .shop-archive__header--term {
+    padding-bottom: 40px;
+  }
+
+  .shop-archive__eyebrow {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    margin: 0 0 14px;
+    padding: 6px 14px;
+    border: 1px solid rgba(58, 38, 24, 0.18);
+    border-radius: 999px;
+    background: rgba(255, 255, 255, 0.4);
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--c-primary);
+  }
+
+  .shop-archive__eyebrow-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: var(--c-accent);
+    box-shadow: 0 0 0 3px rgba(81, 110, 82, 0.18);
+  }
+
   .shop-archive__title {
     margin: 0;
-    font-family: var(--f-body);
-    font-size: clamp(36px, 4vw, 56px);
-    line-height: 1;
+    font-family: var(--font-heading);
+    font-size: clamp(36px, 4.4vw, 60px);
+    line-height: 1.05;
     font-weight: 700;
-    color: #000000;
-    letter-spacing: -0.03em;
+    color: var(--c-primary);
+    letter-spacing: -0.01em;
   }
-  
+
+  .shop-archive__description-wrap {
+    position: relative;
+    max-width: 1080px;
+    margin: 26px auto 0;
+    text-align: left;
+  }
+
   .shop-archive__description {
-    max-width: 760px;
-    margin: 14px auto 0;
-    font-size: 16px;
-    line-height: 1.65;
-    color: #666666;
+    font-size: clamp(15px, 1.05vw, 17px);
+    line-height: 1.78;
+    color: var(--c-text-soft);
+    text-align: left;
+  }
+
+  .shop-archive__description p {
+    margin: 0 0 14px;
+    color: inherit;
+  }
+
+  .shop-archive__description p:last-child {
+    margin-bottom: 0;
+  }
+
+  .shop-archive__description p:first-child {
+    font-size: clamp(17px, 1.25vw, 19.5px);
+    line-height: 1.6;
+    color: var(--c-text);
+    font-weight: 400;
+    margin-bottom: 18px;
+  }
+
+  .shop-archive__description strong,
+  .shop-archive__description b {
+    color: var(--c-primary);
+    font-weight: 600;
+  }
+
+  .shop-archive__description ul,
+  .shop-archive__description ol {
+    list-style: disc;
+    margin: 0 0 14px;
+    padding-left: 1.4em;
+  }
+
+  .shop-archive__description ul li,
+  .shop-archive__description ol li {
+    margin-bottom: 6px;
+  }
+
+  /* Collapsible long descriptions */
+  .shop-archive__description-wrap.is-collapsible .shop-archive__description {
+    overflow: hidden;
+    transition: max-height 0.45s ease;
+  }
+
+  .shop-archive__description-wrap.is-collapsible.is-collapsed .shop-archive__description {
+    max-height: 12.5em;
+    -webkit-mask-image: linear-gradient(to bottom, #000 60%, transparent 100%);
+    mask-image: linear-gradient(to bottom, #000 60%, transparent 100%);
+  }
+
+  .shop-archive__description-wrap.is-collapsible:not(.is-collapsed) .shop-archive__description {
+    max-height: none;
+  }
+
+  .shop-archive__description-toggle {
+    margin: 18px 0 0;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 9px 18px;
+    background: transparent;
+    border: 1px solid rgba(58, 38, 24, 0.22);
+    color: var(--c-primary);
+    font-size: 13px;
+    font-weight: 600;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    border-radius: 999px;
+    cursor: pointer;
+    transition: background 0.2s ease, border-color 0.2s ease, color 0.2s ease;
+  }
+
+  .shop-archive__description-toggle:hover {
+    background: var(--c-primary);
+    border-color: var(--c-primary);
+    color: #ffffff;
+  }
+
+  .shop-archive__description-toggle-icon {
+    width: 14px;
+    height: 14px;
+    transition: transform 0.25s ease;
+  }
+
+  .shop-archive__description-toggle[aria-expanded="true"] .shop-archive__description-toggle-icon {
+    transform: rotate(180deg);
+  }
+
+  .shop-archive__header-reset {
+    margin: 22px 0 0;
+  }
+
+  .shop-archive__header-reset-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 16px;
+    font-size: 13px;
+    font-weight: 600;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--c-text-soft);
+    border-bottom: 1px solid transparent;
+    transition: color 0.2s ease, border-color 0.2s ease;
+  }
+
+  .shop-archive__header-reset-link:hover {
+    color: var(--c-primary);
+    border-bottom-color: var(--c-primary);
   }
   
   /* --------------------------------------------------
@@ -822,9 +967,22 @@
   
   @media (max-width: 767px) {
     .shop-archive__header {
-      margin-bottom: 28px;
+      margin-bottom: 32px;
+      padding-bottom: 28px;
     }
-  
+
+    .shop-archive__title {
+      font-size: clamp(30px, 8vw, 40px);
+    }
+
+    .shop-archive__description {
+      text-align: left;
+    }
+
+    .shop-archive__description-wrap {
+      margin-top: 18px;
+    }
+
     .shop-archive__toolbar {
       gap: 18px;
       margin-bottom: 24px;

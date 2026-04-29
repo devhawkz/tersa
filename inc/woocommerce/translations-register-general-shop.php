@@ -67,6 +67,34 @@ function tersa_pll_register_general_shop_strings(): void {
 	// Shop archive — no results
 	pll_register_string('shop_no_products_found', 'Nema pronađenih proizvoda za odabrane filtere.', 'Tersa Shop');
 
+	// Shop archive — gumbi i UI labeli (archive-product.php)
+	pll_register_string('tersa_archive_btn_apply', 'Primijeni', 'Tersa – kolekcija (gumbi)', ['multiline' => false]);
+	pll_register_string('tersa_archive_btn_apply_filters', 'Primijeni filtre', 'Tersa – kolekcija (gumbi)', ['multiline' => false]);
+	pll_register_string('tersa_archive_btn_reset_filters', 'Poništi filtre', 'Tersa – kolekcija (gumbi)', ['multiline' => false]);
+	pll_register_string('tersa_archive_btn_show_all', 'Prikaži sve proizvode', 'Tersa – kolekcija (gumbi)', ['multiline' => false]);
+	pll_register_string('tersa_archive_btn_read_more', 'Pročitaj više', 'Tersa – kolekcija (opis)', ['multiline' => false]);
+	pll_register_string('tersa_archive_btn_read_less', 'Sažmi opis', 'Tersa – kolekcija (opis)', ['multiline' => false]);
+	pll_register_string('tersa_archive_eyebrow_active_category', 'Aktivni filter kategorije', 'Tersa – kolekcija (opis)', ['multiline' => false]);
+	pll_register_string('tersa_archive_sale_toggle', 'Prikaži samo proizvode na popustu', 'Tersa – kolekcija (filteri)', ['multiline' => false]);
+
+	// Shop archive — filter naslovi
+	pll_register_string('tersa_archive_filter_category', 'Kategorija', 'Tersa – kolekcija (filteri)', ['multiline' => false]);
+	pll_register_string('tersa_archive_filter_color', 'Boja', 'Tersa – kolekcija (filteri)', ['multiline' => false]);
+	pll_register_string('tersa_archive_filter_material', 'Materijal', 'Tersa – kolekcija (filteri)', ['multiline' => false]);
+	pll_register_string('tersa_archive_filter_size', 'Dimenzija', 'Tersa – kolekcija (filteri)', ['multiline' => false]);
+	pll_register_string('tersa_archive_filter_patterns', 'Patterns & Textures', 'Tersa – kolekcija (filteri)', ['multiline' => false]);
+
+	// Shop archive — pristupačnost (aria)
+	pll_register_string('tersa_archive_aria_breadcrumb', 'Breadcrumb', 'Tersa – kolekcija (pristupačnost)', ['multiline' => false]);
+	pll_register_string('tersa_archive_aria_home', 'Naslovnica', 'Tersa – kolekcija (pristupačnost)', ['multiline' => false]);
+	pll_register_string('tersa_archive_aria_view', 'Product view', 'Tersa – kolekcija (pristupačnost)', ['multiline' => false]);
+	pll_register_string('tersa_archive_aria_view_list', 'List view', 'Tersa – kolekcija (pristupačnost)', ['multiline' => false]);
+	pll_register_string('tersa_archive_aria_view_grid', 'Grid view', 'Tersa – kolekcija (pristupačnost)', ['multiline' => false]);
+	pll_register_string('tersa_archive_aria_sort', 'Sort products', 'Tersa – kolekcija (pristupačnost)', ['multiline' => false]);
+	pll_register_string('tersa_archive_aria_filters', 'Product filters', 'Tersa – kolekcija (pristupačnost)', ['multiline' => false]);
+	pll_register_string('tersa_archive_aria_products', 'Products', 'Tersa – kolekcija (pristupačnost)', ['multiline' => false]);
+	pll_register_string('tersa_archive_aria_pagination', 'Navigacija kroz proizvode', 'Tersa – kolekcija (pristupačnost)', ['multiline' => false]);
+
 	// Cart drawer JS error
 	pll_register_string('tersa_cart_load_error', 'Greška pri učitavanju košarice.', 'Tersa – WooCommerce (košarica)', ['multiline' => false]);
 
