@@ -9,9 +9,15 @@ if (!$product instanceof WC_Product) {
 
 $product_id        = $product->get_id();
 $product_name      = $product->get_name();
-$main_image_id     = $product->get_image_id();
-$gallery_image_ids = $product->get_gallery_image_ids();
-$attachment_ids    = array_values(array_unique(array_filter(array_merge([$main_image_id], $gallery_image_ids))));
+
+/**
+ * Plugin (Tersa Variation Gallery) može preuzeti glavnu sliku i galeriju
+ * kada postoji "default varijacija" sa vlastitom galerijom. Bez plugina,
+ * filteri ostaju no-op i vraćaju default WC vrednosti.
+ */
+$main_image_id     = (int) apply_filters('tersa_main_product_image_id', (int) $product->get_image_id(), $product);
+$gallery_image_ids = (array) apply_filters('tersa_product_gallery_image_ids', $product->get_gallery_image_ids(), $product);
+$attachment_ids    = array_values(array_unique(array_filter(array_map('absint', array_merge([$main_image_id], $gallery_image_ids)))));
 
 $current_price_html = $product->get_price_html();
 $average_rating     = (float) $product->get_average_rating();
@@ -79,18 +85,6 @@ if ($product->is_on_sale()) {
 	}
 }
 
-$tersa_variation_gallery_reset_id = 0;
-$tersa_variation_gallery_reset_alt = $product_name;
-if ($product->is_type('variable') && !empty($attachment_ids)) {
-	$tersa_variation_gallery_reset_id = (int) $attachment_ids[0];
-	if ($tersa_variation_gallery_reset_id > 0) {
-		$alt_meta = trim((string) get_post_meta($tersa_variation_gallery_reset_id, '_wp_attachment_image_alt', true));
-		if ($alt_meta !== '') {
-			$tersa_variation_gallery_reset_alt = $alt_meta;
-		}
-	}
-}
-
 /*
  * Glavna slika se renderuje u kvadratu (aspect-ratio 1/1) koji zauzima ~50vw u
  * 2-kolonskom layoutu (≥1201px) i 100vw u 1-kolonskom (≤1200px). Eksplicitan
@@ -98,11 +92,55 @@ if ($product->is_type('variable') && !empty($attachment_ids)) {
  */
 $tersa_main_image_size  = '1536x1536';
 $tersa_main_image_sizes = '(min-width: 1201px) 50vw, 100vw';
+
+/**
+ * Parent gallery payload za frontend JS — koristi se kao fallback kad varijacija
+ * nema vlastitu galeriju. Sadrži i sliku i thumb varijantu (jedan upit po atačmentu;
+ * URL-ovi prolaze kroz WP attachment cache).
+ *
+ * Gradimo iz neoverride-ovane parent liste (bez plugin filtera), tako da reset
+ * uvek vraća pravu parent galeriju, čak i ako je default varijacija imala svoju.
+ */
+$tersa_parent_main_image_id     = (int) $product->get_image_id();
+$tersa_parent_gallery_image_ids = $product->get_gallery_image_ids();
+$tersa_parent_attachment_ids    = array_values(array_unique(array_filter(array_map(
+	'absint',
+	array_merge([$tersa_parent_main_image_id], $tersa_parent_gallery_image_ids)
+))));
+
+// Batch prime cache za sve attachment-e iz parent galerije (jedan SELECT).
+if (!empty($tersa_parent_attachment_ids)) {
+	_prime_post_caches($tersa_parent_attachment_ids, true, true);
+}
+
+$tersa_parent_gallery_payload = [];
+foreach ($tersa_parent_attachment_ids as $tersa_pid) {
+	$tersa_src = wp_get_attachment_image_url($tersa_pid, $tersa_main_image_size);
+	if (!$tersa_src) {
+		continue;
+	}
+	$tersa_parent_gallery_payload[] = [
+		'id'     => $tersa_pid,
+		'src'    => $tersa_src,
+		'full'   => wp_get_attachment_image_url($tersa_pid, 'full') ?: $tersa_src,
+		'thumb'  => wp_get_attachment_image_url($tersa_pid, 'thumbnail') ?: $tersa_src,
+		'srcset' => (string) wp_get_attachment_image_srcset($tersa_pid, $tersa_main_image_size),
+		'sizes'  => $tersa_main_image_sizes,
+		'alt'    => (string) get_post_meta($tersa_pid, '_wp_attachment_image_alt', true),
+	];
+}
 ?>
 
 <?php do_action('woocommerce_before_single_product'); ?>
 
-<div id="product-<?php the_ID(); ?>" <?php wc_product_class('product-single', $product); ?>>
+<div
+	id="product-<?php the_ID(); ?>"
+	<?php wc_product_class('product-single', $product); ?>
+	data-tersa-product-id="<?php echo esc_attr((string) $product_id); ?>"
+>
+	<script type="application/json" class="tersa-product-fallback-gallery">
+	<?php echo wp_json_encode($tersa_parent_gallery_payload, JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT); ?>
+	</script>
 	<?php
 	// Prevent WC's default image output — custom gallery is handled above.
 	remove_action('woocommerce_before_single_product_summary', 'woocommerce_show_product_images', 20);
@@ -111,17 +149,7 @@ $tersa_main_image_sizes = '(min-width: 1201px) 50vw, 100vw';
 	<div class="product-single__inner">
 		<div class="product-single__gallery-column">
 			<div class="product-single__gallery">
-				<div
-					class="product-single__main-media"
-					<?php if ($tersa_variation_gallery_reset_id > 0) : ?>
-						data-tersa-variation-gallery="1"
-						data-tersa-default-large="<?php echo esc_url(wp_get_attachment_image_url($tersa_variation_gallery_reset_id, $tersa_main_image_size)); ?>"
-						data-tersa-default-full="<?php echo esc_url(wp_get_attachment_image_url($tersa_variation_gallery_reset_id, 'full')); ?>"
-						data-tersa-default-srcset="<?php echo esc_attr((string) wp_get_attachment_image_srcset($tersa_variation_gallery_reset_id, $tersa_main_image_size)); ?>"
-						data-tersa-default-sizes="<?php echo esc_attr($tersa_main_image_sizes); ?>"
-						data-tersa-default-alt="<?php echo esc_attr($tersa_variation_gallery_reset_alt); ?>"
-					<?php endif; ?>
-				>
+				<div class="product-single__main-media">
 					<?php if (!empty($badge_items)) : ?>
 						<div class="product-single__badges" aria-label="<?php echo esc_attr(function_exists('pll__') ? pll__('Označke proizvoda') : __('Označke proizvoda', 'tersa-shop')); ?>">
 							<?php foreach ($badge_items as $badge) : ?>

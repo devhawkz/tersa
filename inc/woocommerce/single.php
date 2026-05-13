@@ -133,3 +133,83 @@ function tersa_remove_default_single_product_summary_hooks(): void {
 	remove_action('woocommerce_single_product_summary', 'woocommerce_template_single_sharing', 50);
 }
 add_action('woocommerce_before_single_product', 'tersa_remove_default_single_product_summary_hooks', 1);
+
+/**
+ * Preload glavne slike proizvoda i prvih par dodatnih za brže prebacivanje
+ * između thumb-ova.
+ *
+ * Strategija:
+ * - Glavna slika: visok prioritet (LCP target) — preload sa srcset/sizes
+ *   identičnim onome u <img>, da browser bira istu varijantu i ne duplira fetch.
+ * - Sledeće 1–2 slike u galeriji: niski prioritet (fetchpriority="low")
+ *   da ne otimaju propusni opseg LCP-u.
+ *
+ * Vrednosti se računaju identično šablonu (content-single-product.php),
+ * uključujući plugin filtere — tako preload uvek pogađa istu sliku koja
+ * će se renderovati.
+ */
+function tersa_preload_product_gallery(): void {
+	if (!function_exists('is_product') || !is_product()) {
+		return;
+	}
+
+	$product = wc_get_product(get_queried_object_id());
+	if (!$product instanceof WC_Product) {
+		return;
+	}
+
+	$main_image_id = (int) apply_filters('tersa_main_product_image_id', (int) $product->get_image_id(), $product);
+	if ($main_image_id <= 0) {
+		return;
+	}
+
+	$gallery_ids = (array) apply_filters('tersa_product_gallery_image_ids', $product->get_gallery_image_ids(), $product);
+	$attachment_ids = array_values(array_unique(array_filter(array_map(
+		'absint',
+		array_merge([$main_image_id], $gallery_ids)
+	))));
+
+	// Mora biti identično vrednostima u šablonu da browser ne duplira fetch.
+	$size  = '1536x1536';
+	$sizes = '(min-width: 1201px) 50vw, 100vw';
+
+	// Glavna slika — visok prioritet.
+	$main_src    = wp_get_attachment_image_url($main_image_id, $size);
+	if (!$main_src) {
+		return;
+	}
+	$main_srcset = (string) wp_get_attachment_image_srcset($main_image_id, $size);
+
+	printf(
+		'<link rel="preload" as="image" href="%s" imagesrcset="%s" imagesizes="%s" fetchpriority="high" />' . "\n",
+		esc_url($main_src),
+		esc_attr($main_srcset),
+		esc_attr($sizes)
+	);
+
+	// Prve 2 sledeće slike u galeriji — nisko prioritetne, warm-up za brze
+	// klikove na thumb. Preskačemo glavnu (već je preload-ovana).
+	$count = 0;
+	foreach ($attachment_ids as $att_id) {
+		if ($att_id === $main_image_id) {
+			continue;
+		}
+		if ($count >= 2) {
+			break;
+		}
+		$next_src = wp_get_attachment_image_url($att_id, $size);
+		if (!$next_src) {
+			continue;
+		}
+		$next_srcset = (string) wp_get_attachment_image_srcset($att_id, $size);
+
+		printf(
+			'<link rel="preload" as="image" href="%s" imagesrcset="%s" imagesizes="%s" fetchpriority="low" />' . "\n",
+			esc_url($next_src),
+			esc_attr($next_srcset),
+			esc_attr($sizes)
+		);
+		$count++;
+	}
+}
+add_action('wp_head', 'tersa_preload_product_gallery', 5);
