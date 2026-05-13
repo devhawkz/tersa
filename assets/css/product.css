@@ -58,6 +58,98 @@
   .product-single__main-image-link {
     display: block;
     text-decoration: none;
+    cursor: zoom-in;
+  }
+
+  /* --------------------------------------------------
+     Lightbox (custom preview za glavnu sliku)
+  -------------------------------------------------- */
+  .product-single__lightbox {
+    position: fixed;
+    inset: 0;
+    z-index: 9999;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    padding: clamp(16px, 4vw, 48px);
+  }
+
+  .product-single__lightbox.is-open {
+    display: flex;
+  }
+
+  .product-single__lightbox[hidden] {
+    display: none;
+  }
+
+  .product-single__lightbox.is-open[hidden] {
+    display: flex;
+  }
+
+  .product-single__lightbox-backdrop {
+    position: absolute;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.88);
+    cursor: zoom-out;
+  }
+
+  .product-single__lightbox-close {
+    position: absolute;
+    top: clamp(12px, 2vw, 24px);
+    right: clamp(12px, 2vw, 24px);
+    z-index: 2;
+    width: 48px;
+    height: 48px;
+    padding: 0;
+    border: 0;
+   
+    background: transparent;
+    color: #ffffff;
+    font-size: 32px;
+    line-height: 1;
+    font-weight: 300;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: background-color 0.2s ease, transform 0.2s ease;
+  }
+
+  .product-single__lightbox-close:hover,
+  .product-single__lightbox-close:focus-visible {
+    transform: scale(1.05);
+    outline: none;
+  }
+
+  .product-single__lightbox-close:focus-visible {
+    box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.7), 0 10px 24px rgba(0, 0, 0, 0.25);
+  }
+
+  .product-single__lightbox-figure {
+    position: relative;
+    z-index: 1;
+    margin: 0;
+    max-width: min(1400px, 96vw);
+    max-height: 92vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    pointer-events: none;
+  }
+
+  .product-single__lightbox-image {
+    display: block;
+    max-width: 100%;
+    max-height: 92vh;
+    width: auto;
+    height: auto;
+    object-fit: contain;
+    pointer-events: auto;
+  }
+
+  /* Spreči scroll pozadine dok je lightbox otvoren */
+  body.tersa-lightbox-open {
+    overflow: hidden;
   }
   
   .product-single__main-image {

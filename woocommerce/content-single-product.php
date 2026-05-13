@@ -384,6 +384,28 @@ $tersa_main_image_sizes = '(min-width: 1201px) 50vw, 100vw';
 	do_action('woocommerce_after_single_product_summary');
 	?>
 	</div>
+
+	<div
+		class="product-single__lightbox"
+		role="dialog"
+		aria-modal="true"
+		aria-hidden="true"
+		aria-label="<?php echo esc_attr(function_exists('pll__') ? pll__('Pregled slike proizvoda') : __('Pregled slike proizvoda', 'tersa-shop')); ?>"
+		hidden
+	>
+		<div class="product-single__lightbox-backdrop" data-tersa-lightbox-close></div>
+		<button
+			type="button"
+			class="product-single__lightbox-close"
+			data-tersa-lightbox-close
+			aria-label="<?php echo esc_attr(function_exists('pll__') ? pll__('Zatvori pregled') : __('Zatvori pregled', 'tersa-shop')); ?>"
+		>
+			<span aria-hidden="true">&times;</span>
+		</button>
+		<figure class="product-single__lightbox-figure">
+			<img class="product-single__lightbox-image" src="" alt="" />
+		</figure>
+	</div>
 </div>
 
 <?php do_action('woocommerce_after_single_product'); ?>

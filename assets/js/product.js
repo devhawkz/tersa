@@ -49,6 +49,69 @@ document.addEventListener('DOMContentLoaded', function () {
       });
     });
   
+    var lightbox = galleryRoot.querySelector('.product-single__lightbox');
+    var lightboxImage = lightbox ? lightbox.querySelector('.product-single__lightbox-image') : null;
+    var lastFocusedBeforeLightbox = null;
+
+    function tersaOpenLightbox(src, alt) {
+      if (!lightbox || !lightboxImage || !src) {
+        return;
+      }
+      lightboxImage.setAttribute('src', src);
+      lightboxImage.setAttribute('alt', alt || '');
+      lightbox.removeAttribute('hidden');
+      lightbox.classList.add('is-open');
+      lightbox.setAttribute('aria-hidden', 'false');
+      document.body.classList.add('tersa-lightbox-open');
+
+      lastFocusedBeforeLightbox = document.activeElement;
+      var closeBtn = lightbox.querySelector('.product-single__lightbox-close');
+      if (closeBtn) {
+        closeBtn.focus();
+      }
+    }
+
+    function tersaCloseLightbox() {
+      if (!lightbox) {
+        return;
+      }
+      lightbox.classList.remove('is-open');
+      lightbox.setAttribute('hidden', '');
+      lightbox.setAttribute('aria-hidden', 'true');
+      document.body.classList.remove('tersa-lightbox-open');
+      if (lightboxImage) {
+        lightboxImage.setAttribute('src', '');
+      }
+      if (lastFocusedBeforeLightbox && typeof lastFocusedBeforeLightbox.focus === 'function') {
+        lastFocusedBeforeLightbox.focus();
+      }
+    }
+
+    if (lightbox && mainImageLink) {
+      mainImageLink.addEventListener('click', function (event) {
+        var href = mainImageLink.getAttribute('href');
+        if (!href) {
+          return;
+        }
+        event.preventDefault();
+        var altText = mainImage ? mainImage.getAttribute('alt') || '' : '';
+        tersaOpenLightbox(href, altText);
+      });
+
+      lightbox.querySelectorAll('[data-tersa-lightbox-close]').forEach(function (el) {
+        el.addEventListener('click', function (event) {
+          event.preventDefault();
+          tersaCloseLightbox();
+        });
+      });
+
+      document.addEventListener('keydown', function (event) {
+        if (event.key === 'Escape' && lightbox.classList.contains('is-open')) {
+          tersaCloseLightbox();
+        }
+      });
+    }
+
     var accordionToggles = document.querySelectorAll('.product-single__accordion-toggle');
   
     accordionToggles.forEach(function (toggle) {
