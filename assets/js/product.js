@@ -49,6 +49,64 @@ document.addEventListener('DOMContentLoaded', function () {
       });
     });
   
+    var thumbsWrap = galleryRoot.querySelector('.product-single__thumbs-wrap--slider');
+    if (thumbsWrap) {
+      var thumbsStrip = thumbsWrap.querySelector('.product-single__thumbs');
+      var prevBtn = thumbsWrap.querySelector('[data-tersa-thumbs-prev]');
+      var nextBtn = thumbsWrap.querySelector('[data-tersa-thumbs-next]');
+
+      function tersaThumbStep() {
+        if (!thumbsStrip) {
+          return 0;
+        }
+        var first = thumbsStrip.querySelector('.product-single__thumb');
+        if (!first) {
+          return 0;
+        }
+        var rect = first.getBoundingClientRect();
+        var styles = window.getComputedStyle(thumbsStrip);
+        var gap = parseFloat(styles.columnGap || styles.gap || '0') || 0;
+        return Math.round(rect.width + gap);
+      }
+
+      function tersaUpdateThumbNavState() {
+        if (!thumbsStrip) {
+          return;
+        }
+        var maxScroll = thumbsStrip.scrollWidth - thumbsStrip.clientWidth;
+        if (prevBtn) {
+          prevBtn.disabled = thumbsStrip.scrollLeft <= 1;
+        }
+        if (nextBtn) {
+          nextBtn.disabled = thumbsStrip.scrollLeft >= maxScroll - 1;
+        }
+      }
+
+      if (prevBtn) {
+        prevBtn.addEventListener('click', function () {
+          if (!thumbsStrip) {
+            return;
+          }
+          thumbsStrip.scrollBy({ left: -tersaThumbStep(), behavior: 'smooth' });
+        });
+      }
+
+      if (nextBtn) {
+        nextBtn.addEventListener('click', function () {
+          if (!thumbsStrip) {
+            return;
+          }
+          thumbsStrip.scrollBy({ left: tersaThumbStep(), behavior: 'smooth' });
+        });
+      }
+
+      if (thumbsStrip) {
+        thumbsStrip.addEventListener('scroll', tersaUpdateThumbNavState, { passive: true });
+        window.addEventListener('resize', tersaUpdateThumbNavState);
+        tersaUpdateThumbNavState();
+      }
+    }
+
     var lightbox = galleryRoot.querySelector('.product-single__lightbox');
     var lightboxImage = lightbox ? lightbox.querySelector('.product-single__lightbox-image') : null;
     var lastFocusedBeforeLightbox = null;

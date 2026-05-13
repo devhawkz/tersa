@@ -208,10 +208,77 @@
     box-shadow: 0 10px 24px rgba(0, 0, 0, 0.08);
   }
   
+  .product-single__thumbs-wrap {
+    position: relative;
+  }
+
   .product-single__thumbs {
     display: grid;
     grid-template-columns: repeat(5, minmax(0, 1fr));
-    gap: 18px;
+    gap: 10px;
+  }
+
+  /* Slider mode: aktivira se kad ima > 5 minijatura */
+  .product-single__thumbs-wrap--slider .product-single__thumbs {
+    display: flex;
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    scroll-behavior: smooth;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+    /* Prostor da prev/next dugmad ne pokrivaju krajnje slike */
+    padding: 0 44px;
+  }
+
+  .product-single__thumbs-wrap--slider .product-single__thumbs::-webkit-scrollbar {
+    display: none;
+  }
+
+  .product-single__thumbs-wrap--slider .product-single__thumb {
+    flex: 0 0 calc((100% - 88px - 2 * 18px) / 3);
+    scroll-snap-align: start;
+  }
+
+  .product-single__thumbs-nav {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    z-index: 4;
+    width: 36px;
+    height: 36px;
+    padding: 0;
+    border: 0;
+    border-radius: 999px;
+    background: #ffffff;
+    color: #111111;
+    font-size: 22px;
+    line-height: 1;
+    font-weight: 400;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    box-shadow: 0 6px 18px rgba(0, 0, 0, 0.12);
+    transition: opacity 0.2s ease, transform 0.2s ease;
+  }
+
+  .product-single__thumbs-nav--prev {
+    left: -3%;
+  }
+
+  .product-single__thumbs-nav--next {
+    right: -3%;
+  }
+
+  .product-single__thumbs-nav:hover:not(:disabled),
+  .product-single__thumbs-nav:focus-visible:not(:disabled) {
+    transform: translateY(-50%) scale(1.05);
+    outline: none;
+  }
+
+  .product-single__thumbs-nav:disabled {
+    opacity: 0.35;
+    cursor: default;
   }
   
   .product-single__thumb {
@@ -233,8 +300,8 @@
   .product-single__thumb-image {
     display: block;
     width: 100%;
-    aspect-ratio: 1 / 1.18;
-    object-fit: cover;
+    aspect-ratio: 1 / 1;
+
   }
   
   .product-single__summary {
@@ -761,6 +828,14 @@
       grid-template-columns: repeat(4, minmax(0, 1fr));
       gap: 10px;
     }
+
+    .product-single__thumbs-wrap--slider .product-single__thumbs {
+      padding: 0 36px;
+    }
+
+    .product-single__thumbs-wrap--slider .product-single__thumb {
+      flex: 0 0 calc((100% - 72px - 2 * 10px) / 3);
+    }
   
     .product-single__title {
       font-size: 34px;
@@ -1014,4 +1089,3 @@
     display: none;
   }
 
-  

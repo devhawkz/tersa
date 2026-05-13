@@ -158,45 +158,71 @@ $tersa_main_image_sizes = '(min-width: 1201px) 50vw, 100vw';
 					<?php endif; ?>
 				</div>
 
-				<?php if (count($attachment_ids) > 1) : ?>
-					<div class="product-single__thumbs" role="list" aria-label="<?php echo esc_attr(function_exists('pll__') ? pll__('Minijature u galeriji') : __('Minijature u galeriji', 'tersa-shop')); ?>">
-						<?php foreach ($attachment_ids as $index => $attachment_id) : ?>
-							<?php
-							$thumb_url = wp_get_attachment_image_url($attachment_id, 'medium');
-							$full_url  = wp_get_attachment_image_url($attachment_id, 'full');
-
-							if (!$thumb_url || !$full_url) {
-								continue;
-							}
-
-							$large_srcset = (string) wp_get_attachment_image_srcset($attachment_id, $tersa_main_image_size);
-							?>
+				<?php if (count($attachment_ids) > 1) :
+					$tersa_thumbs_slider = count($attachment_ids) >= 4;
+					?>
+					<div class="product-single__thumbs-wrap<?php echo $tersa_thumbs_slider ? ' product-single__thumbs-wrap--slider' : ''; ?>"
+						<?php if ($tersa_thumbs_slider) : ?>data-tersa-thumbs-slider="1"<?php endif; ?>>
+						<?php if ($tersa_thumbs_slider) : ?>
 							<button
-								class="product-single__thumb<?php echo $index === 0 ? ' is-active' : ''; ?>"
 								type="button"
-								data-full-image="<?php echo esc_url($full_url); ?>"
-								data-large-image="<?php echo esc_url(wp_get_attachment_image_url($attachment_id, $tersa_main_image_size)); ?>"
-								data-large-srcset="<?php echo esc_attr($large_srcset); ?>"
-								data-large-sizes="<?php echo esc_attr($tersa_main_image_sizes); ?>"
-								data-image-id="<?php echo esc_attr((string) $attachment_id); ?>"
-								aria-label="<?php echo esc_attr(sprintf(function_exists('pll__') ? pll__('Prikaži sliku %d') : __('Prikaži sliku %d', 'tersa-shop'), $index + 1)); ?>"
-								aria-pressed="<?php echo $index === 0 ? 'true' : 'false'; ?>"
+								class="product-single__thumbs-nav product-single__thumbs-nav--prev"
+								data-tersa-thumbs-prev
+								aria-label="<?php echo esc_attr(function_exists('pll__') ? pll__('Prethodne slike') : __('Prethodne slike', 'tersa-shop')); ?>"
+								disabled
 							>
-								<?php
-								echo wp_get_attachment_image(
-									$attachment_id,
-									'thumbnail',
-									false,
-									[
-										'class'    => 'product-single__thumb-image',
-										'loading'  => 'lazy',
-										'decoding' => 'async',
-										'alt'      => '',
-									]
-								);
-								?>
+								<span aria-hidden="true">&#8249;</span>
 							</button>
-						<?php endforeach; ?>
+						<?php endif; ?>
+						<div class="product-single__thumbs" role="list" aria-label="<?php echo esc_attr(function_exists('pll__') ? pll__('Minijature u galeriji') : __('Minijature u galeriji', 'tersa-shop')); ?>">
+							<?php foreach ($attachment_ids as $index => $attachment_id) : ?>
+								<?php
+								$thumb_url = wp_get_attachment_image_url($attachment_id, 'medium');
+								$full_url  = wp_get_attachment_image_url($attachment_id, 'full');
+
+								if (!$thumb_url || !$full_url) {
+									continue;
+								}
+
+								$large_srcset = (string) wp_get_attachment_image_srcset($attachment_id, $tersa_main_image_size);
+								?>
+								<button
+									class="product-single__thumb<?php echo $index === 0 ? ' is-active' : ''; ?>"
+									type="button"
+									data-full-image="<?php echo esc_url($full_url); ?>"
+									data-large-image="<?php echo esc_url(wp_get_attachment_image_url($attachment_id, $tersa_main_image_size)); ?>"
+									data-large-srcset="<?php echo esc_attr($large_srcset); ?>"
+									data-large-sizes="<?php echo esc_attr($tersa_main_image_sizes); ?>"
+									data-image-id="<?php echo esc_attr((string) $attachment_id); ?>"
+									aria-label="<?php echo esc_attr(sprintf(function_exists('pll__') ? pll__('Prikaži sliku %d') : __('Prikaži sliku %d', 'tersa-shop'), $index + 1)); ?>"
+									aria-pressed="<?php echo $index === 0 ? 'true' : 'false'; ?>"
+								>
+									<?php
+									echo wp_get_attachment_image(
+										$attachment_id,
+										'thumbnail',
+										false,
+										[
+											'class'    => 'product-single__thumb-image',
+											'loading'  => 'lazy',
+											'decoding' => 'async',
+											'alt'      => '',
+										]
+									);
+									?>
+								</button>
+							<?php endforeach; ?>
+						</div>
+						<?php if ($tersa_thumbs_slider) : ?>
+							<button
+								type="button"
+								class="product-single__thumbs-nav product-single__thumbs-nav--next"
+								data-tersa-thumbs-next
+								aria-label="<?php echo esc_attr(function_exists('pll__') ? pll__('Sljedeće slike') : __('Sljedeće slike', 'tersa-shop')); ?>"
+							>
+								<span aria-hidden="true">&#8250;</span>
+							</button>
+						<?php endif; ?>
 					</div>
 				<?php endif; ?>
 			</div>
