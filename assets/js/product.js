@@ -15,13 +15,26 @@ document.addEventListener('DOMContentLoaded', function () {
         }
   
         var largeImage = thumb.getAttribute('data-large-image');
+        var largeSrcset = thumb.getAttribute('data-large-srcset');
+        var largeSizes = thumb.getAttribute('data-large-sizes');
         var fullImage = thumb.getAttribute('data-full-image');
-  
+
         if (largeImage) {
           mainImage.setAttribute('src', largeImage);
-          mainImage.setAttribute('srcset', '');
+
+          if (largeSrcset) {
+            mainImage.setAttribute('srcset', largeSrcset);
+          } else {
+            mainImage.removeAttribute('srcset');
+          }
+
+          if (largeSizes) {
+            mainImage.setAttribute('sizes', largeSizes);
+          } else {
+            mainImage.removeAttribute('sizes');
+          }
         }
-  
+
         if (fullImage) {
           mainImageLink.setAttribute('href', fullImage);
         }

@@ -12,7 +12,7 @@
     margin: 0 auto;
     padding: 28px clamp(20px, 4vw, 48px) 0;
     display: grid;
-    grid-template-columns: minmax(0, 1.08fr) minmax(420px, 0.82fr);
+    grid-template-columns: minmax(0, 1fr) minmax(420px, 0.9fr);
     gap: clamp(32px, 4vw, 56px);
     align-items: start;
   }
@@ -64,7 +64,7 @@
     display: block;
     width: 100%;
     height: auto;
-    aspect-ratio: 1 / 1.2;
+    aspect-ratio: 1 / 1;
     object-fit: cover;
   }
   

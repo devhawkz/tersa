@@ -90,6 +90,14 @@ if ($product->is_type('variable') && !empty($attachment_ids)) {
 		}
 	}
 }
+
+/*
+ * Glavna slika se renderuje u kvadratu (aspect-ratio 1/1) koji zauzima ~50vw u
+ * 2-kolonskom layoutu (≥1201px) i 100vw u 1-kolonskom (≤1200px). Eksplicitan
+ * sizes atribut sprečava da browser bira premalu varijantu na Retina ekranima.
+ */
+$tersa_main_image_size  = '1536x1536';
+$tersa_main_image_sizes = '(min-width: 1201px) 50vw, 100vw';
 ?>
 
 <?php do_action('woocommerce_before_single_product'); ?>
@@ -107,10 +115,10 @@ if ($product->is_type('variable') && !empty($attachment_ids)) {
 					class="product-single__main-media"
 					<?php if ($tersa_variation_gallery_reset_id > 0) : ?>
 						data-tersa-variation-gallery="1"
-						data-tersa-default-large="<?php echo esc_url(wp_get_attachment_image_url($tersa_variation_gallery_reset_id, 'large')); ?>"
+						data-tersa-default-large="<?php echo esc_url(wp_get_attachment_image_url($tersa_variation_gallery_reset_id, $tersa_main_image_size)); ?>"
 						data-tersa-default-full="<?php echo esc_url(wp_get_attachment_image_url($tersa_variation_gallery_reset_id, 'full')); ?>"
-						data-tersa-default-srcset="<?php echo esc_attr((string) wp_get_attachment_image_srcset($tersa_variation_gallery_reset_id, 'large')); ?>"
-						data-tersa-default-sizes="<?php echo esc_attr((string) wp_get_attachment_image_sizes($tersa_variation_gallery_reset_id, 'large')); ?>"
+						data-tersa-default-srcset="<?php echo esc_attr((string) wp_get_attachment_image_srcset($tersa_variation_gallery_reset_id, $tersa_main_image_size)); ?>"
+						data-tersa-default-sizes="<?php echo esc_attr($tersa_main_image_sizes); ?>"
 						data-tersa-default-alt="<?php echo esc_attr($tersa_variation_gallery_reset_alt); ?>"
 					<?php endif; ?>
 				>
@@ -133,12 +141,13 @@ if ($product->is_type('variable') && !empty($attachment_ids)) {
 							<?php
 							echo wp_get_attachment_image(
 								$main_image_id,
-								'large',
+								$tersa_main_image_size,
 								false,
 								[
 									'class'    => 'product-single__main-image',
 									'loading'  => 'eager',
 									'decoding' => 'async',
+									'sizes'    => $tersa_main_image_sizes,
 								'alt'      => $product_name,
 							]
 						);
@@ -159,12 +168,16 @@ if ($product->is_type('variable') && !empty($attachment_ids)) {
 							if (!$thumb_url || !$full_url) {
 								continue;
 							}
+
+							$large_srcset = (string) wp_get_attachment_image_srcset($attachment_id, $tersa_main_image_size);
 							?>
 							<button
 								class="product-single__thumb<?php echo $index === 0 ? ' is-active' : ''; ?>"
 								type="button"
 								data-full-image="<?php echo esc_url($full_url); ?>"
-								data-large-image="<?php echo esc_url(wp_get_attachment_image_url($attachment_id, 'large')); ?>"
+								data-large-image="<?php echo esc_url(wp_get_attachment_image_url($attachment_id, $tersa_main_image_size)); ?>"
+								data-large-srcset="<?php echo esc_attr($large_srcset); ?>"
+								data-large-sizes="<?php echo esc_attr($tersa_main_image_sizes); ?>"
 								data-image-id="<?php echo esc_attr((string) $attachment_id); ?>"
 								aria-label="<?php echo esc_attr(sprintf(function_exists('pll__') ? pll__('Prikaži sliku %d') : __('Prikaži sliku %d', 'tersa-shop'), $index + 1)); ?>"
 								aria-pressed="<?php echo $index === 0 ? 'true' : 'false'; ?>"
