@@ -6,38 +6,106 @@ if (!defined('ABSPATH')) {
 /**
  * Product single behavior:
  * - overwrite product tab titles
+ * - always show accordion tabs (even when empty)
+ * - remove duplicate H2 headings inside accordion panels
  * - pluralization for reviews count (Polylang-aware)
  */
 
-function tersa_woocommerce_product_tabs_override($tabs) {
+function tersa_product_tab_translate(string $string): string {
+	return function_exists('pll__') ? pll__($string) : __($string, 'tersa-shop');
+}
+
+function tersa_product_tab_empty_message(string $string): void {
+	echo '<p class="product-single__accordion-empty">' . esc_html(tersa_product_tab_translate($string)) . '</p>';
+}
+
+function tersa_product_has_description_content(): bool {
+	global $post;
+
+	if (!$post instanceof WP_Post) {
+		return false;
+	}
+
+	return trim(wp_strip_all_tags((string) $post->post_content)) !== '';
+}
+
+function tersa_product_has_additional_information(): bool {
 	global $product;
 
-	$_t = function (string $str): string {
-		return function_exists('pll__') ? pll__($str) : __($str, 'tersa-shop');
-	};
+	if (!$product instanceof WC_Product) {
+		return false;
+	}
 
-	$hr_titles = [
-		'description'            => $_t('Opis'),
-		'additional_information' => $_t('Dodatne informacije'),
+	return $product->has_attributes()
+		|| apply_filters('wc_product_enable_dimensions_display', $product->has_weight() || $product->has_dimensions());
+}
+
+function tersa_woocommerce_product_description_tab_panel(): void {
+	if (tersa_product_has_description_content()) {
+		woocommerce_product_description_tab();
+		return;
+	}
+
+	tersa_product_tab_empty_message('Još nema opisa.');
+}
+
+function tersa_woocommerce_product_additional_information_tab_panel(): void {
+	if (tersa_product_has_additional_information()) {
+		woocommerce_product_additional_information_tab();
+		return;
+	}
+
+	tersa_product_tab_empty_message('Nema dodatnih informacija.');
+}
+
+function tersa_woocommerce_product_reviews_tab_panel(): void {
+	if (!comments_open()) {
+		tersa_product_tab_empty_message('Recenzije nisu dostupne.');
+		return;
+	}
+
+	comments_template();
+}
+
+function tersa_woocommerce_product_tabs_override($tabs) {
+	global $product, $post;
+
+	if (!$product instanceof WC_Product || !$post instanceof WP_Post) {
+		return $tabs;
+	}
+
+	$review_count = (int) $product->get_review_count();
+
+	$tabs['description'] = [
+		'title'    => tersa_product_tab_translate('Opis'),
+		'priority' => 10,
+		'callback' => 'tersa_woocommerce_product_description_tab_panel',
 	];
 
-	foreach ($hr_titles as $key => $title) {
-		if (isset($tabs[$key]['title'])) {
-			$tabs[$key]['title'] = $title;
-		}
-	}
+	$tabs['additional_information'] = [
+		'title'    => tersa_product_tab_translate('Dodatne informacije'),
+		'priority' => 20,
+		'callback' => 'tersa_woocommerce_product_additional_information_tab_panel',
+	];
 
-	if (isset($tabs['reviews']) && $product instanceof WC_Product) {
-		$count = (int) $product->get_review_count();
-		$tabs['reviews']['title'] = sprintf(
-			function_exists('pll__') ? pll__('Recenzije (%d)') : __('Recenzije (%d)', 'tersa-shop'),
-			$count
-		);
-	}
+	$tabs['reviews'] = [
+		'title'    => sprintf(
+			tersa_product_tab_translate('Recenzije (%d)'),
+			$review_count
+		),
+		'priority' => 30,
+		'callback' => 'tersa_woocommerce_product_reviews_tab_panel',
+	];
 
 	return $tabs;
 }
-add_filter('woocommerce_product_tabs', 'tersa_woocommerce_product_tabs_override', 20);
+add_filter('woocommerce_product_tabs', 'tersa_woocommerce_product_tabs_override', 99);
+
+/**
+ * Accordion toggle već prikazuje naslov taba — ukloni dupli H2 iz WC tab šablona.
+ */
+add_filter('woocommerce_product_description_heading', '__return_empty_string');
+add_filter('woocommerce_product_additional_information_heading', '__return_empty_string');
 
 function tersa_woocommerce_ngettext_reviews_plural($translation, $single, $plural, $number, $domain) {
 	if ($domain !== 'woocommerce') {

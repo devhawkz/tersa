@@ -22,6 +22,9 @@ function tersa_pll_register_reviews_strings(): void {
 	pll_register_string('tersa_product_aria_nav', 'Navigacija', 'Tersa – proizvod (pristupačnost)', ['multiline' => false]);
 
 	pll_register_string('tersa_wc_reviews_none', 'Još nema recenzija.', 'Tersa – WooCommerce (recenzije)', ['multiline' => false]);
+	pll_register_string('tersa_wc_description_none', 'Još nema opisa.', 'Tersa – proizvod (accordion)', ['multiline' => false]);
+	pll_register_string('tersa_wc_additional_info_none', 'Nema dodatnih informacija.', 'Tersa – proizvod (accordion)', ['multiline' => false]);
+	pll_register_string('tersa_wc_reviews_unavailable', 'Recenzije nisu dostupne.', 'Tersa – proizvod (accordion)', ['multiline' => false]);
 	pll_register_string('tersa_wc_add_review', 'Dodaj recenziju', 'Tersa – WooCommerce (recenzije)', ['multiline' => false]);
 	pll_register_string('tersa_wc_first_review', 'Budite prvi koji će recenzirati &ldquo;%s&rdquo;', 'Tersa – WooCommerce (recenzije)', ['multiline' => false]);
 	pll_register_string('tersa_wc_reply_to', 'Odgovor na %s', 'Tersa – WooCommerce (recenzije)', ['multiline' => false]);

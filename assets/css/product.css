@@ -157,7 +157,6 @@
     width: 100%;
     height: auto;
     aspect-ratio: 1 / 1;
-    object-fit: cover;
   }
   
   .product-single__badges {
@@ -785,6 +784,16 @@
   .product-single__accordion.is-open .product-single__accordion-content {
     opacity: 1;
     transform: translateY(0);
+  }
+
+  .product-single__accordion-empty {
+    margin: 0;
+    color: #888888;
+    font-style: italic;
+  }
+
+  .product-single__accordion-content .woocommerce-Reviews-title {
+    display: none;
   }
   
   /* plugin swatches basic alignment */

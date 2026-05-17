@@ -944,13 +944,12 @@
   }
   
   .site-header__cart-body .tersa-mini-cart__thumb img {
-    display: block !important;
-    width: 128px !important;
-    height: 148px !important;
-    margin: 0 !important;
-    float: none !important;
-    object-fit: cover !important;
-    box-shadow: none !important;
+    display: block;
+    width: 100%!important;
+    height: 100%!important;
+    margin: 0;
+    float: none;
+    box-shadow: none;
   }
   
   .site-header__cart-body .tersa-mini-cart__content {

@@ -397,7 +397,7 @@
    
    .entry-content,
    .page-content {
-     width: min(100%, var(--content-measure-wide));
+     width: 100%
    }
    
    .entry-content > * + *,
