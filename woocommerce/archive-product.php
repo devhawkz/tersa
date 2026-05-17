@@ -326,7 +326,6 @@ $reset_url = function_exists('tersa_get_archive_reset_url')
 												<span class="shop-archive__filter-check" aria-hidden="true"></span>
 												<span class="shop-archive__filter-text">
 													<?php echo esc_html($term->name); ?>
-													<span class="shop-archive__filter-count">(<?php echo esc_html((string) $term->count); ?>)</span>
 												</span>
 											</label>
 										</li>
