@@ -15,7 +15,7 @@
 .home-bestsellers__inner {
   width: min(100%, 1600px);
   margin: 0 auto;
-  padding: 0 clamp(20px, 4vw, 48px);
+  /* padding: 0 clamp(20px, 4vw, 48px); */
 }
 
 .home-bestsellers__title {

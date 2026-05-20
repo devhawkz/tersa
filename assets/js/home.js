@@ -72,10 +72,18 @@ document.addEventListener('DOMContentLoaded', () => {
 
       let autoplayTimerId = null;
 
+      // Minimum 4000ms — sprečavamo prebrzo automatsko menjanje slidova
+      // koje korisnicima ne ostavlja dovoljno vremena da pročitaju sadržaj.
+      const MIN_AUTOPLAY_MS = 4000;
+      const DEFAULT_AUTOPLAY_MS = 5000;
+
       const parseAutoplayMs = () => {
         const raw = slider.getAttribute('data-autoplay-ms');
         const n = raw ? Number.parseInt(raw, 10) : NaN;
-        return Number.isFinite(n) && n >= 3000 ? n : 3000;
+        if (!Number.isFinite(n)) {
+          return DEFAULT_AUTOPLAY_MS;
+        }
+        return Math.max(n, MIN_AUTOPLAY_MS);
       };
 
       const autoplayMs = parseAutoplayMs();

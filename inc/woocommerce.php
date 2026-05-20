@@ -12,3 +12,4 @@ require_once $base . 'single.php';        // product single behavior (tabs/revie
 require_once $base . 'cart-drawer.php';   // mini-cart + cart block append (bestsellers)
 require_once $base . 'ajax.php';          // custom AJAX endpoints (drawer fragments)
 require_once $base . 'cache.php';         // transient/cache handling + cart fragment cache
+require_once $base . 'checkout.php';      // payment + security badges on checkout (CorvusPay)

@@ -1,0 +1,197 @@
+/* =========================================================
+   TERSA — Payment & Security Badges
+   File: assets/css/payment-badges.css
+   Used: checkout (woocommerce_review_order_after_payment),
+         + manually (template-parts/woocommerce/payment-security-badges.php)
+         na stranicama "Načini plaćanja" / "Izjava o sigurnosti".
+   ========================================================= */
+
+.payment-security-badges {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  margin: 24px 0 0;
+  padding: 24px 22px;
+  border: 1px solid rgba(17, 17, 17, 0.08);
+  border-radius: 6px;
+  background: #ffffff;
+}
+
+.payment-security-badges--dark {
+  background: #1a1c20;
+  border-color: rgba(255, 255, 255, 0.08);
+  color: #ffffff;
+}
+
+.payment-security-badges__title {
+  margin: 0;
+  font-family: var(--font-body);
+  font-size: 1.05rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: #111;
+}
+
+.payment-security-badges--dark .payment-security-badges__title {
+  color: #fff;
+}
+
+.payment-security-badges__group {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.payment-security-badges__subheading {
+  margin: 0;
+  font-family: var(--font-body);
+  font-size: 0.78rem;
+  font-weight: 500;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: #6f6f6f;
+}
+
+.payment-security-badges--dark .payment-security-badges__subheading {
+  color: rgba(255, 255, 255, 0.6);
+}
+
+.payment-security-badges__list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  align-items: center;
+}
+
+.payment-security-badges__item {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Kartice — 72×35 px (usklađeno s footerom) */
+.payment-security-badges__list--cards .payment-security-badges__item {
+  width: 72px;
+  height: 35px;
+}
+
+.payment-security-badges__list--cards .payment-security-badges__item a {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+  padding: 2px;
+  border: 1px solid rgba(17, 17, 17, 0.08);
+  border-radius: 4px;
+  background: #ffffff;
+  transition: border-color var(--transition-fast, 0.15s ease),
+    background-color var(--transition-fast, 0.15s ease);
+}
+
+.payment-security-badges__list--cards .payment-security-badges__item a:hover {
+  border-color: rgba(17, 17, 17, 0.18);
+  background: #fafafa;
+}
+
+.payment-security-badges__icon {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+/* Sigurnosni logotipi — 100×35 px (stranice nacin-placanja / izjava o sigurnosti) */
+.payment-security-badges__list--security {
+  gap: 8px;
+}
+
+.payment-security-badges__item--security {
+  width: 100px;
+  height: 35px;
+}
+
+.payment-security-badges__item--security a {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+  padding: 2px;
+  border: 1px solid rgba(17, 17, 17, 0.08);
+  border-radius: 4px;
+  background: #ffffff;
+  transition: opacity var(--transition-fast, 0.15s ease),
+    border-color var(--transition-fast, 0.15s ease);
+}
+
+.payment-security-badges__item--security a:hover {
+  opacity: 0.9;
+  border-color: rgba(17, 17, 17, 0.18);
+}
+
+.payment-security-badges__icon--security {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+.payment-security-badges--dark .payment-security-badges__item--security a {
+  border-color: rgba(255, 255, 255, 0.12);
+  background: rgba(255, 255, 255, 0.06);
+}
+
+/* CorvusPay logo */
+.payment-security-badges__group--corvuspay {
+  align-self: flex-start;
+  padding-top: 6px;
+  border-top: 1px dashed rgba(17, 17, 17, 0.08);
+}
+
+.payment-security-badges--dark .payment-security-badges__group--corvuspay {
+  border-top-color: rgba(255, 255, 255, 0.1);
+}
+
+.payment-security-badges__corvuspay {
+  display: inline-flex;
+  align-items: center;
+  height: 32px;
+  transition: opacity var(--transition-fast, 0.15s ease);
+}
+
+.payment-security-badges__corvuspay:hover {
+  opacity: 0.85;
+}
+
+.payment-security-badges__corvuspay-icon {
+  display: block;
+  height: 100%;
+  width: auto;
+}
+
+/* Mobile */
+@media (max-width: 640px) {
+  .payment-security-badges {
+    padding: 18px 16px;
+    gap: 14px;
+  }
+
+  .payment-security-badges__title {
+    font-size: 0.95rem;
+  }
+
+  .payment-security-badges__list--cards .payment-security-badges__item {
+    width: 64px;
+    height: 32px;
+  }
+
+  .payment-security-badges__item--security {
+    width: 88px;
+    height: 32px;
+  }
+}

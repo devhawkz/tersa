@@ -188,6 +188,16 @@ function tersa_enqueue_assets() {
 		);
 	}
 
+	// Payment & security badges — checkout (po CorvusPay "Standardi logotipa v3.4" obavezno).
+	if (function_exists('is_checkout') && is_checkout() && (!function_exists('is_order_received_page') || !is_order_received_page())) {
+		wp_enqueue_style(
+			'tersa-payment-badges',
+			$theme_uri . '/assets/css/payment-badges.css',
+			['tersa-base'],
+			tersa_asset_ver('assets/css/payment-badges.css')
+		);
+	}
+
 	if (is_404()) {
 		wp_enqueue_style(
 			'tersa-404',

@@ -159,6 +159,17 @@
     font-size: clamp(1.05rem, 1.4vw, 1.25rem);
     line-height: 1.55;
   }
+
+  .contact-card__rich-text,
+  .contact-card__rich-text p {
+    color: #8a8a8a;
+    font-size: clamp(1.05rem, 1.4vw, 1.25rem);
+    line-height: 1.55;
+  }
+
+  .contact-card__rich-text > * {
+    margin: 0;
+  }
   
   .contact-card__block a {
     color: #111;
@@ -168,7 +179,43 @@
   .contact-card__block a:hover {
     color: var(--c-accent);
   }
-  
+
+  /* Impressum (pravni podaci) - kompaktna definicijska lista */
+  .contact-card__block--impressum {
+    padding: clamp(32px, 5vw, 80px);
+    border-top: 1px solid rgba(0, 0, 0, 0.08);
+  }
+
+  .contact-card__impressum {
+    display: grid;
+    grid-template-columns: minmax(140px, max-content) 1fr;
+    gap: 4px 16px;
+    margin: 8px 0 0;
+    font-size: clamp(0.95rem, 1.2vw, 1.05rem);
+    line-height: 1.5;
+  }
+
+  .contact-card__impressum dt {
+    color: #8a8a8a;
+    font-weight: 400;
+  }
+
+  .contact-card__impressum dd {
+    margin: 0;
+    color: #111;
+    font-weight: 500;
+  }
+
+  .contact-card__impressum dd small {
+    color: #8a8a8a;
+    font-size: 0.85em;
+    font-weight: 400;
+  }
+
+  .contact-card__impressum dd a {
+    color: #111;
+  }
+
   .contact-card__form {
     min-width: 0;
   }
@@ -294,6 +341,20 @@
     .contact-card__block p,
     .contact-card__form {
       text-align: center;
+    }
+
+    .contact-card__impressum {
+      grid-template-columns: 1fr;
+      gap: 0 0;
+      text-align: center;
+    }
+
+    .contact-card__impressum dt {
+      margin-top: 8px;
+    }
+
+    .contact-card__impressum dt:first-child {
+      margin-top: 0;
     }
   }
   

@@ -26,7 +26,7 @@
   
   .site-footer__grid {
     display: grid;
-    grid-template-columns: 1.2fr 1fr 1.3fr;
+    grid-template-columns: 1.2fr 1fr 1fr 1.3fr;
     gap: clamp(28px, 4vw, 56px);
     align-items: start;
   }
@@ -82,6 +82,14 @@
   .site-footer__company p {
     margin: 0;
     color: rgba(255, 255, 255, 0.76);
+  }
+
+  .site-footer__company-address {
+    color: rgba(255, 255, 255, 0.76);
+  }
+
+  .site-footer__company-address > * {
+    margin: 0;
   }
   
   .site-footer__company a {
@@ -221,8 +229,9 @@
   
   .site-footer__bottom-inner {
     min-height: 82px;
+    padding: 18px 0;
     display: grid;
-    grid-template-columns: 1fr 1fr 1fr;
+    grid-template-columns: minmax(150px, 1fr) minmax(0, auto) minmax(150px, 1fr);
     gap: 24px;
     align-items: center;
     justify-items: stretch;
@@ -248,41 +257,146 @@
     text-align: center;
     color: rgba(255, 255, 255, 0.62);
   }
-  
-  /* PAYMENTS*/
 
-  .site-footer__payments {
+  .site-footer__bottom-brand {
     display: flex;
-    flex-wrap: wrap;
-    gap: 0.75rem;
-    margin: 0;
-    padding: 0;
-    list-style: none;
-    justify-content: flex-end;
+    align-items: center;
+    justify-content: flex-start;
+    min-width: 0;
+  }
+
+  .site-footer__bottom-center {
+    justify-self: center;
+    text-align: center;
+    min-width: 0;
   }
   
+  /* BOTTOM ROW — CorvusPay lijevo, copyright u sredini, kartice desno */
+  .site-footer__bottom-left {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    justify-self: start;
+    min-width: 0;
+  }
+
+  /* IMPRESSUM (HR ZTD čl. 21, ZET čl. 6 — obavezno na svakoj stranici) */
+  .site-footer__impressum {
+    margin: 0;
+    color: rgba(255, 255, 255, 0.55);
+    font-size: 0.72rem;
+    line-height: 1.5;
+  }
+
+  .site-footer__impressum-line {
+    margin: 0 0 1px;
+    font-style: normal;
+  }
+
+  .site-footer__impressum-line:last-child {
+    margin-bottom: 0;
+  }
+
+  .site-footer__impressum-line strong {
+    color: rgba(255, 255, 255, 0.85);
+    font-weight: 600;
+  }
+
+  /* PAYMENTS (logotipi kartica + CorvusPay) */
+
+  .site-footer__payments-wrap {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    justify-self: end;
+    min-width: 0;
+  }
+
+  .site-footer__payments-row {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 8px;
+    justify-content: flex-end;
+  }
+
+  /**
+   * Bijeli "rack" — pozadine logotipa kartica se ne smiju mijenjati po brand standardima v3.4.
+   * Maestro/Visa/Diners/Discover imaju tamne komponente koje na tamnoj pozadini ne bi imale
+   * dovoljan kontrast, pa zadržavamo bijeli rack (preporučeno u brand kit-u).
+   */
+  .site-footer__payments-rack,
+  .site-footer__security-rack {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin: 0;
+    padding: 6px 10px;
+    list-style: none;
+    background: #ffffff;
+    border-radius: 6px;
+    border: 1px solid rgba(0, 0, 0, 0.06);
+    align-items: center;
+  }
+
+  /* Kartice — 72×35 px (usklađeno s checkout blokom) */
   .site-footer__payment-badge {
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    min-height: 44px;
-    padding: 0.625rem 1rem;
-    color: #ffffff;
-    font-size: 0.95rem;
-    line-height: 1;
+    margin: 0;
+    width: 72px;
+    height: 35px;
+    flex-shrink: 0;
   }
-  
-  .site-footer__payment-badge--icon {
-    padding: 0.625rem 0.875rem;
+
+  /* Sigurnosni logotipi — šire ćelije (Diners sigurna kupnja je horizontalan) */
+  .site-footer__payment-badge--security {
+    width: 100px;
+    height: 35px;
   }
-  
+
+  .site-footer__payment-badge a {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    height: 100%;
+    padding: 2px;
+    border-radius: 4px;
+    transition: background-color var(--transition-fast, 0.15s ease);
+  }
+
+  .site-footer__payment-badge a:hover {
+    background: rgba(0, 0, 0, 0.05);
+  }
+
   .site-footer__payment-icon {
     display: block;
-    width: 56px;
-    height: auto;
-    fill: currentColor;
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
   }
-  
+
+  /* CorvusPay logo — negativ verzija na tamnoj pozadini footera */
+  .site-footer__corvuspay {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    height: 34px;
+    transition: opacity var(--transition-fast, 0.15s ease);
+  }
+
+  .site-footer__corvuspay:hover {
+    opacity: 0.85;
+  }
+
+  .site-footer__corvuspay-icon {
+    display: block;
+    height: 100%;
+    width: auto;
+  }
+
   .screen-reader-text {
     position: absolute;
     width: 1px;
@@ -299,20 +413,7 @@
   
   @media (max-width: 1100px) {
     .site-footer__grid {
-      grid-template-columns: 1fr 1fr 1fr;
-    }
-    
-    .site-footer__bottom-inner {
-      grid-template-columns: 1fr 1fr 1fr;
-      justify-items: center;
-    }
-  
-    .site-footer__copyright {
-      text-align: left;
-    }
-  
-    .site-footer__payments {
-      justify-content: flex-start;
+      grid-template-columns: 1fr 1fr;
     }
   }
   
@@ -325,16 +426,33 @@
     .site-footer__grid {
       grid-template-columns: 1fr;
     }
+
     .site-footer__bottom-inner {
-      grid-template-columns: 1fr ;
+      grid-template-columns: 1fr;
       justify-items: center;
-    }
-    
-  
-    .site-footer__bottom-inner {
       gap: 18px;
       padding: 20px 0 24px;
-      justify-items: center;
+    }
+
+    .site-footer__bottom-brand,
+    .site-footer__bottom-center {
+      justify-content: center;
+      justify-self: center;
+      text-align: center;
+    }
+
+    .site-footer__payments-wrap {
+      justify-content: center;
+      justify-self: center;
+    }
+
+    .site-footer__payments-row {
+      justify-content: center;
+    }
+
+    .site-footer__impressum {
+      text-align: center;
+      font-size: 0.7rem;
     }
 
     .site-footer .site-footer__newsletter-form {

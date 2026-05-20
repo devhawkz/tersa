@@ -257,15 +257,16 @@
   .home-hero__img {
     display: block;
     width: 100%;
+    /*
     max-width: 590px;
     height: auto;
-    object-fit: contain;
+    object-fit: contain;*/
   }
   
   .home-hero__badge {
     position: absolute;
-    top: -4%;
-    left: -4%;
+    top: -14%;
+    left: -8%;
     z-index: 3;
     width: clamp(120px, 11vw, 190px);
     height: clamp(120px, 11vw, 190px);
@@ -377,10 +378,10 @@
     }
   
     .home-hero__badge {
-      top: -7%;
-      left: 18%;
-      width: 150px;
-      height: 150px;
+      top: -14%;
+      left: 15%;
+      width: 9.375rem;
+      height: 9.375rem;
     }
     .home-hero__badge-top, 
     .home-hero__badge-bottom{
@@ -441,11 +442,17 @@
     }
   
     .home-hero__badge {
-      top: 67%;
       left: 18%;
-      width: 124px;
-      height: 124px;
+      width: 6.8rem;
+      height: 6.8rem;
       padding: 10px;
+    }
+    .home-hero__badge-top,
+    .home-hero__badge-bottom{
+        font-size: 6px;
+    }
+    .home-hero__badge-main{
+        font-size: 26px;
     }
   
     .home-hero__badge-main {
@@ -481,9 +488,23 @@
   @media (max-width: 450px) {
     .home-hero__badge{
         left:0%;
+        width: 5.25rem;
+        height: 5.25rem;
+    }
+    .home-hero__badge-main{
+        font-size: 20px;
+    }
+    .home-hero__badge-top,
+    .home-hero__badge-bottom{
+        font-size: 8px;
     }
   }
-
+@media (max-width: 375px) {
+  .home-hero__badge{
+    top:72%;
+    left: 80%;
+  }
+}
   @media (prefers-reduced-motion: reduce) {
     .home-hero__slide::before,
     .home-hero__content,
@@ -511,7 +532,7 @@
   .home-shop-categories__inner {
     width: min(100%, 1600px);
     margin: 0 auto;
-    padding: 0 clamp(20px, 4vw, 48px);
+    /* padding: 0 clamp(20px, 4vw, 48px); */
   }
   
   .home-shop-categories__title {
@@ -732,7 +753,7 @@
   .home-promo-banners__inner {
     width: min(100%, 1600px);
     margin: 0 auto;
-    padding: 0 clamp(20px, 4vw, 48px);
+    /* padding: 0 clamp(20px, 4vw, 48px); */
   }
   
   .home-promo-banners__grid {
@@ -759,14 +780,14 @@
     display: block;
     overflow: hidden;
     background: #e9e9e9;
-    aspect-ratio: 1 / 1.08;
+    /* aspect-ratio: 1 / 1.08; */
   }
   
   .home-promo-banners__image {
     display: block;
     width: 100%;
     height: 100%;
-    object-fit: cover;
+  
   }
   
   .home-promo-banners__frame {
@@ -1131,3 +1152,5 @@
       max-width: 100%;
     }
   }
+
+ 

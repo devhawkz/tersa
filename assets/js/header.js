@@ -1,4 +1,39 @@
 document.addEventListener('DOMContentLoaded', function () {
+  // ─── Sticky shrink header on scroll ──────────────────────────────────
+  // Smanjuje visinu i veličinu logotipa nakon što korisnik skrola dolje,
+  // kako sticky header ne bi zaklanjao previše vidljive površine.
+  (function initStickyShrink() {
+    var siteHeader = document.querySelector('.site-header');
+    if (!siteHeader) {
+      return;
+    }
+
+    var SCROLL_THRESHOLD = 60;
+    var ticking = false;
+    var isScrolled = false;
+
+    function applyState() {
+      ticking = false;
+      var nextScrolled = window.scrollY > SCROLL_THRESHOLD;
+      if (nextScrolled === isScrolled) {
+        return;
+      }
+      isScrolled = nextScrolled;
+      siteHeader.classList.toggle('is-scrolled', isScrolled);
+    }
+
+    function onScroll() {
+      if (ticking) {
+        return;
+      }
+      ticking = true;
+      window.requestAnimationFrame(applyState);
+    }
+
+    applyState();
+    window.addEventListener('scroll', onScroll, { passive: true });
+  })();
+
   var menuToggle = document.querySelector('.site-header__toggle');
   var mobileNavigation = document.getElementById('mobile-navigation');
   var mobileBackdrop = document.querySelector('.site-header__mobile-backdrop');
