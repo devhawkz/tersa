@@ -735,6 +735,13 @@ document.addEventListener('DOMContentLoaded', function () {
   }
 
   var isRefreshingCartDrawer = false;
+  var pendingCartDrawerRefresh = false;
+  var cartDrawerRefreshVersion = 0;
+
+  function invalidateCartDrawerRefreshes() {
+    cartDrawerRefreshVersion += 1;
+  }
+
   function removeWooNotices() {
     // WooCommerce JS client-side ubacuje <a class="added_to_cart wc-forward"> odmah posle dugmeta.
     document.querySelectorAll('a.added_to_cart.wc-forward, a.added_to_cart.wc_forward').forEach(function (el) {
@@ -760,8 +767,8 @@ document.addEventListener('DOMContentLoaded', function () {
   }
 
   function refreshCartDrawerAndBadge() {
-    if (!window.tersaCartDrawer || isRefreshingCartDrawer) {
-      if (!window.tersaCartDrawer && !cartDrawerHydrated) {
+    if (!window.tersaCartDrawer) {
+      if (!cartDrawerHydrated) {
         var missingConfigContent = document.querySelector('#cart-drawer .widget_shopping_cart_content');
         if (missingConfigContent) {
           missingConfigContent.textContent = (window.tersaHeaderI18n && window.tersaHeaderI18n.cartLoadError)
@@ -772,8 +779,15 @@ document.addEventListener('DOMContentLoaded', function () {
       return;
     }
 
+    if (isRefreshingCartDrawer) {
+      pendingCartDrawerRefresh = true;
+      return;
+    }
+
     isRefreshingCartDrawer = true;
+    pendingCartDrawerRefresh = false;
     removeWooNotices();
+    var refreshVersion = cartDrawerRefreshVersion;
 
     var body = new URLSearchParams();
     var fragmentsUrl = getCartAjaxUrl('fragments');
@@ -808,6 +822,10 @@ document.addEventListener('DOMContentLoaded', function () {
           return;
         }
 
+        if (refreshVersion !== cartDrawerRefreshVersion) {
+          return;
+        }
+
         updateCartDrawerContent(data.data.mini_cart_html, data.data.cart_count);
         cartDrawerHydrated = true;
 
@@ -825,20 +843,18 @@ document.addEventListener('DOMContentLoaded', function () {
       })
       .finally(function () {
         isRefreshingCartDrawer = false;
+        if (pendingCartDrawerRefresh) {
+          refreshCartDrawerAndBadge();
+        }
       });
   }
 
   function bindMiniCartQtyActions() {
     document.addEventListener('click', function (event) {
-      // Klik na "trash" (remove) u cart drawer-u:
-      // WooCommerce često radi uklanjanje async, ali badge nije uvek odmah osvežen.
-      if (window.tersaCartDrawer) {
-        var removeLink = event.target.closest('#cart-drawer .remove_from_cart_button');
-        if (removeLink) {
-          // Malo kašnjenja da WooCommerce prvo izvrši promenu košarice.
-          setTimeout(refreshCartDrawerAndBadge, 250);
-          return;
-        }
+      var removeLink = event.target.closest('#cart-drawer .remove_from_cart_button');
+      if (removeLink) {
+        invalidateCartDrawerRefreshes();
+        return;
       }
 
       var button = event.target.closest('.tersa-mini-cart__qty-btn');
@@ -866,6 +882,7 @@ document.addEventListener('DOMContentLoaded', function () {
       }
 
       qtyWrap.classList.add('is-loading');
+      invalidateCartDrawerRefreshes();
 
       var body = new URLSearchParams();
       var qtyUrl = getCartAjaxUrl('qty');
@@ -1009,6 +1026,7 @@ document.addEventListener('DOMContentLoaded', function () {
   if (window.jQuery) {
     window.jQuery(document.body).on('added_to_cart', function () {
       // Odmah ukloni šta god je već tu, ali WC JS dodaje link malo kasnije pa ponovi čišćenje.
+      invalidateCartDrawerRefreshes();
       removeWooNotices();
       setTimeout(removeWooNotices, 0);
       setTimeout(removeWooNotices, 200);
@@ -1020,9 +1038,22 @@ document.addEventListener('DOMContentLoaded', function () {
       removeWooNotices();
     });
 
-    // Osveži drawer + badge posle uklanjanja iz košarice ili ažuriranja totals-a.
+    // WooCommerce already refreshes mini-cart fragments after remove/add.
+    // Running our own refresh at the same time can overwrite the fresh WC fragment
+    // with an older response, which makes a removed item appear again in the drawer.
+    window.jQuery(document.body).on('removed_from_cart', function () {
+      invalidateCartDrawerRefreshes();
+      removeWooNotices();
+    });
+
+    window.jQuery(document.body).on('wc_fragments_loaded wc_fragments_refreshed', function () {
+      removeWooNotices();
+    });
+
+    // Osveži drawer + badge posle ažuriranja totals-a / cart page DOM-a.
     // Ovo obuhvata i slučaj kada količinu menjate preko input/selecta u drawer-u.
-    window.jQuery(document.body).on('removed_from_cart updated_cart_totals wc_fragments_loaded wc_fragments_refreshed updated_wc_div', function () {
+    window.jQuery(document.body).on('updated_cart_totals updated_wc_div', function () {
+      invalidateCartDrawerRefreshes();
       removeWooNotices();
       refreshCartDrawerAndBadge();
     });
