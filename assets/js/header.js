@@ -8,13 +8,17 @@ document.addEventListener('DOMContentLoaded', function () {
       return;
     }
 
-    var SCROLL_THRESHOLD = 60;
+    var SCROLL_ENTER_THRESHOLD = 96;
+    var SCROLL_EXIT_THRESHOLD = 48;
     var ticking = false;
     var isScrolled = false;
 
     function applyState() {
       ticking = false;
-      var nextScrolled = window.scrollY > SCROLL_THRESHOLD;
+      var nextScrolled = isScrolled
+        ? window.scrollY > SCROLL_EXIT_THRESHOLD
+        : window.scrollY > SCROLL_ENTER_THRESHOLD;
+
       if (nextScrolled === isScrolled) {
         return;
       }
