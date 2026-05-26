@@ -737,9 +737,23 @@ document.addEventListener('DOMContentLoaded', function () {
   var isRefreshingCartDrawer = false;
   var pendingCartDrawerRefresh = false;
   var cartDrawerRefreshVersion = 0;
+  var cartDrawerSyncTimer = null;
 
   function invalidateCartDrawerRefreshes() {
     cartDrawerRefreshVersion += 1;
+  }
+
+  function syncCartDrawerSoon(delay) {
+    invalidateCartDrawerRefreshes();
+
+    if (cartDrawerSyncTimer) {
+      clearTimeout(cartDrawerSyncTimer);
+    }
+
+    cartDrawerSyncTimer = setTimeout(function () {
+      cartDrawerSyncTimer = null;
+      refreshCartDrawerAndBadge();
+    }, typeof delay === 'number' ? delay : 0);
   }
 
   function removeWooNotices() {
@@ -847,6 +861,110 @@ document.addEventListener('DOMContentLoaded', function () {
           refreshCartDrawerAndBadge();
         }
       });
+  }
+
+  function getBlocksCartSignature(cartData) {
+    if (!cartData || !Array.isArray(cartData.items)) {
+      return '';
+    }
+
+    return cartData.items.map(function (item) {
+      return [
+        item.key || item.id || '',
+        typeof item.quantity === 'number' ? item.quantity : ''
+      ].join(':');
+    }).join('|');
+  }
+
+  function initCartPageDrawerSync() {
+    var hasCartPage = document.body.classList.contains('woocommerce-cart') ||
+      document.querySelector('.woocommerce-cart-form, .wp-block-woocommerce-cart, .wc-block-cart');
+
+    if (!hasCartPage || !window.tersaCartDrawer) {
+      return;
+    }
+
+    document.addEventListener('click', function (event) {
+      if (
+        event.target.closest('.woocommerce-cart-form .product-remove > a') ||
+        event.target.closest('.wc-block-cart-item__remove-link')
+      ) {
+        syncCartDrawerSoon(350);
+      }
+    });
+
+    document.addEventListener('change', function (event) {
+      if (
+        event.target.closest('.woocommerce-cart-form input.qty') ||
+        event.target.closest('.wc-block-components-quantity-selector input')
+      ) {
+        syncCartDrawerSoon(650);
+      }
+    });
+
+    function initBlocksCartStoreSync(attempt) {
+      if (!window.wp || !window.wp.data || typeof window.wp.data.subscribe !== 'function') {
+        if (attempt < 20) {
+          setTimeout(function () {
+            initBlocksCartStoreSync(attempt + 1);
+          }, 250);
+        }
+        return;
+      }
+
+      var selectCartStore = function () {
+        try {
+          if (window.wc && window.wc.wcBlocksData && window.wc.wcBlocksData.cartStore) {
+            return window.wp.data.select(window.wc.wcBlocksData.cartStore);
+          }
+
+          return window.wp.data.select('wc/store/cart');
+        } catch (error) {
+          return null;
+        }
+      };
+
+      var cartStore = selectCartStore();
+      if (!cartStore || typeof cartStore.getCartData !== 'function') {
+        if (attempt < 20) {
+          setTimeout(function () {
+            initBlocksCartStoreSync(attempt + 1);
+          }, 250);
+        }
+        return;
+      }
+
+      var lastSettledSignature = getBlocksCartSignature(cartStore.getCartData());
+      var wasPending = typeof cartStore.hasPendingItemsOperations === 'function'
+        ? cartStore.hasPendingItemsOperations()
+        : false;
+
+      window.wp.data.subscribe(function () {
+        var store = selectCartStore();
+        if (!store || typeof store.getCartData !== 'function') {
+          return;
+        }
+
+        var isPending = typeof store.hasPendingItemsOperations === 'function'
+          ? store.hasPendingItemsOperations()
+          : false;
+        var signature = getBlocksCartSignature(store.getCartData());
+
+        if (isPending) {
+          wasPending = true;
+          return;
+        }
+
+        if (signature !== lastSettledSignature) {
+          syncCartDrawerSoon(wasPending ? 0 : 150);
+          lastSettledSignature = signature;
+        }
+
+        wasPending = false;
+      });
+    }
+
+    initBlocksCartStoreSync(0);
   }
 
   function bindMiniCartQtyActions() {
@@ -1050,12 +1168,11 @@ document.addEventListener('DOMContentLoaded', function () {
       removeWooNotices();
     });
 
-    // Osveži drawer + badge posle ažuriranja totals-a / cart page DOM-a.
-    // Ovo obuhvata i slučaj kada količinu menjate preko input/selecta u drawer-u.
-    window.jQuery(document.body).on('updated_cart_totals updated_wc_div', function () {
-      invalidateCartDrawerRefreshes();
+    // Osveži drawer + badge posle ažuriranja cart stranice.
+    // Classic cart okida ove evente posle brisanja artikla i promene količine.
+    window.jQuery(document.body).on('updated_cart_totals updated_wc_div item_removed_from_classic_cart wc_cart_emptied', function () {
       removeWooNotices();
-      refreshCartDrawerAndBadge();
+      syncCartDrawerSoon(0);
     });
   } else {
     document.body.addEventListener('added_to_cart', function () {
@@ -1067,6 +1184,7 @@ document.addEventListener('DOMContentLoaded', function () {
   }
 
   bindMiniCartQtyActions();
+  initCartPageDrawerSync();
 
   // Hover/focus prefetch na cart ikonicu:
   // AJAX fetch kreće čim korisnik pomjeri miš prema dugmetu (tipično 100-200ms
