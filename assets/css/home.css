@@ -555,10 +555,13 @@
   
   .home-shop-categories__item {
     display: flex;
+    flex-direction: column;
     align-items: center;
-    gap: 18px;
-    min-height: 110px;
+    justify-content: flex-start;
+    gap: 14px;
+    min-height: 160px;
     color: #111111;
+    text-align: center;
     text-decoration: none;
   }
   
@@ -579,19 +582,16 @@
   
   .home-shop-categories__icon-bg {
     position: absolute;
-    top: 18px;
-    right: 8px;
-    width: 66px;
-    height: 66px;
-    border-radius: 50%;
-    background-color: #ecd1c7;
+    width: 120px;
+    height: 120px;
+    border-radius:8% 8% 8% 45%;
+    background-color: #fff;
   }
   
   .home-shop-categories__icon {
     position: relative;
     z-index: 1;
-    width: 86px;
-    height: 86px;
+    
     display: inline-flex;
     align-items: center;
     justify-content: center;
@@ -634,10 +634,13 @@
   .home-shop-categories__text {
     display: flex;
     flex-direction: column;
+    align-items: center;
     gap: 10px;
+    width: 100%;
   }
   
   .home-shop-categories__name {
+    display: block;
     font-family: var(--f-body);
     font-size: clamp(12px, 1.7vw, 20px);
     line-height: 1.2;
@@ -664,7 +667,7 @@
     }
   
     .home-shop-categories__item {
-      min-height: 96px;
+      min-height: 132px;
     }
   
     .home-shop-categories__icon-wrap {
@@ -706,8 +709,8 @@
     }
   
     .home-shop-categories__item {
-      min-height: 84px;
-      gap: 14px;
+      min-height: 122px;
+      gap: 12px;
     }
   
     .home-shop-categories__icon-wrap {

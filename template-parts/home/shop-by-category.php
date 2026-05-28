@@ -29,22 +29,78 @@ $items_raw = [
 	$fields['home_category_item_1'] ?? null,
 	$fields['home_category_item_2'] ?? null,
 	$fields['home_category_item_3'] ?? null,
-	$fields['home_category_item_4'] ?? null,
 ];
 
 $theme_uri = get_template_directory_uri();
 $theme_dir = get_template_directory();
+$fallback_icon_file = 'icon-4-2x.png';
+$fallback_icon_path = $theme_dir . '/assets/img/' . $fallback_icon_file;
+$fallback_icon_url  = file_exists($fallback_icon_path)
+	? $theme_uri . '/assets/img/' . $fallback_icon_file
+	: $theme_uri . '/assets/img/heart-svgrepo-com.svg';
 
-$icon_files = [
-	'icon-4-2x.png',
-	'icon-4-2x.png',
-	'icon-4-2x.png',
-	'icon-4-2x.png'
-];
+if (!function_exists('tersa_shop_category_icon_data')) {
+	function tersa_shop_category_icon_data($image, $fallback_url) {
+		if (is_array($image)) {
+			$image_id = isset($image['ID']) ? (int) $image['ID'] : 0;
+
+			if ($image_id) {
+				$src = wp_get_attachment_image_src($image_id, 'medium');
+
+				if (!empty($src[0])) {
+					return [
+						'url'    => $src[0],
+						'alt'    => $image['alt'] ?? '',
+						'width'  => $src[1] ?? 86,
+						'height' => $src[2] ?? 86,
+					];
+				}
+			}
+
+			if (!empty($image['url'])) {
+				return [
+					'url'    => $image['url'],
+					'alt'    => $image['alt'] ?? '',
+					'width'  => $image['width'] ?? 86,
+					'height' => $image['height'] ?? 86,
+				];
+			}
+		}
+
+		if (is_numeric($image)) {
+			$src = wp_get_attachment_image_src((int) $image, 'medium');
+
+			if (!empty($src[0])) {
+				return [
+					'url'    => $src[0],
+					'alt'    => get_post_meta((int) $image, '_wp_attachment_image_alt', true),
+					'width'  => $src[1] ?? 86,
+					'height' => $src[2] ?? 86,
+				];
+			}
+		}
+
+		if (is_string($image) && '' !== trim($image)) {
+			return [
+				'url'    => $image,
+				'alt'    => '',
+				'width'  => 86,
+				'height' => 86,
+			];
+		}
+
+		return [
+			'url'    => $fallback_url,
+			'alt'    => '',
+			'width'  => 86,
+			'height' => 86,
+		];
+	}
+}
 
 $items = [];
 
-foreach ($items_raw as $index => $item) {
+foreach ($items_raw as $item) {
 	if (
 		empty($item) ||
 		empty($item['title']) ||
@@ -53,16 +109,15 @@ foreach ($items_raw as $index => $item) {
 		continue;
 	}
 
-	$icon_file = $icon_files[$index] ?? 'icon-1-2x.svg';
-	$icon_path = $theme_dir . '/assets/img/' . $icon_file;
-	$icon_url  = file_exists($icon_path)
-		? $theme_uri . '/assets/img/' . $icon_file
-		: $theme_uri . '/assets/img/heart-svgrepo-com.svg';
+	$icon = tersa_shop_category_icon_data($item['image'] ?? null, $fallback_icon_url);
 
 	$items[] = [
-		'title'    => $item['title'],
-		'url'      => $item['link'],
-		'icon_url' => $icon_url,
+		'title'       => $item['title'],
+		'url'         => $item['link'],
+		'icon_url'    => $icon['url'],
+		'icon_alt'    => $icon['alt'],
+		'icon_width'  => $icon['width'],
+		'icon_height' => $icon['height'],
 	];
 }
 
@@ -87,11 +142,11 @@ if (empty($items)) {
 						<span class="home-shop-categories__icon">
 							<img
 								src="<?php echo esc_url($item['icon_url']); ?>"
-								alt=""
+								alt="<?php echo esc_attr($item['icon_alt']); ?>"
 								loading="lazy"
 								decoding="async"
-								width="86"
-								height="86"
+								width="<?php echo esc_attr($item['icon_width']); ?>"
+								height="<?php echo esc_attr($item['icon_height']); ?>"
 							>
 						</span>
 					</span>
