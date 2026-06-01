@@ -46,8 +46,29 @@ if (!WC()->cart->is_empty()) : ?>
 			<li class="woocommerce-mini-cart-item mini_cart_item tersa-mini-cart__item" data-cart-item-key="<?php echo esc_attr($cart_item_key); ?>">
 				<?php
 				$trash_icon = '<svg class="mini-cart__remove-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 50 50" aria-hidden="true" focusable="false"><path d="M10.289 14.211h3.102l1.444 25.439c.029.529.468.943.998.943h18.933c.53 0 .969-.415.998-.944l1.421-25.438h3.104c.553 0 1-.448 1-1s-.447-1-1-1h-3.741a1.02 1.02 0 0 0-.309.031h-5.246V9.594c0-.552-.447-1-1-1h-9.409c-.553 0-1 .448-1 1v2.617h-5.248a1.02 1.02 0 0 0-.267.027h-3.779c-.553 0-1 .448-1 1s.447.973 1 .973zm11.295-3.617h7.409v1.617h-7.409zM35.182 14.211 33.82 38.594H16.778l-1.384-24.383z"/><path d="M20.395 36.718a1.004 1.004 0 0 0 1-1.056l-1.052-18.535a1.002 1.002 0 0 0-2 .113l1.052 18.535a1.003 1.003 0 0 0 1 .943zm9.752 0a1.003 1.003 0 0 0 1-.943l1.052-18.535a1.002 1.002 0 0 0-2-.113l-1.052 18.535a1.004 1.004 0 0 0 1.052 1.056zm-4.858.001a1 1 0 0 0 1-1V17.184a1 1 0 0 0-2 0v18.535a1 1 0 0 0 1 1z"/></svg>';
+				$remove_link_allowed_html = [
+					'a'    => [
+						'href'               => true,
+						'class'              => true,
+						'aria-label'         => true,
+						'data-product_id'    => true,
+						'data-cart_item_key' => true,
+						'data-product_sku'   => true,
+					],
+					'svg'  => [
+						'class'        => true,
+						'xmlns'        => true,
+						'viewBox'      => true,
+						'viewbox'      => true,
+						'aria-hidden'  => true,
+						'focusable'    => true,
+					],
+					'path' => [
+						'd' => true,
+					],
+				];
 
-				echo apply_filters(
+				echo wp_kses(apply_filters(
 					'woocommerce_cart_item_remove_link',
 					sprintf(
 						'<a href="%s" class="remove remove_from_cart_button" aria-label="%s" data-product_id="%s" data-cart_item_key="%s" data-product_sku="%s">%s</a>',
@@ -59,7 +80,7 @@ if (!WC()->cart->is_empty()) : ?>
 						$trash_icon
 					),
 					$cart_item_key
-				);
+				), $remove_link_allowed_html);
 				?>
 
 			<div class="tersa-mini-cart__thumb">
@@ -83,7 +104,7 @@ if (!WC()->cart->is_empty()) : ?>
 						<?php endif; ?>
 					</div>
 
-					<?php echo wc_get_formatted_cart_item_data($cart_item); ?>
+					<?php echo wp_kses_post(wc_get_formatted_cart_item_data($cart_item)); ?>
 
 					<div class="tersa-mini-cart__meta">
 						<div class="tersa-mini-cart__qty" data-cart-item-key="<?php echo esc_attr($cart_item_key); ?>">

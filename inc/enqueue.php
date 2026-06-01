@@ -135,6 +135,15 @@ function tersa_enqueue_assets() {
 			tersa_asset_ver('assets/js/shop.js'),
 			true
 		);
+
+		wp_localize_script('tersa-shop', 'tersaShopI18n', [
+			'readMore' => function_exists('pll__')
+				? pll__('Pročitaj više')
+				: __('Pročitaj više', 'tersa-shop'),
+			'readLess' => function_exists('pll__')
+				? pll__('Sažmi opis')
+				: __('Sažmi opis', 'tersa-shop'),
+		]);
 	}
 
 	if (function_exists('is_product') && is_product()) {
@@ -169,6 +178,15 @@ function tersa_enqueue_assets() {
 			tersa_asset_ver('assets/js/product.js'),
 			true
 		);
+
+		wp_localize_script('tersa-product', 'tersaProductI18n', [
+			'previousImages' => function_exists('pll__')
+				? pll__('Prethodne slike')
+				: __('Prethodne slike', 'tersa-shop'),
+			'nextImages' => function_exists('pll__')
+				? pll__('Sljedeće slike')
+				: __('Sljedeće slike', 'tersa-shop'),
+		]);
 	}
 
 	if (function_exists('is_cart') && is_cart()) {
@@ -235,6 +253,7 @@ function tersa_enqueue_assets() {
 		// wc-ajax endpoints — lakša ruta od admin-ajax.php (preferirano na frontend-u).
 		'wcAjaxFragments' => class_exists('WC_AJAX') ? WC_AJAX::get_endpoint('tersa_get_cart_drawer_fragments') : '',
 		'wcAjaxQty'       => class_exists('WC_AJAX') ? WC_AJAX::get_endpoint('tersa_update_mini_cart_qty') : '',
+		'lang'            => function_exists('pll_current_language') ? sanitize_key((string) pll_current_language('slug')) : '',
 		'nonce'           => wp_create_nonce('tersa_cart_nonce'),
 	]);
 
@@ -245,6 +264,9 @@ function tersa_enqueue_assets() {
 		'cartLoadError' => function_exists('pll__')
 			? pll__('Greška pri učitavanju košarice.')
 			: __('Greška pri učitavanju košarice.', 'tersa-shop'),
+		'searchResults' => function_exists('pll__')
+			? pll__('Rezultati pretrage')
+			: __('Rezultati pretrage', 'tersa-shop'),
 	]);
 }
 add_action('wp_enqueue_scripts', 'tersa_enqueue_assets');

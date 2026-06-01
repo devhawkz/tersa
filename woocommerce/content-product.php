@@ -53,6 +53,18 @@ $button_label_add_to_cart = function_exists('pll__')
 	? pll__('Dodaj u košaricu')
 	: __('Dodaj u košaricu', 'tersa-shop');
 
+$allowed_add_to_cart_html = [
+	'a' => [
+		'href'             => true,
+		'class'            => true,
+		'aria-label'       => true,
+		'rel'              => true,
+		'data-quantity'    => true,
+		'data-product_id'  => true,
+		'data-product_sku' => true,
+	],
+];
+
 if ($has_multiple_variants) {
 	$button_attributes = [
 		'href'       => $product_url,
@@ -74,38 +86,12 @@ if ($has_multiple_variants) {
 
 /**
  * Badge logika:
- * - tagovi tipa "najprodavanije", "novo"
+ * - Polylang-aware product_tag termovi mapirani po ID-ju
  * - ako je proizvod na sniženju, dodaje se "On sale"
  */
-$badges = [];
-
-// get_the_terms() hits the term object cache directly — shorter path than wp_get_post_terms()
-// when tersa_prime_product_tag_term_cache has already warmed the cache for the current loop.
-$_raw_tags         = get_the_terms($product_id, 'product_tag');
-$product_tag_names = (!is_wp_error($_raw_tags) && is_array($_raw_tags))
-	? array_map(static function ($t) { return (string) $t->name; }, $_raw_tags)
+$badges = function_exists('tersa_get_product_tag_badges')
+	? tersa_get_product_tag_badges($product_id, 2)
 	: [];
-unset($_raw_tags);
-
-if (!empty($product_tag_names)) {
-	foreach ($product_tag_names as $tag_name) {
-		$normalized = sanitize_title($tag_name);
-
-		if (in_array($normalized, ['najprodavanije', 'best-seller', 'bestseller', 'hot'], true)) {
-			$badges[] = [
-				'label'   => $tag_name,
-				'primary' => true,
-			];
-		}
-
-		if (in_array($normalized, ['novo', 'new'], true)) {
-			$badges[] = [
-				'label'   => $tag_name,
-				'primary' => false,
-			];
-		}
-	}
-}
 
 if ($product->is_on_sale()) {
 	$badges[] = [
@@ -185,13 +171,13 @@ $short_description = wp_kses_post(
 			<div class="shop-card__cta-wrap">
 				<?php
 				if ($has_multiple_variants) {
-					echo sprintf(
+					echo wp_kses(sprintf(
 						'<a %s>%s</a>',
 						wc_implode_html_attributes($button_attributes),
 						esc_html($button_label_options)
-					);
+					), $allowed_add_to_cart_html);
 				} else {
-					echo apply_filters(
+					echo wp_kses(apply_filters(
 						'woocommerce_loop_add_to_cart_link',
 						sprintf(
 							'<a %s>%s</a>',
@@ -203,7 +189,7 @@ $short_description = wp_kses_post(
 							'class'      => implode(' ', $button_classes),
 							'attributes' => $button_attributes,
 						]
-					);
+					), $allowed_add_to_cart_html);
 				}
 				?>
 			</div>
@@ -239,13 +225,13 @@ $short_description = wp_kses_post(
 			<div class="shop-card__list-cta">
 				<?php
 				if ($has_multiple_variants) {
-					echo sprintf(
+					echo wp_kses(sprintf(
 						'<a %s>%s</a>',
 						wc_implode_html_attributes($button_attributes),
 						esc_html($button_label_options)
-					);
+					), $allowed_add_to_cart_html);
 				} else {
-					echo apply_filters(
+					echo wp_kses(apply_filters(
 						'woocommerce_loop_add_to_cart_link',
 						sprintf(
 							'<a %s>%s</a>',
@@ -257,7 +243,7 @@ $short_description = wp_kses_post(
 							'class'      => implode(' ', $button_classes),
 							'attributes' => $button_attributes,
 						]
-					);
+					), $allowed_add_to_cart_html);
 				}
 				?>
 			</div>

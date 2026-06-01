@@ -17,14 +17,8 @@ if (empty($hero_image_raw) && function_exists('get_field')) {
 
 $hero_image_url = '';
 
-if (is_numeric($hero_image_raw)) {
-	$hero_image_url = wp_get_attachment_image_url((int) $hero_image_raw, 'full');
-} elseif (is_array($hero_image_raw) && !empty($hero_image_raw['ID'])) {
-	$hero_image_url = wp_get_attachment_image_url((int) $hero_image_raw['ID'], 'full');
-} elseif (is_array($hero_image_raw) && !empty($hero_image_raw['url'])) {
-	$hero_image_url = $hero_image_raw['url'];
-} elseif (is_string($hero_image_raw) && trim($hero_image_raw) !== '') {
-	$hero_image_url = $hero_image_raw;
+if (function_exists('tersa_get_acf_image_url')) {
+	$hero_image_url = tersa_get_acf_image_url($hero_image_raw, 'full');
 }
 
 if (!$hero_image_url) {

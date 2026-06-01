@@ -1,4 +1,9 @@
 document.addEventListener('DOMContentLoaded', function () {
+    function getShopText(key, fallback) {
+      var i18n = window.tersaShopI18n || {};
+      return typeof i18n[key] === 'string' && i18n[key] !== '' ? i18n[key] : fallback;
+    }
+
     var filterToggles = document.querySelectorAll('.shop-archive__filter-toggle');
   
     filterToggles.forEach(function (toggle) {
@@ -45,8 +50,8 @@ document.addEventListener('DOMContentLoaded', function () {
 
         var isCollapsed = wrap.classList.contains('is-collapsed');
         var label = toggle.querySelector('.shop-archive__description-toggle-text');
-        var moreLabel = toggle.getAttribute('data-label-more') || 'Pročitaj više';
-        var lessLabel = toggle.getAttribute('data-label-less') || 'Sažmi opis';
+        var moreLabel = toggle.getAttribute('data-label-more') || getShopText('readMore', 'Read more');
+        var lessLabel = toggle.getAttribute('data-label-less') || getShopText('readLess', 'Collapse description');
 
         wrap.classList.toggle('is-collapsed');
         toggle.setAttribute('aria-expanded', isCollapsed ? 'true' : 'false');

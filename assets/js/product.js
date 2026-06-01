@@ -97,6 +97,11 @@ document.addEventListener('DOMContentLoaded', function () {
       .replace(/>/g, '&gt;');
   }
 
+  function tersaProductText(key, fallback) {
+    var i18n = window.tersaProductI18n || {};
+    return typeof i18n[key] === 'string' && i18n[key] !== '' ? i18n[key] : fallback;
+  }
+
   function tersaBuildThumbsWrap(gallery) {
     if (!Array.isArray(gallery) || gallery.length < 2) {
       return '';
@@ -107,7 +112,7 @@ document.addEventListener('DOMContentLoaded', function () {
     var html = '<div class="' + wrapClass + '"' + (sliderMode ? ' data-tersa-thumbs-slider="1"' : '') + '>';
 
     if (sliderMode) {
-      html += '<button type="button" class="product-single__thumbs-nav product-single__thumbs-nav--prev" data-tersa-thumbs-prev aria-label="Previous" disabled><span aria-hidden="true">&#8249;</span></button>';
+      html += '<button type="button" class="product-single__thumbs-nav product-single__thumbs-nav--prev" data-tersa-thumbs-prev aria-label="' + tersaEscapeAttr(tersaProductText('previousImages', 'Previous images')) + '" disabled><span aria-hidden="true">&#8249;</span></button>';
     }
 
     html += '<div class="product-single__thumbs" role="list">';
@@ -126,7 +131,7 @@ document.addEventListener('DOMContentLoaded', function () {
     html += '</div>';
 
     if (sliderMode) {
-      html += '<button type="button" class="product-single__thumbs-nav product-single__thumbs-nav--next" data-tersa-thumbs-next aria-label="Next"><span aria-hidden="true">&#8250;</span></button>';
+      html += '<button type="button" class="product-single__thumbs-nav product-single__thumbs-nav--next" data-tersa-thumbs-next aria-label="' + tersaEscapeAttr(tersaProductText('nextImages', 'Next images')) + '"><span aria-hidden="true">&#8250;</span></button>';
     }
 
     html += '</div>';

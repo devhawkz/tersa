@@ -42,47 +42,48 @@ $fallback_icon_url  = file_exists($fallback_icon_path)
 if (!function_exists('tersa_shop_category_icon_data')) {
 	function tersa_shop_category_icon_data($image, $fallback_url) {
 		if (is_array($image)) {
-			$image_id = isset($image['ID']) ? (int) $image['ID'] : 0;
+			$image_id = isset($image['ID']) ? absint($image['ID']) : (isset($image['id']) ? absint($image['id']) : 0);
 
 			if ($image_id) {
 				$src = wp_get_attachment_image_src($image_id, 'medium');
 
 				if (!empty($src[0])) {
 					return [
-						'url'    => $src[0],
-						'alt'    => $image['alt'] ?? '',
-						'width'  => $src[1] ?? 86,
-						'height' => $src[2] ?? 86,
+						'url'    => esc_url_raw((string) $src[0]),
+						'alt'    => isset($image['alt']) && is_string($image['alt']) ? $image['alt'] : '',
+						'width'  => isset($src[1]) ? absint($src[1]) : 86,
+						'height' => isset($src[2]) ? absint($src[2]) : 86,
 					];
 				}
 			}
 
-			if (!empty($image['url'])) {
+			if (!empty($image['url']) && is_string($image['url'])) {
 				return [
-					'url'    => $image['url'],
-					'alt'    => $image['alt'] ?? '',
-					'width'  => $image['width'] ?? 86,
-					'height' => $image['height'] ?? 86,
+					'url'    => esc_url_raw($image['url']),
+					'alt'    => isset($image['alt']) && is_string($image['alt']) ? $image['alt'] : '',
+					'width'  => isset($image['width']) ? absint($image['width']) : 86,
+					'height' => isset($image['height']) ? absint($image['height']) : 86,
 				];
 			}
 		}
 
 		if (is_numeric($image)) {
-			$src = wp_get_attachment_image_src((int) $image, 'medium');
+			$image_id = absint($image);
+			$src      = wp_get_attachment_image_src($image_id, 'medium');
 
 			if (!empty($src[0])) {
 				return [
-					'url'    => $src[0],
-					'alt'    => get_post_meta((int) $image, '_wp_attachment_image_alt', true),
-					'width'  => $src[1] ?? 86,
-					'height' => $src[2] ?? 86,
+					'url'    => esc_url_raw((string) $src[0]),
+					'alt'    => (string) get_post_meta($image_id, '_wp_attachment_image_alt', true),
+					'width'  => isset($src[1]) ? absint($src[1]) : 86,
+					'height' => isset($src[2]) ? absint($src[2]) : 86,
 				];
 			}
 		}
 
 		if (is_string($image) && '' !== trim($image)) {
 			return [
-				'url'    => $image,
+				'url'    => esc_url_raw($image),
 				'alt'    => '',
 				'width'  => 86,
 				'height' => 86,
@@ -90,7 +91,7 @@ if (!function_exists('tersa_shop_category_icon_data')) {
 		}
 
 		return [
-			'url'    => $fallback_url,
+			'url'    => esc_url_raw((string) $fallback_url),
 			'alt'    => '',
 			'width'  => 86,
 			'height' => 86,

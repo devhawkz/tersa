@@ -39,20 +39,28 @@ $company_name     = $impressum['name']     ?? 'Tersa d.o.o.';
 $company_activity = $impressum['activity'] ?? __('Prerada drva i trgovina drvnim proizvodima', 'tersa-shop');
 $company_address  = $impressum['address']  ?? __('Nikole Tesle 71, 31551 Črnkovci', 'tersa-shop');
 $company_email    = $impressum['email']    ?? 'tersa@tersa.hr';
+$company_email_href = sanitize_email((string) $company_email);
 $company_address_markup = function_exists('tersa_safe_rich_text')
 	? tersa_safe_rich_text((string) $company_address)
 	: wp_kses_post(wpautop((string) $company_address));
 $company_address_plain = wp_strip_all_tags((string) $company_address);
 $footer_newsletter_shortcode = !empty($company_settings['footer_newsletter_cf7_shortcode'])
-	? $company_settings['footer_newsletter_cf7_shortcode']
-	: '[contact-form-7 id="02a3794" title="Contact form 1"]';
+	? (string) $company_settings['footer_newsletter_cf7_shortcode']
+	: '';
+if ($footer_newsletter_shortcode !== '' && function_exists('tersa_translate_string')) {
+	$footer_newsletter_shortcode = tersa_translate_string($footer_newsletter_shortcode);
+}
 
 $tersa_payment_methods   = function_exists('tersa_get_payment_methods') ? tersa_get_payment_methods() : [];
 $tersa_security_badges   = function_exists('tersa_get_security_badges') ? tersa_get_security_badges('light') : [];
 $tersa_payments_dir_path = get_template_directory() . '/assets/img/payments/';
 $tersa_payments_dir_uri  = get_template_directory_uri() . '/assets/img/payments/';
 
-$_pll_url = function_exists('tersa_pll_page_url') ? 'tersa_pll_page_url' : function (string $s): string { return home_url('/' . $s . '/'); };
+$_pll_url = function_exists('tersa_pll_page_url') ? 'tersa_pll_page_url' : function (string $s): string {
+	$home_url = tersa_get_current_language_home_url();
+	return trailingslashit($home_url) . trim(sanitize_title($s), '/') . '/';
+};
+$_home_url = tersa_get_current_language_home_url();
 
 $about_fallback = [
 	[
@@ -94,7 +102,7 @@ $legal_fallback = [
 				<div class="site-footer__grid">
 					<section class="site-footer__brand-col" aria-labelledby="footer-company-heading">
 						<div class="site-footer__logo-wrap">
-							<a href="<?php echo esc_url(home_url('/')); ?>" class="site-footer__logo-link" aria-label="<?php echo esc_attr(sprintf(__('Go to homepage, %s', 'tersa-shop'), $site_name)); ?>">
+							<a href="<?php echo esc_url($_home_url); ?>" class="site-footer__logo-link" aria-label="<?php echo esc_attr(sprintf(__('Go to homepage, %s', 'tersa-shop'), $site_name)); ?>">
 								<?php echo $footer_logo_markup ?: '<span class="site-footer__logo-text">' . esc_html($site_name) . '</span>'; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
 							</a>
 						</div>
@@ -110,7 +118,11 @@ $legal_fallback = [
 							</div>
 							<p>
 								<span class="site-footer__label"><?php esc_html_e('E-mail:', 'tersa-shop'); ?></span>
-								<a href="mailto:<?php echo esc_attr($company_email); ?>"><?php echo esc_html($company_email); ?></a>
+								<?php if ($company_email_href) : ?>
+									<a href="mailto:<?php echo esc_attr($company_email_href); ?>"><?php echo esc_html($company_email); ?></a>
+								<?php else : ?>
+									<?php echo esc_html($company_email); ?>
+								<?php endif; ?>
 							</p>
 							
 						</address>
@@ -176,6 +188,10 @@ $legal_fallback = [
 						$newsletter_text = !empty($footer_settings['footer_newsletter_text'])
 							? $footer_settings['footer_newsletter_text']
 							: __('Promotivna poruka za newsletter', 'tersa-shop');
+						if (function_exists('tersa_translate_string')) {
+							$newsletter_heading = tersa_translate_string((string) $newsletter_heading);
+							$newsletter_text    = tersa_translate_string((string) $newsletter_text);
+						}
 						?>
 						<h2 id="footer-newsletter-heading" class="site-footer__heading">
 							<?php echo esc_html($newsletter_heading); ?>
@@ -190,11 +206,11 @@ $legal_fallback = [
 						// Stilove primenjuješ tako što u CF7 form template-u dodaš klase
 						// npr. text polju: [email* your-email class:site-footer__newsletter-input]
 						// i dugmetu: [submit class:site-footer__newsletter-button \"Prijavi se\"]
-					if (function_exists('tersa_safe_cf7_shortcode_output')) {
-						// tersa_safe_cf7_shortcode_output() validateira strogi regex — samo CF7 shortcode.
-						// wp_kses_post() bi uklonilo <form> elemente pa ga ne koristimo ovdje.
-						echo tersa_safe_cf7_shortcode_output((string) $footer_newsletter_shortcode); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
-					}
+						if ($footer_newsletter_shortcode !== '' && function_exists('tersa_safe_cf7_shortcode_output')) {
+							// tersa_safe_cf7_shortcode_output() validateira strogi regex — samo CF7 shortcode.
+							// wp_kses_post() bi uklonilo <form> elemente pa ga ne koristimo ovdje.
+							echo tersa_safe_cf7_shortcode_output((string) $footer_newsletter_shortcode); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+						}
 						?>
 					</section>
 				</div>
@@ -227,7 +243,7 @@ $legal_fallback = [
 							<?php
 							$company_link = sprintf(
 								'<a href="%s">%s</a>',
-								esc_url(home_url('/')),
+								esc_url($_home_url),
 								esc_html($company_name)
 							);
 

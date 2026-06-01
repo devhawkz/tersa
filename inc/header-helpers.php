@@ -104,20 +104,71 @@ function tersa_maybe_clear_header_settings_cache(int $post_id, $post = null): vo
 add_action('save_post_page', 'tersa_maybe_clear_header_settings_cache', 10, 2);
 
 /**
+ * Vraća početnu stranicu za trenutni Polylang jezik.
+ *
+ * @return string
+ */
+function tersa_get_current_language_home_url(): string {
+	if (function_exists('pll_home_url')) {
+		$url = pll_home_url();
+
+		if (!empty($url)) {
+			return (string) $url;
+		}
+	}
+
+	return home_url('/');
+}
+
+/**
+ * Vraća WooCommerce page URL mapiran na trenutni Polylang jezik.
+ *
+ * @param string $page WooCommerce page key: shop, cart, checkout, myaccount.
+ * @return string
+ */
+function tersa_get_wc_page_url(string $page): string {
+	$page = sanitize_key($page);
+
+	if (function_exists('wc_get_page_id')) {
+		$page_id = (int) wc_get_page_id($page);
+
+		if ($page_id > 0) {
+			$translated_id = 0;
+
+			if (function_exists('pll_get_post')) {
+				$translated_id = (int) pll_get_post($page_id);
+			}
+
+			$url = get_permalink($translated_id ?: $page_id);
+
+			if (!empty($url)) {
+				return (string) $url;
+			}
+		}
+	}
+
+	if (function_exists('wc_get_page_permalink')) {
+		$url = wc_get_page_permalink($page);
+
+		if (!empty($url)) {
+			return (string) $url;
+		}
+	}
+
+	return tersa_get_current_language_home_url();
+}
+
+/**
  * Vraća shop/search URL.
  *
  * @return string
  */
 function tersa_get_search_url(): string {
 	if (class_exists('WooCommerce')) {
-		$shop_url = wc_get_page_permalink('shop');
-
-		if ($shop_url) {
-			return $shop_url;
-		}
+		return tersa_get_wc_page_url('shop');
 	}
 
-	return home_url('/');
+	return tersa_get_current_language_home_url();
 }
 
 /**
@@ -461,10 +512,11 @@ function tersa_get_header_template_data(): array {
 	$link_data   = tersa_get_topbar_link_data($topbar_url);
 
 	$cached = [
-		'home_url'               => home_url('/'),
+		'home_url'               => tersa_get_current_language_home_url(),
 		'site_name'              => get_bloginfo('name'),
 		'logo_markup'            => tersa_get_header_logo_markup(),
 		'wishlist_url'           => tersa_get_wishlist_url(),
+		'cart_url'               => class_exists('WooCommerce') ? tersa_get_wc_page_url('cart') : '',
 		'wishlist_count'         => tersa_get_wishlist_count(),
 		'cart_count'             => tersa_get_cart_count(),
 		'topbar_enabled'         => !empty($header_data['topbar_enabled']),

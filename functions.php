@@ -3,30 +3,32 @@ if (!defined('ABSPATH')) {
 	exit;
 }
 
-require_once get_template_directory() . '/inc/enqueue.php';
-require_once get_template_directory() . '/inc/eu-projects.php';
+defined('TERSA_THEME_DIR') || define('TERSA_THEME_DIR', get_template_directory());
 
 // Theme setup
-require_once get_template_directory() . '/inc/setup.php';
-require_once get_template_directory() . '/inc/customizer.php';
+require_once TERSA_THEME_DIR . '/inc/setup.php';
+require_once TERSA_THEME_DIR . '/inc/customizer.php';
+
+require_once TERSA_THEME_DIR . '/inc/enqueue.php';
+require_once TERSA_THEME_DIR . '/inc/eu-projects.php';
 
 // Helpers
-require_once get_template_directory() . '/inc/header-helpers.php';
-require_once get_template_directory() . '/inc/footer-helpers.php';
-require_once get_template_directory() . '/inc/shortcodes.php';
+require_once TERSA_THEME_DIR . '/inc/header-helpers.php';
+require_once TERSA_THEME_DIR . '/inc/footer-helpers.php';
+require_once TERSA_THEME_DIR . '/inc/shortcodes.php';
 
 // WooCommerce
-require_once get_template_directory() . '/inc/woocommerce.php';
+require_once TERSA_THEME_DIR . '/inc/woocommerce.php';
 
 // SEO / Schema
- require_once get_template_directory() . '/inc/schema.php';
-require_once get_template_directory() . '/inc/seo-facets.php';
+require_once TERSA_THEME_DIR . '/inc/schema.php';
+require_once TERSA_THEME_DIR . '/inc/seo-facets.php';
 
 // Performance
-require_once get_template_directory() . '/inc/performance.php';
+require_once TERSA_THEME_DIR . '/inc/performance.php';
 
 // Security
- require_once get_template_directory() . '/inc/security.php';
+require_once TERSA_THEME_DIR . '/inc/security.php';
 
 // Debug logging (targeted: mail, WC gateway, tersa AJAX) — always on, /wp-content/debug.log
-require_once get_template_directory() . '/inc/debug-log.php';
+require_once TERSA_THEME_DIR . '/inc/debug-log.php';

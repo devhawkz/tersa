@@ -27,35 +27,9 @@ $short_description  = apply_filters('woocommerce_short_description', $product->g
 $sku                = $product->get_sku();
 $categories         = wc_get_product_category_list($product_id, ', ');
 $tabs               = apply_filters('woocommerce_product_tabs', []);
-$badge_items        = [];
-
-$product_tag_names = wp_get_post_terms(
-	$product_id,
-	'product_tag',
-	[
-		'fields' => 'names',
-	]
-);
-
-if (is_array($product_tag_names) && !empty($product_tag_names)) {
-	foreach ($product_tag_names as $tag_name) {
-		$normalized = sanitize_title($tag_name);
-
-		if (in_array($normalized, ['najprodavanije', 'best-seller', 'bestseller', 'hot'], true)) {
-			$badge_items[] = [
-				'label'   => $tag_name,
-				'primary' => true,
-			];
-		}
-
-		if (in_array($normalized, ['novo', 'new'], true)) {
-			$badge_items[] = [
-				'label'   => $tag_name,
-				'primary' => false,
-			];
-		}
-	}
-}
+$badge_items        = function_exists('tersa_get_product_tag_badges')
+	? tersa_get_product_tag_badges($product_id, 2)
+	: [];
 
 if ($product->is_on_sale()) {
 	$badge_items[] = [
@@ -275,7 +249,7 @@ foreach ($tersa_parent_attachment_ids as $tersa_pid) {
 
 				<div class="product-single__meta-top">
 					<div class="product-single__reviews">
-						<?php echo wc_get_rating_html($average_rating, $review_count); ?>
+						<?php echo wp_kses_post(wc_get_rating_html($average_rating, $review_count)); ?>
 						<?php if ($review_count > 0) : ?>
 							<span class="product-single__review-count">(<?php echo esc_html((string) $review_count); ?>)</span>
 						<?php endif; ?>
@@ -324,16 +298,16 @@ foreach ($tersa_parent_attachment_ids as $tersa_pid) {
 
 				<div class="product-single__actions-row">
 					<?php if (function_exists('shortcode_exists') && shortcode_exists('yith_wcwl_add_to_wishlist')) : ?>
+						<?php
+						$single_wishlist_markup = function_exists('tersa_get_wishlist_button_markup')
+							? tersa_get_wishlist_button_markup($product_id, 'product-single__wishlist-link')
+							: '';
+						?>
+						<?php if ($single_wishlist_markup !== '') : ?>
 						<div class="product-single__wishlist">
-							<?php
-							echo do_shortcode(
-								sprintf(
-									'[yith_wcwl_add_to_wishlist product_id="%d" link_classes="product-single__wishlist-link"]',
-									$product_id
-								)
-							);
-							?>
+							<?php echo wp_kses_post($single_wishlist_markup); ?>
 						</div>
+						<?php endif; ?>
 					<?php endif; ?>
 
 					

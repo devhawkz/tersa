@@ -63,7 +63,7 @@ add_action(
 		$author = wp_unslash($_GET['author']);
 
 		if (is_scalar($author) && preg_match('/^\d+$/', (string) $author)) {
-			wp_safe_redirect(home_url('/'), 301);
+			wp_safe_redirect(tersa_get_current_language_home_url(), 301);
 			exit;
 		}
 	}

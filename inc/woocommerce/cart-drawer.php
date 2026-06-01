@@ -83,6 +83,8 @@ function tersa_get_cart_bestseller_fields(): array {
 		'home_bestsellers_section_title'      => get_field('home_bestsellers_section_title', $front_id),
 		'home_bestsellers_badge_color_1'      => get_field('home_bestsellers_badge_color_1', $front_id),
 		'home_bestsellers_badge_color'        => get_field('home_bestsellers_badge_color', $front_id),
+		'home_bestsellers_product_tag_1'      => get_field('home_bestsellers_product_tag_1', $front_id),
+		'home_bestsellers_product_tag'        => get_field('home_bestsellers_product_tag', $front_id),
 		'home_bestsellers_product_tag_slug_1' => get_field('home_bestsellers_product_tag_slug_1', $front_id),
 		'home_bestsellers_product_tag_slug'   => get_field('home_bestsellers_product_tag_slug', $front_id),
 	];

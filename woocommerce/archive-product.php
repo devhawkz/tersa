@@ -59,7 +59,9 @@ if (is_product_category() || is_product_tag() || is_tax()) {
 } elseif (function_exists('tersa_get_active_filter_values')) {
 	$active_cat_filters = tersa_get_active_filter_values('product_cat');
 	if (count($active_cat_filters) === 1) {
-		$maybe_term = get_term_by('slug', $active_cat_filters[0], 'product_cat');
+		$maybe_term = function_exists('tersa_get_current_language_term_by_slug')
+			? tersa_get_current_language_term_by_slug($active_cat_filters[0], 'product_cat')
+			: null;
 		if ($maybe_term instanceof WP_Term) {
 			$display_term     = $maybe_term;
 			$is_filtered_term = true;
@@ -79,7 +81,7 @@ $archive_description_long  = $archive_description_plain && function_exists('mb_s
 
 $reset_url = function_exists('tersa_get_archive_reset_url')
 	? tersa_get_archive_reset_url()
-	: get_permalink(wc_get_page_id('shop'));
+	: tersa_get_current_language_home_url();
 ?>
 
 <main id="main-content" class="shop-archive">
@@ -265,20 +267,32 @@ $reset_url = function_exists('tersa_get_archive_reset_url')
 							: [];
 
 					// Transient cache za terme filtera — izbjegava DB upit po taksonomiji na svakom requestu.
-					$_fl_lang       = function_exists('pll_current_language') ? (string) pll_current_language() : '';
+					$_fl_lang       = function_exists('tersa_get_current_language_slug') ? tersa_get_current_language_slug() : (function_exists('pll_current_language') ? sanitize_key((string) pll_current_language('slug')) : '');
 					$_fl_cache_key  = 'tersa_filter_terms_' . $taxonomy . ($_fl_lang ? '_' . $_fl_lang : '');
 					$terms          = get_transient($_fl_cache_key);
 
 					if (false === $terms) {
-						$terms = get_terms([
+						$term_args = [
 							'taxonomy'   => $taxonomy,
 							'hide_empty' => true,
 							'orderby'    => 'name',
 							'order'      => 'ASC',
-						]);
+						];
+
+						if ($_fl_lang) {
+							$term_args['lang'] = $_fl_lang;
+						}
+
+						$terms = get_terms($term_args);
 						if (!is_wp_error($terms)) {
 							set_transient($_fl_cache_key, $terms, 6 * HOUR_IN_SECONDS);
 						}
+					}
+
+					if ($_fl_lang && is_array($terms) && function_exists('pll_get_term_language')) {
+						$terms = array_values(array_filter($terms, static function ($term) use ($_fl_lang): bool {
+							return $term instanceof WP_Term && pll_get_term_language($term->term_id, 'slug') === $_fl_lang;
+						}));
 					}
 
 						if (is_wp_error($terms) || empty($terms)) {

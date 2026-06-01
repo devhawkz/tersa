@@ -3,8 +3,17 @@ if (!defined('ABSPATH')) {
 	exit;
 }
 
-function tersa_theme_setup() {
+/**
+ * Učitava prevode teme iz /languages što ranije u setup fazi.
+ *
+ * @return void
+ */
+function tersa_load_theme_textdomain(): void {
 	load_theme_textdomain('tersa-shop', get_template_directory() . '/languages');
+}
+add_action('after_setup_theme', 'tersa_load_theme_textdomain', 0);
+
+function tersa_theme_setup(): void {
 
 	// WordPress kontroliše <title> tag umesto teme (potrebno za SEO plugine)
 	add_theme_support('title-tag');
@@ -30,8 +39,6 @@ function tersa_theme_setup() {
 		'flex-height' => true,
 		'flex-width'  => true,
 	]);
-
-	
 
 	// Block Editor (Gutenberg) podrška
 	add_theme_support('align-wide');         // wide/full blokovi
@@ -62,9 +69,6 @@ function tersa_theme_setup() {
 	// Veličina za promo banner slike
 	add_image_size('tersa-banner', 900, 700, true);
 	add_image_size('tersa-countdown', 900, 900, true);
-	
-	
-
 	register_nav_menus([
 		'primary'      => __('Primary menu', 'tersa-shop'),
 		'footer_about' => __('Footer About menu', 'tersa-shop'),
@@ -88,7 +92,7 @@ add_filter(
 );
 
 
-function tersa_register_sidebars() {
+function tersa_register_sidebars(): void {
 	register_sidebar([
 		'name'          => esc_html__('Glavna bočna traka', 'tersa-shop'),
 		'id'            => 'primary-sidebar',

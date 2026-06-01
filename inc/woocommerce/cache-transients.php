@@ -7,7 +7,8 @@ if (!defined('ABSPATH')) {
  * Cache invalidation (transients) za WooCommerce.
  *
  * Handles:
- * - `tersa_bestsellers_{tag}_{instance}` + `_{lang}` varijante
+ * - `tersa_bestsellers_{tag}_{instance}` + `_{lang}` varijante (legacy slug keys)
+ * - `tersa_bestsellers_term_{term_id}_{instance}` + `_{lang}` varijante
  * - `tersa_related_{product_id}` + `_{lang}` varijante
  * - `tersa_cart_bestseller_fields` + `_{lang}` varijante
  * - `tersa_filter_terms_{taxonomy}` + `_{lang}` varijante
@@ -68,7 +69,7 @@ function tersa_delete_transient_all_langs(string $base_key): void {
  * @param bool|null    $update
  */
 function tersa_purge_woocommerce_transients_on_product_save(int $post_id, $post = null, $update = null): void {
-	// 1) BESTSELLERS: skup je mali i poznat — razvlačimo eksplicitno.
+	// 1) BESTSELLERS legacy slug keys: skup je mali i poznat — razvlačimo eksplicitno.
 	$bestseller_tag_slugs = ['najprodavanije', 'najnovije'];
 	$bestseller_instances = [1, 2];
 
@@ -76,6 +77,27 @@ function tersa_purge_woocommerce_transients_on_product_save(int $post_id, $post 
 		foreach ($bestseller_instances as $instance) {
 			$base_key = 'tersa_bestsellers_' . $tag_slug . '_' . $instance;
 			tersa_delete_transient_all_langs($base_key);
+		}
+	}
+
+	// 1b) BESTSELLERS term-ID keys: tags are usually a tiny taxonomy, and this runs only on product save.
+	$product_tag_ids = get_terms([
+		'taxonomy'   => 'product_tag',
+		'hide_empty' => false,
+		'fields'     => 'ids',
+		'lang'       => '',
+	]);
+
+	if (!is_wp_error($product_tag_ids) && is_array($product_tag_ids)) {
+		foreach ($product_tag_ids as $tag_id) {
+			$tag_id = absint($tag_id);
+			if (!$tag_id) {
+				continue;
+			}
+
+			foreach ($bestseller_instances as $instance) {
+				tersa_delete_transient_all_langs('tersa_bestsellers_term_' . $tag_id . '_' . $instance);
+			}
 		}
 	}
 
@@ -113,6 +135,17 @@ function tersa_purge_filter_terms_cache(int $term_id, int $tt_id, string $taxono
 	}
 
 	tersa_delete_transient_all_langs('tersa_filter_terms_' . $taxonomy);
+
+	if ($taxonomy === 'product_tag') {
+		$term_id = absint($term_id);
+		if (!$term_id) {
+			return;
+		}
+
+		foreach ([1, 2] as $instance) {
+			tersa_delete_transient_all_langs('tersa_bestsellers_term_' . $term_id . '_' . $instance);
+		}
+	}
 }
 add_action('edited_term', 'tersa_purge_filter_terms_cache', 10, 3);
 add_action('created_term', 'tersa_purge_filter_terms_cache', 10, 3);

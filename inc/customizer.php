@@ -6,6 +6,10 @@ if (!defined('ABSPATH')) {
 /**
  * Customizer options for homepage behavior.
  */
+function tersa_sanitize_checkbox($value): bool {
+	return (bool) wp_validate_boolean($value);
+}
+
 function tersa_customize_register(WP_Customize_Manager $wp_customize): void {
 	$wp_customize->add_section(
 		'tersa_homepage_options',
@@ -20,7 +24,7 @@ function tersa_customize_register(WP_Customize_Manager $wp_customize): void {
 		'tersa_show_front_page_sidebar',
 		[
 			'default'           => false,
-			'sanitize_callback' => 'rest_sanitize_boolean',
+			'sanitize_callback' => 'tersa_sanitize_checkbox',
 			'transport'         => 'refresh',
 		]
 	);

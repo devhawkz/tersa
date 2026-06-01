@@ -10,6 +10,7 @@ $home_url                = $data['home_url'];
 $site_name               = $data['site_name'];
 $logo_markup             = $data['logo_markup'];
 $wishlist_url            = $data['wishlist_url'];
+$cart_url                = $data['cart_url'];
 $wishlist_count          = $data['wishlist_count'];
 $cart_count              = $data['cart_count'];
 $topbar_enabled          = $data['topbar_enabled'];
@@ -108,7 +109,7 @@ $topbar_link_is_external = $data['topbar_link_is_external'];
 					<?php if (class_exists('WooCommerce')) : ?>
 						<a
 							class="site-header__icon-link site-header__icon-link--cart"
-							href="<?php echo esc_url(wc_get_cart_url()); ?>"
+							href="<?php echo esc_url($cart_url ?: wc_get_cart_url()); ?>"
 							aria-label="<?php echo esc_attr(tersa_get_cart_aria_label()); ?>"
 							aria-expanded="false"
 							aria-controls="cart-drawer"

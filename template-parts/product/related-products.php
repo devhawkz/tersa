@@ -13,13 +13,25 @@ if ($product_id <= 0) {
 	return;
 }
 
-$_rel_lang     = function_exists('pll_current_language') ? (string) pll_current_language() : '';
+$_rel_lang     = function_exists('tersa_get_current_language_slug') ? tersa_get_current_language_slug() : (function_exists('pll_current_language') ? sanitize_key((string) pll_current_language('slug')) : '');
 $transient_key = 'tersa_related_' . $product_id . ($_rel_lang ? '_' . $_rel_lang : '');
 $related_ids   = get_transient($transient_key);
 
 if (false === $related_ids) {
-	$related_ids = wc_get_related_products($product_id, 4);
+	$related_ids = wc_get_related_products($product_id, 8);
+
+	if (function_exists('tersa_filter_product_ids_for_current_language')) {
+		$related_ids = tersa_filter_product_ids_for_current_language((array) $related_ids);
+	}
+
+	$related_ids = array_slice(array_map('absint', (array) $related_ids), 0, 4);
 	set_transient($transient_key, $related_ids ?: [], 12 * HOUR_IN_SECONDS);
+} elseif (function_exists('tersa_filter_product_ids_for_current_language')) {
+	$related_ids = array_slice(
+		tersa_filter_product_ids_for_current_language(array_map('absint', (array) $related_ids)),
+		0,
+		4
+	);
 }
 
 if (empty($related_ids)) {
@@ -31,7 +43,10 @@ $rel_tags_by_id = [];
 $rel_terms_raw  = wp_get_object_terms(
 	$related_ids,
 	'product_tag',
-	['fields' => 'all_with_object_id']
+	array_merge(
+		['fields' => 'all_with_object_id'],
+		function_exists('tersa_get_current_language_query_arg') ? tersa_get_current_language_query_arg() : []
+	)
 );
 
 if (!is_wp_error($rel_terms_raw) && is_array($rel_terms_raw)) {
@@ -56,6 +71,17 @@ if (!is_wp_error($rel_terms_raw) && is_array($rel_terms_raw)) {
 $rel_label_options = function_exists('pll__') ? pll__('Vidi opcije') : 'Vidi opcije';
 
 $badge_color = '#000000';
+$allowed_add_to_cart_html = [
+	'a' => [
+		'href'             => true,
+		'class'            => true,
+		'aria-label'       => true,
+		'rel'              => true,
+		'data-quantity'    => true,
+		'data-product_id'  => true,
+		'data-product_sku' => true,
+	],
+];
 
 // Jedan WP upit za sve related proizvode umjesto N pojedinačnih wc_get_product() poziva.
 $rel_products_batch = wc_get_products([
@@ -64,7 +90,7 @@ $rel_products_batch = wc_get_products([
 	'order'   => 'ASC',
 	'limit'   => count($related_ids),
 	'status'  => 'publish',
-]);
+] + (function_exists('tersa_get_current_language_query_arg') ? tersa_get_current_language_query_arg() : []));
 
 $rel_products_map = [];
 foreach ($rel_products_batch as $_p) {
@@ -208,13 +234,13 @@ unset($rel_products_batch, $_p);
 					<div class="home-bestsellers__cart-wrap">
 						<?php
 						if ($rel_has_variants) {
-							echo sprintf(
+							echo wp_kses(sprintf(
 								'<a %s>%s</a>',
 								wc_implode_html_attributes($rel_button_attrs),
 								esc_html($rel_label_options)
-							);
+							), $allowed_add_to_cart_html);
 						} else {
-							echo apply_filters(
+							echo wp_kses(apply_filters(
 								'woocommerce_loop_add_to_cart_link',
 								sprintf(
 									'<a %s>%s</a>',
@@ -226,7 +252,7 @@ unset($rel_products_batch, $_p);
 									'class'      => implode(' ', $rel_button_classes),
 									'attributes' => $rel_button_attrs,
 								]
-							);
+							), $allowed_add_to_cart_html);
 						}
 						?>
 					</div>

@@ -2,6 +2,9 @@
 defined('ABSPATH') || exit;
 
 get_header();
+
+$home_url = tersa_get_current_language_home_url();
+$shop_url = (class_exists('WooCommerce') && function_exists('tersa_get_wc_page_url')) ? tersa_get_wc_page_url('shop') : '';
 ?>
 
 <main id="main-content" class="site-main tersa-404" role="main">
@@ -36,19 +39,16 @@ get_header();
 				</p>
 
 				<div class="tersa-404__actions" aria-label="<?php echo esc_attr__('Mogućnosti navigacije', 'tersa-shop'); ?>">
-					<a class="tersa-button tersa-button--primary" href="<?php echo esc_url(home_url('/')); ?>">
+					<a class="tersa-button tersa-button--primary" href="<?php echo esc_url($home_url); ?>">
 						<?php echo esc_html__('Povratak na početnu', 'tersa-shop'); ?>
 					</a>
 
-					<?php if (function_exists('wc_get_page_permalink')) : ?>
-						<a class="tersa-button tersa-button--secondary" href="<?php echo esc_url(wc_get_page_permalink('shop')); ?>">
+					<?php if ($shop_url !== '') : ?>
+						<a class="tersa-button tersa-button--secondary" href="<?php echo esc_url($shop_url); ?>">
 							<?php echo esc_html__('Idi u trgovinu', 'tersa-shop'); ?>
 						</a>
 					<?php endif; ?>
 				</div>
-				<?php
-				$shop_url = function_exists('wc_get_page_permalink') ? wc_get_page_permalink('shop') : '';
-				?>
 			</div>
 		</div>
 	</section>

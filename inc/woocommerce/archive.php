@@ -95,7 +95,9 @@ function tersa_breadcrumb_inject_filtered_category(array $crumbs): array {
 		return $crumbs;
 	}
 
-	$term = get_term_by('slug', $values[0], 'product_cat');
+	$term = function_exists('tersa_get_current_language_term_by_slug')
+		? tersa_get_current_language_term_by_slug($values[0], 'product_cat')
+		: null;
 	if (!($term instanceof WP_Term)) {
 		return $crumbs;
 	}
@@ -107,11 +109,8 @@ function tersa_breadcrumb_inject_filtered_category(array $crumbs): array {
 add_filter('woocommerce_get_breadcrumb', 'tersa_breadcrumb_inject_filtered_category', 10, 1);
 
 function tersa_get_archive_reset_url(): string {
-	if (function_exists('wc_get_page_id')) {
-		$shop_id = wc_get_page_id('shop');
-		if ($shop_id > 0) {
-			return get_permalink($shop_id);
-		}
+	if (function_exists('tersa_get_wc_page_url')) {
+		return tersa_get_wc_page_url('shop');
 	}
 
 	if (function_exists('get_post_type_archive_link')) {
@@ -121,7 +120,7 @@ function tersa_get_archive_reset_url(): string {
 		}
 	}
 
-	return home_url('/');
+	return tersa_get_current_language_home_url();
 }
 
 function tersa_modify_archive_query(WP_Query $query) {
@@ -145,6 +144,11 @@ function tersa_modify_archive_query(WP_Query $query) {
 	$meta_query = (array) $query->get('meta_query');
 	$filter_taxonomies = ['product_cat', 'pa_color', 'pa_material', 'pa_size', 'pa_patterns_textures', 'pa_pattern'];
 	$current_term = get_queried_object();
+	$lang_args = function_exists('tersa_get_current_language_query_arg') ? tersa_get_current_language_query_arg() : [];
+
+	if (!empty($lang_args['lang'])) {
+		$query->set('lang', $lang_args['lang']);
+	}
 
 	if ($current_term instanceof WP_Term && $current_term->taxonomy === 'product_cat') {
 		$has_product_cat_in_query = false;
@@ -180,6 +184,9 @@ function tersa_modify_archive_query(WP_Query $query) {
 
 	if (tersa_is_sale_filter_active() && function_exists('wc_get_product_ids_on_sale')) {
 		$sale_ids = wc_get_product_ids_on_sale();
+		if (function_exists('tersa_filter_product_ids_for_current_language')) {
+			$sale_ids = tersa_filter_product_ids_for_current_language(array_map('absint', (array) $sale_ids));
+		}
 		$query->set('post__in', !empty($sale_ids) ? $sale_ids : [0]);
 	}
 
@@ -242,4 +249,3 @@ function tersa_prime_product_tag_term_cache(): void {
 	update_object_term_cache($ids, 'product');
 }
 add_action('woocommerce_before_shop_loop', 'tersa_prime_product_tag_term_cache', 5);
-

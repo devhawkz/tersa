@@ -84,6 +84,18 @@ document.addEventListener('DOMContentLoaded', function () {
     };
   }
 
+  function getHeaderText(key, fallback) {
+    var i18n = window.tersaHeaderI18n || {};
+    return typeof i18n[key] === 'string' && i18n[key] !== '' ? i18n[key] : fallback;
+  }
+
+  function appendCartLanguage(body) {
+    var cfg = window.tersaCartDrawer || {};
+    if (cfg.lang && typeof cfg.lang === 'string') {
+      body.append('lang', cfg.lang);
+    }
+  }
+
   function getFocusableElements(container) {
     if (!container) {
       return [];
@@ -285,9 +297,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
       var nav = item.closest('.site-header__nav');
       var template = nav ? nav.getAttribute('data-submenu-label') : '';
-      var fallback = (window.tersaHeaderI18n && window.tersaHeaderI18n.openSubmenuFor)
-        ? window.tersaHeaderI18n.openSubmenuFor
-        : 'Otvori podizbornik za %s';
+      var fallback = getHeaderText('openSubmenuFor', 'Open submenu for %s');
       var labelTemplate = template || fallback;
       var label = labelTemplate.replace('%s', link.textContent.trim());
 
@@ -334,9 +344,7 @@ document.addEventListener('DOMContentLoaded', function () {
         return;
       }
 
-      var openSubmenuTpl = (window.tersaHeaderI18n && window.tersaHeaderI18n.openSubmenuFor)
-        ? window.tersaHeaderI18n.openSubmenuFor
-        : 'Otvori podizbornik za %s';
+      var openSubmenuTpl = getHeaderText('openSubmenuFor', 'Open submenu for %s');
       var label = openSubmenuTpl.replace('%s', link.textContent.trim());
       var toggle = buildSubmenuToggle(label);
       link.insertAdjacentElement('afterend', toggle);
@@ -534,7 +542,7 @@ document.addEventListener('DOMContentLoaded', function () {
       return;
     }
 
-    var baseLabel = searchTitle.getAttribute('data-search-label') || 'Rezultati pretrage';
+    var baseLabel = searchTitle.getAttribute('data-search-label') || getHeaderText('searchResults', 'Search results');
     var count = getAwsResultCount();
     searchTitle.textContent = count > 0 ? baseLabel + ' (' + count + ')' : baseLabel;
   }
@@ -785,9 +793,7 @@ document.addEventListener('DOMContentLoaded', function () {
       if (!cartDrawerHydrated) {
         var missingConfigContent = document.querySelector('#cart-drawer .widget_shopping_cart_content');
         if (missingConfigContent) {
-          missingConfigContent.textContent = (window.tersaHeaderI18n && window.tersaHeaderI18n.cartLoadError)
-            ? window.tersaHeaderI18n.cartLoadError
-            : 'Greška pri učitavanju košarice.';
+          missingConfigContent.textContent = getHeaderText('cartLoadError', 'Cart could not be loaded.');
         }
       }
       return;
@@ -810,6 +816,7 @@ document.addEventListener('DOMContentLoaded', function () {
       body.append('action', 'tersa_get_cart_drawer_fragments');
     }
     body.append('nonce', window.tersaCartDrawer.nonce);
+    appendCartLanguage(body);
 
     fetch(fragmentsUrl, {
       method: 'POST',
@@ -829,9 +836,7 @@ document.addEventListener('DOMContentLoaded', function () {
         if (!data || !data.success || !data.data || typeof data.data.mini_cart_html !== 'string') {
           var invalidContent = document.querySelector('#cart-drawer .widget_shopping_cart_content');
           if (invalidContent && !cartDrawerHydrated) {
-            invalidContent.textContent = (window.tersaHeaderI18n && window.tersaHeaderI18n.cartLoadError)
-              ? window.tersaHeaderI18n.cartLoadError
-              : 'Greška pri učitavanju košarice.';
+            invalidContent.textContent = getHeaderText('cartLoadError', 'Cart could not be loaded.');
           }
           return;
         }
@@ -850,9 +855,7 @@ document.addEventListener('DOMContentLoaded', function () {
         console.error(error);
         var cartContent = document.querySelector('#cart-drawer .widget_shopping_cart_content');
         if (cartContent && !cartDrawerHydrated) {
-          cartContent.textContent = (window.tersaHeaderI18n && window.tersaHeaderI18n.cartLoadError)
-            ? window.tersaHeaderI18n.cartLoadError
-            : 'Greška pri učitavanju košarice.';
+          cartContent.textContent = getHeaderText('cartLoadError', 'Cart could not be loaded.');
         }
       })
       .finally(function () {
@@ -1008,11 +1011,13 @@ document.addEventListener('DOMContentLoaded', function () {
         body.append('action', 'tersa_update_mini_cart_qty');
       }
       body.append('nonce', window.tersaCartDrawer.nonce);
+      appendCartLanguage(body);
       body.append('cart_item_key', cartItemKey);
       body.append('quantity', String(nextQty));
 
       fetch(qtyUrl, {
         method: 'POST',
+        credentials: 'same-origin',
         headers: {
           'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8'
         },

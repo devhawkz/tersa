@@ -13,12 +13,8 @@ $get = function_exists('get_field') ? function ($key, $fallback = '') use ($page
 $work_image_url = '';
 if (function_exists('get_field')) {
 	$img = get_field('about_work_image', $page_id);
-	if (is_numeric($img)) {
-		$work_image_url = wp_get_attachment_image_url((int) $img, 'full');
-	} elseif (is_array($img) && !empty($img['url'])) {
-		$work_image_url = $img['url'];
-	} elseif (is_array($img) && !empty($img['ID'])) {
-		$work_image_url = wp_get_attachment_image_url((int) $img['ID'], 'full');
+	if (function_exists('tersa_get_acf_image_url')) {
+		$work_image_url = tersa_get_acf_image_url($img, 'full');
 	}
 }
 if (!$work_image_url) {

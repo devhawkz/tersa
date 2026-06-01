@@ -38,13 +38,23 @@ $hq_hours_sat     = $get ? $get('contact_hq_hours_sat', '') : '';
 $hq_address_default = $impressum['address'] ?? ($get_option ? $get_option('company_address', __('Nikole Tesle 71, 31551 Črnkovci', 'tersa-shop')) : __('Nikole Tesle 71, 31551 Črnkovci', 'tersa-shop'));
 $hq_address       = $get ? $get('contact_hq_address', $hq_address_default) : $hq_address_default;
 $form_heading     = $get ? $get('contact_form_heading', __('We would love to hear from you.', 'tersa-shop')) : __('We would love to hear from you.', 'tersa-shop');
-$contact_cf7_shortcode = $get_option ? $get_option('contact_cf7_shortcode', '[contact-form-7 id="6a84fef" title="Kontakt"]') : '[contact-form-7 id="6a84fef" title="Kontakt"]';
+$contact_cf7_shortcode = $get_option ? $get_option('contact_cf7_shortcode', '') : '';
+if ($contact_cf7_shortcode !== '' && function_exists('tersa_translate_string')) {
+	$contact_cf7_shortcode = tersa_translate_string((string) $contact_cf7_shortcode);
+}
 $hq_address_markup = function_exists('tersa_safe_rich_text')
 	? tersa_safe_rich_text((string) $hq_address)
 	: wp_kses_post(wpautop((string) $hq_address));
+$contact_form_markup = ($contact_cf7_shortcode !== '' && function_exists('tersa_safe_cf7_shortcode_output'))
+	? tersa_safe_cf7_shortcode_output((string) $contact_cf7_shortcode)
+	: '';
 
-$phone_href = preg_replace('/\s+/', '', $phone);
-$phone_href_second = preg_replace('/\s+/', '', $phone_second);
+$phone_href = preg_replace('/[^0-9+]/', '', (string) $phone);
+$phone_href_second = preg_replace('/[^0-9+]/', '', (string) $phone_second);
+$email_href = sanitize_email((string) $email);
+$email_complaints_href = !empty($impressum['email_complaints'])
+	? sanitize_email((string) $impressum['email_complaints'])
+	: '';
 ?>
 
 <section class="contact-section">
@@ -59,14 +69,22 @@ $phone_href_second = preg_replace('/\s+/', '', $phone_second);
 					<div class="contact-card__block">
 						<h3 class="contact-card__label"><?php echo esc_html($call_label); ?></h3>
 						<p style="margin:0">
-							<a href="tel:<?php echo esc_attr($phone_href); ?>"><?php echo esc_html($phone); ?></a>
+							<?php if ($phone_href) : ?>
+								<a href="tel:<?php echo esc_attr($phone_href); ?>"><?php echo esc_html($phone); ?></a>
+							<?php else : ?>
+								<?php echo esc_html($phone); ?>
+							<?php endif; ?>
 						</p>
 						<p><?php echo esc_html($call_text); ?></p>
 					</div>
 					<?php if (!empty($phone_second)) : ?>
 						<div class="contact-card__block">
 							<p style="margin:0">
-								<a href="tel:<?php echo esc_attr($phone_href_second); ?>"><?php echo esc_html($phone_second); ?></a>
+								<?php if ($phone_href_second) : ?>
+									<a href="tel:<?php echo esc_attr($phone_href_second); ?>"><?php echo esc_html($phone_second); ?></a>
+								<?php else : ?>
+									<?php echo esc_html($phone_second); ?>
+								<?php endif; ?>
 							</p>
 							<?php if (!empty($call_text_second)) : ?>
 								<p><?php echo esc_html($call_text_second); ?></p>
@@ -79,7 +97,11 @@ $phone_href_second = preg_replace('/\s+/', '', $phone_second);
 						<p><?php echo esc_html($write_text); ?></p>
 						<p>
 							<?php echo esc_html($email_label); ?>
-							<a href="mailto:<?php echo esc_attr($email); ?>"><?php echo esc_html($email); ?></a>
+							<?php if ($email_href) : ?>
+								<a href="mailto:<?php echo esc_attr($email_href); ?>"><?php echo esc_html($email); ?></a>
+							<?php else : ?>
+								<?php echo esc_html($email); ?>
+							<?php endif; ?>
 						</p>
 					</div>
 
@@ -94,90 +116,94 @@ $phone_href_second = preg_replace('/\s+/', '', $phone_second);
 						</div>
 					</div>
 
-				
-				</div>
-								
-				<div class="contact-card__form">
-					<h2 class="contact-card__heading">
-						<?php echo esc_html($form_heading); ?>
-					</h2>
 
-					<div class="contact-card__form-wrap">
-					<?php
-					if (function_exists('tersa_safe_cf7_shortcode_output')) {
-						// tersa_safe_cf7_shortcode_output() validateira strogi regex — samo CF7 shortcode.
-						// wp_kses_post() bi uklonilo <form> elemente pa ga ne koristimo ovdje.
-						echo tersa_safe_cf7_shortcode_output((string) $contact_cf7_shortcode); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
-					}
-					?>
-					</div>
 				</div>
+
+				<?php if ($contact_form_markup !== '') : ?>
+					<div class="contact-card__form">
+						<h2 class="contact-card__heading">
+							<?php echo esc_html($form_heading); ?>
+						</h2>
+
+						<div class="contact-card__form-wrap">
+							<?php
+							// tersa_safe_cf7_shortcode_output() validateira strogi regex — samo CF7 shortcode.
+							// wp_kses_post() bi uklonilo <form> elemente pa ga ne koristimo ovdje.
+							echo $contact_form_markup; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+							?>
+						</div>
+					</div>
+				<?php endif; ?>
 			</div>
 			<?php
-					/**
-					 * Impressum — pravni podaci o tvrtki obavezni za CorvusPay aktivaciju
-					 * i sukladnost sa HR Zakonom o elektroničkoj trgovini (čl. 6).
-					 *
-					 * Klijent (Tersa d.o.o.) je u dokumentu "Popis podataka i sadržaja - upitnik"
-					 * eksplicitno potvrdio da podaci o firmi idu na postojeću Kontakt stranicu.
-					 */
-					if (!empty($impressum)) : ?>
-						<div class="contact-card__block contact-card__block--impressum">
-							<h3 class="contact-card__label"><?php esc_html_e('Podaci o tvrtki:', 'tersa-shop'); ?></h3>
-							<dl class="contact-card__impressum">
-								<dt><?php esc_html_e('Naziv:', 'tersa-shop'); ?></dt>
-								<dd><?php echo esc_html($impressum['full_name']); ?></dd>
+			/**
+			 * Impressum — pravni podaci o tvrtki obavezni za CorvusPay aktivaciju
+			 * i sukladnost sa HR Zakonom o elektroničkoj trgovini (čl. 6).
+			 *
+			 * Klijent (Tersa d.o.o.) je u dokumentu "Popis podataka i sadržaja - upitnik"
+			 * eksplicitno potvrdio da podaci o firmi idu na postojeću Kontakt stranicu.
+			 */
+			if (!empty($impressum)) : ?>
+				<div class="contact-card__block contact-card__block--impressum">
+					<h3 class="contact-card__label"><?php esc_html_e('Podaci o tvrtki:', 'tersa-shop'); ?></h3>
+					<dl class="contact-card__impressum">
+						<dt><?php esc_html_e('Naziv:', 'tersa-shop'); ?></dt>
+						<dd><?php echo esc_html($impressum['full_name']); ?></dd>
 
-								<?php if (!empty($impressum['activity'])) : ?>
-									<dt><?php esc_html_e('Djelatnost:', 'tersa-shop'); ?></dt>
-									<dd><?php echo esc_html($impressum['activity']); ?></dd>
+						<?php if (!empty($impressum['activity'])) : ?>
+							<dt><?php esc_html_e('Djelatnost:', 'tersa-shop'); ?></dt>
+							<dd><?php echo esc_html($impressum['activity']); ?></dd>
+						<?php endif; ?>
+
+						<dt><?php esc_html_e('OIB:', 'tersa-shop'); ?></dt>
+						<dd><?php echo esc_html($impressum['oib']); ?></dd>
+
+						<dt><?php esc_html_e('MBS:', 'tersa-shop'); ?></dt>
+						<dd><?php echo esc_html($impressum['mbs']); ?></dd>
+
+						<dt><?php esc_html_e('Registar:', 'tersa-shop'); ?></dt>
+						<dd><?php echo esc_html($impressum['court']); ?></dd>
+
+						<?php if (!empty($impressum['director'])) : ?>
+							<dt><?php esc_html_e('Odgovorna osoba:', 'tersa-shop'); ?></dt>
+							<dd><?php echo esc_html($impressum['director']); ?></dd>
+						<?php endif; ?>
+
+						<?php if (!empty($impressum['share_capital'])) : ?>
+							<dt><?php esc_html_e('Temeljni kapital:', 'tersa-shop'); ?></dt>
+							<dd><?php echo esc_html($impressum['share_capital']); ?></dd>
+						<?php endif; ?>
+
+						<?php if (!empty($impressum['iban'])) : ?>
+							<dt><?php esc_html_e('IBAN:', 'tersa-shop'); ?></dt>
+							<dd>
+								<?php echo esc_html($impressum['iban']); ?>
+								<?php if (!empty($impressum['bank'])) : ?>
+									<small>(<?php echo esc_html($impressum['bank']); ?>)</small>
 								<?php endif; ?>
+							</dd>
+						<?php endif; ?>
 
-								<dt><?php esc_html_e('OIB:', 'tersa-shop'); ?></dt>
-								<dd><?php echo esc_html($impressum['oib']); ?></dd>
+						<?php if (!empty($impressum['vat_id'])) : ?>
+							<dt><?php esc_html_e('PDV ID:', 'tersa-shop'); ?></dt>
+							<dd><?php echo esc_html($impressum['vat_id']); ?></dd>
+						<?php endif; ?>
 
-								<dt><?php esc_html_e('MBS:', 'tersa-shop'); ?></dt>
-								<dd><?php echo esc_html($impressum['mbs']); ?></dd>
-
-								<dt><?php esc_html_e('Registar:', 'tersa-shop'); ?></dt>
-								<dd><?php echo esc_html($impressum['court']); ?></dd>
-
-								<?php if (!empty($impressum['director'])) : ?>
-									<dt><?php esc_html_e('Odgovorna osoba:', 'tersa-shop'); ?></dt>
-									<dd><?php echo esc_html($impressum['director']); ?></dd>
+						<?php if (!empty($impressum['email_complaints']) && $impressum['email_complaints'] !== $impressum['email']) : ?>
+							<dt><?php esc_html_e('Reklamacije i povrati:', 'tersa-shop'); ?></dt>
+							<dd>
+								<?php if ($email_complaints_href) : ?>
+									<a href="mailto:<?php echo esc_attr($email_complaints_href); ?>">
+										<?php echo esc_html($impressum['email_complaints']); ?>
+									</a>
+								<?php else : ?>
+									<?php echo esc_html($impressum['email_complaints']); ?>
 								<?php endif; ?>
-
-								<?php if (!empty($impressum['share_capital'])) : ?>
-									<dt><?php esc_html_e('Temeljni kapital:', 'tersa-shop'); ?></dt>
-									<dd><?php echo esc_html($impressum['share_capital']); ?></dd>
-								<?php endif; ?>
-
-								<?php if (!empty($impressum['iban'])) : ?>
-									<dt><?php esc_html_e('IBAN:', 'tersa-shop'); ?></dt>
-									<dd>
-										<?php echo esc_html($impressum['iban']); ?>
-										<?php if (!empty($impressum['bank'])) : ?>
-											<small>(<?php echo esc_html($impressum['bank']); ?>)</small>
-										<?php endif; ?>
-									</dd>
-								<?php endif; ?>
-
-								<?php if (!empty($impressum['vat_id'])) : ?>
-									<dt><?php esc_html_e('PDV ID:', 'tersa-shop'); ?></dt>
-									<dd><?php echo esc_html($impressum['vat_id']); ?></dd>
-								<?php endif; ?>
-
-								<?php if (!empty($impressum['email_complaints']) && $impressum['email_complaints'] !== $impressum['email']) : ?>
-									<dt><?php esc_html_e('Reklamacije i povrati:', 'tersa-shop'); ?></dt>
-									<dd>
-										<a href="mailto:<?php echo esc_attr($impressum['email_complaints']); ?>">
-											<?php echo esc_html($impressum['email_complaints']); ?>
-										</a>
-									</dd>
-								<?php endif; ?>
-							</dl>
-						</div>
-					<?php endif; ?>
+							</dd>
+						<?php endif; ?>
+					</dl>
+				</div>
+			<?php endif; ?>
 		</div>
 	</div>
 </section>

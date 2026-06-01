@@ -134,25 +134,32 @@ add_action('save_post_page', 'tersa_maybe_clear_footer_settings_cache', 10, 2);
 function tersa_pll_page_url(string $slug): string {
 	static $cache = [];
 
-	if (isset($cache[$slug])) {
-		return $cache[$slug];
+	$slug      = trim(sanitize_title($slug), '/');
+	$lang      = function_exists('pll_current_language') ? (string) pll_current_language('slug') : '';
+	$cache_key = $lang . '|' . $slug;
+	$fallback  = function_exists('tersa_get_current_language_home_url')
+		? trailingslashit(tersa_get_current_language_home_url()) . $slug . '/'
+		: home_url('/' . $slug . '/');
+
+	if (isset($cache[$cache_key])) {
+		return $cache[$cache_key];
 	}
 
 	$page = get_page_by_path($slug);
 
 	if (!$page instanceof WP_Post) {
-		return $cache[$slug] = home_url('/' . $slug . '/');
+		return $cache[$cache_key] = $fallback;
 	}
 
 	if (function_exists('pll_get_post')) {
 		$translated_id = pll_get_post($page->ID);
 		if ($translated_id) {
 			$url = get_permalink($translated_id);
-			return $cache[$slug] = ($url ?: get_permalink($page->ID) ?: home_url('/' . $slug . '/'));
+			return $cache[$cache_key] = ($url ?: get_permalink($page->ID) ?: $fallback);
 		}
 	}
 
-	return $cache[$slug] = (get_permalink($page->ID) ?: home_url('/' . $slug . '/'));
+	return $cache[$cache_key] = (get_permalink($page->ID) ?: $fallback);
 }
 
 /**
@@ -173,6 +180,35 @@ function tersa_safe_rich_text(string $value): string {
 	}
 
 	return wp_kses_post($value);
+}
+
+/**
+ * Normalizuje ACF image vrednost (ID, array ili URL) u bezbedan URL.
+ *
+ * @param mixed  $image ACF image vrednost.
+ * @param string $size  WordPress image size.
+ * @return string
+ */
+function tersa_get_acf_image_url($image, string $size = 'full'): string {
+	$url = '';
+
+	if (is_numeric($image)) {
+		$url = wp_get_attachment_image_url(absint($image), $size);
+	} elseif (is_array($image)) {
+		$image_id = isset($image['ID']) ? absint($image['ID']) : (isset($image['id']) ? absint($image['id']) : 0);
+
+		if ($image_id) {
+			$url = wp_get_attachment_image_url($image_id, $size);
+		}
+
+		if (!$url && !empty($image['url']) && is_string($image['url'])) {
+			$url = $image['url'];
+		}
+	} elseif (is_string($image) && '' !== trim($image)) {
+		$url = $image;
+	}
+
+	return $url ? esc_url_raw((string) $url) : '';
 }
 
 /**
@@ -212,6 +248,17 @@ function tersa_get_company_settings(): array {
 	$page_id   = tersa_get_footer_settings_page_id();
 	$get_field = function_exists('get_field');
 
+	$company_phone_secondary = '';
+	if ($page_id && $get_field) {
+		$company_phone_secondary_raw = get_field('company_phone_secondary', $page_id);
+
+		if (!is_scalar($company_phone_secondary_raw) || '' === trim((string) $company_phone_secondary_raw)) {
+			$company_phone_secondary_raw = get_field('company_phone_primary_secondary', $page_id);
+		}
+
+		$company_phone_secondary = is_scalar($company_phone_secondary_raw) ? (string) $company_phone_secondary_raw : '';
+	}
+
 	$settings = [
 		'company_name'                    => ($page_id && $get_field) ? (string) get_field('company_name', $page_id) : '',
 		'company_full_name'               => ($page_id && $get_field) ? (string) get_field('company_full_name', $page_id) : '',
@@ -220,7 +267,7 @@ function tersa_get_company_settings(): array {
 		'company_email'                   => ($page_id && $get_field) ? (string) get_field('company_email', $page_id) : '',
 		'company_email_complaints'        => ($page_id && $get_field) ? (string) get_field('company_email_complaints', $page_id) : '',
 		'company_phone_primary'           => ($page_id && $get_field) ? (string) get_field('company_phone_primary', $page_id) : '',
-		'company_phone_secondary'         => ($page_id && $get_field) ? (string) get_field('company_phone_secondary', $page_id) : '',
+		'company_phone_secondary'         => $company_phone_secondary,
 		'company_oib'                     => ($page_id && $get_field) ? (string) get_field('company_oib', $page_id) : '',
 		'company_mbs'                     => ($page_id && $get_field) ? (string) get_field('company_mbs', $page_id) : '',
 		'company_court'                   => ($page_id && $get_field) ? (string) get_field('company_court', $page_id) : '',
@@ -271,6 +318,67 @@ function tersa_maybe_clear_company_settings_cache(int $post_id, $post = null): v
 add_action('save_post_page', 'tersa_maybe_clear_company_settings_cache', 10, 2);
 
 /**
+ * Registruje footer/global ACF stringove za Polylang String Translation.
+ *
+ * @return void
+ */
+function tersa_register_footer_polylang_strings(): void {
+	if (!function_exists('pll_register_string')) {
+		return;
+	}
+
+	$register = static function (string $name, string $value, string $group, bool $multiline = false): void {
+		if (trim($value) === '') {
+			return;
+		}
+
+		pll_register_string($name, $value, $group, $multiline);
+	};
+
+	$footer_settings = tersa_get_footer_settings();
+	$company_settings = tersa_get_company_settings();
+
+	$register('footer_newsletter_heading', (string) ($footer_settings['footer_newsletter_heading'] ?? ''), 'Tersa – footer', false);
+	$register('footer_newsletter_text', (string) ($footer_settings['footer_newsletter_text'] ?? ''), 'Tersa – footer', true);
+	$register('footer_newsletter_cf7_shortcode', (string) ($company_settings['footer_newsletter_cf7_shortcode'] ?? ''), 'Tersa – forme', false);
+
+	$company_string_fields = [
+		'company_name'          => false,
+		'company_full_name'     => false,
+		'company_activity'      => false,
+		'company_address'       => true,
+		'company_court'         => false,
+		'company_director'      => false,
+		'company_share_capital' => false,
+		'company_bank'          => false,
+		'company_support_hours' => false,
+	];
+
+	foreach ($company_string_fields as $field => $multiline) {
+		$register($field, (string) ($company_settings[$field] ?? ''), 'Tersa – podaci tvrtke', (bool) $multiline);
+	}
+
+	$company_fallback_strings = [
+		'company_activity_fallback'      => ['Prerada drva i trgovina drvnim proizvodima', false],
+		'company_address_fallback'       => ['Nikole Tesle 71, 31551 Črnkovci, Hrvatska', true],
+		'company_court_fallback'         => ['Trgovački sud u Osijeku', false],
+		'company_director_fallback'      => ['Vlado Šakić, direktor', false],
+		'company_support_hours_fallback' => ['Pon – Pet: 08:00 – 14:00', false],
+	];
+
+	foreach ($company_fallback_strings as $name => [$value, $multiline]) {
+		$register($name, $value, 'Tersa – podaci tvrtke', (bool) $multiline);
+	}
+
+	$global_settings_page_id = tersa_get_global_settings_page_id();
+	if ($global_settings_page_id && function_exists('get_field')) {
+		$register('contact_cf7_shortcode', (string) get_field('contact_cf7_shortcode', $global_settings_page_id), 'Tersa – forme', false);
+		$register('contact_map_embed', (string) get_field('contact_map_embed', $global_settings_page_id), 'Tersa – kontakt', true);
+	}
+}
+add_action('init', 'tersa_register_footer_polylang_strings', 20);
+
+/**
  * ID global settings stranice za trenutni Polylang jezik (ACF Free pristup).
  * Static cache je per-language — isti request nema više od jednog jezičnog konteksta.
  *
@@ -315,25 +423,28 @@ function tersa_get_company_impressum(): array {
 	$pick = static function (string $value, string $fallback): string {
 		return trim($value) !== '' ? $value : $fallback;
 	};
+	$translate = static function (string $value): string {
+		return function_exists('tersa_translate_string') ? tersa_translate_string($value) : $value;
+	};
 
 	return [
-		'name'           => $pick($s['company_name']             ?? '', 'Tersa d.o.o.'),
-		'full_name'      => $pick($s['company_full_name']        ?? '', 'Tersa d.o.o.'),
-		'activity'       => $pick($s['company_activity']         ?? '', 'Prerada drva i trgovina drvnim proizvodima'),
-		'address'        => $pick($s['company_address']          ?? '', 'Nikole Tesle 71, 31551 Črnkovci, Hrvatska'),
+		'name'           => $translate($pick($s['company_name']             ?? '', 'Tersa d.o.o.')),
+		'full_name'      => $translate($pick($s['company_full_name']        ?? '', 'Tersa d.o.o.')),
+		'activity'       => $translate($pick($s['company_activity']         ?? '', 'Prerada drva i trgovina drvnim proizvodima')),
+		'address'        => $translate($pick($s['company_address']          ?? '', 'Nikole Tesle 71, 31551 Črnkovci, Hrvatska')),
 		'oib'            => $pick($s['company_oib']              ?? '', '80835896442'),
 		'mbs'            => $pick($s['company_mbs']              ?? '', '030014012'),
-		'court'          => $pick($s['company_court']            ?? '', 'Trgovački sud u Osijeku'),
-		'director'       => $pick($s['company_director']         ?? '', 'Vlado Šakić, direktor'),
-		'share_capital'  => (string) ($s['company_share_capital'] ?? ''),
+		'court'          => $translate($pick($s['company_court']            ?? '', 'Trgovački sud u Osijeku')),
+		'director'       => $translate($pick($s['company_director']         ?? '', 'Vlado Šakić, direktor')),
+		'share_capital'  => $translate((string) ($s['company_share_capital'] ?? '')),
 		'iban'           => (string) ($s['company_iban']         ?? ''),
-		'bank'           => (string) ($s['company_bank']         ?? ''),
+		'bank'           => $translate((string) ($s['company_bank']         ?? '')),
 		'vat_id'         => (string) ($s['company_vat_id']       ?? ''),
 		'email'          => $pick($s['company_email']            ?? '', 'tersa@tersa.hr'),
 		'email_complaints' => $pick($s['company_email_complaints'] ?? '', 'tersa@tersa.hr'),
 		'phone'          => $pick($s['company_phone_primary']    ?? '', '031/355 900'),
 		'phone_secondary'=> (string) ($s['company_phone_secondary'] ?? ''),
-		'support_hours'  => $pick($s['company_support_hours']    ?? '', 'Pon – Pet: 08:00 – 14:00'),
+		'support_hours'  => $translate($pick($s['company_support_hours']    ?? '', 'Pon – Pet: 08:00 – 14:00')),
 	];
 }
 
@@ -417,4 +528,3 @@ function tersa_get_security_badges(string $variant = 'light'): array {
 		],
 	];
 }
-

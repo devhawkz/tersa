@@ -20,6 +20,9 @@ $settings_page_id = function_exists('tersa_get_global_settings_page_id') ? tersa
 $map_embed = (function_exists('get_field') && $settings_page_id)
 	? (string) get_field('contact_map_embed', $settings_page_id)
 	: '';
+if ($map_embed !== '' && function_exists('tersa_translate_string')) {
+	$map_embed = tersa_translate_string($map_embed);
+}
 
 if (trim($map_embed) === '') {
 	$map_embed = '<iframe

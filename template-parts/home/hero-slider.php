@@ -61,7 +61,8 @@ if (empty($slides)) {
 			<?php foreach ($slides as $index => $slide) : ?>
 				<?php
 				$is_active = $index === 0;
-				$bg_color  = !empty($slide['background_color']) ? $slide['background_color'] : '#f3ead7';
+				$bg_color  = !empty($slide['background_color']) ? sanitize_hex_color((string) $slide['background_color']) : '';
+				$bg_color  = $bg_color ?: '#f3ead7';
 
 				$current_price     = isset($slide['current_price']) ? $slide['current_price'] : '';
 				$old_price         = isset($slide['old_price']) ? $slide['old_price'] : '';

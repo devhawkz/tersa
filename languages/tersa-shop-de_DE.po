@@ -1,0 +1,747 @@
+# German translations for Tersa Shop package.
+# Copyright (C) 2026 Tersa
+# This file is distributed under the same license as the Tersa Shop package.
+# Automatically generated, 2026.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Tersa Shop 1.0.0\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2026-05-28 13:07+0200\n"
+"PO-Revision-Date: 2026-05-28 13:07+0200\n"
+"Last-Translator: Automatically generated\n"
+"Language-Team: none\n"
+"Language: de\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+#: woocommerce/content-product.php:49 woocommerce/content-product.php:50
+#: template-parts/product/related-products.php:56
+msgid "Vidi opcije"
+msgstr ""
+
+#: woocommerce/content-product.php:53 woocommerce/content-product.php:54
+msgid "Dodaj u košaricu"
+msgstr ""
+
+#: woocommerce/content-product.php:112
+#: woocommerce/content-single-product.php:62
+msgid "Na sniženju"
+msgstr ""
+
+#: woocommerce/content-product.php:130
+msgid "Product badges"
+msgstr ""
+
+#: woocommerce/cart/mini-cart.php:55
+#, php-format
+msgid "Remove %s from cart"
+msgstr ""
+
+#: woocommerce/cart/mini-cart.php:94
+msgid "Decrease quantity"
+msgstr ""
+
+#: woocommerce/cart/mini-cart.php:106
+msgid "Increase quantity"
+msgstr ""
+
+#: woocommerce/cart/mini-cart.php:126
+msgid "Subtotal"
+msgstr ""
+
+#: woocommerce/cart/mini-cart.php:137
+msgid "Trenutno nema proizvoda u košarici."
+msgstr ""
+
+#: woocommerce/content-single-product.php:154
+msgid "Označke proizvoda"
+msgstr ""
+
+#: woocommerce/content-single-product.php:167
+msgid "Otvori sliku proizvoda"
+msgstr ""
+
+#: woocommerce/content-single-product.php:199
+msgid "Prethodne slike"
+msgstr ""
+
+#: woocommerce/content-single-product.php:205
+msgid "Minijature u galeriji"
+msgstr ""
+
+#: woocommerce/content-single-product.php:225
+#, php-format
+msgid "Prikaži sliku %d"
+msgstr ""
+
+#: woocommerce/content-single-product.php:249
+msgid "Sljedeće slike"
+msgstr ""
+
+#: woocommerce/content-single-product.php:261
+msgid "Navigacija"
+msgstr ""
+
+#: woocommerce/content-single-product.php:269 404.php:19
+#: archive-eu_project.php:14 template-parts/global/breadcrumbs.php:19
+#: page.php:22
+msgid "Naslovnica"
+msgstr ""
+
+#: woocommerce/content-single-product.php:345
+msgid "Šifra proizvoda:"
+msgstr ""
+
+#: woocommerce/content-single-product.php:352
+msgid "Brendovi:"
+msgstr ""
+
+#: woocommerce/content-single-product.php:357
+msgid "Kategorija:"
+msgstr ""
+
+#: woocommerce/content-single-product.php:375
+#, php-format
+msgid "Recenzije (%d)"
+msgstr ""
+
+#: woocommerce/content-single-product.php:447
+msgid "Pregled slike proizvoda"
+msgstr ""
+
+#: woocommerce/content-single-product.php:455
+msgid "Zatvori pregled"
+msgstr ""
+
+#: 404.php:15 page.php:18
+msgid "Putanja stranice"
+msgstr ""
+
+#: 404.php:27
+msgid "Greška 404"
+msgstr ""
+
+#: 404.php:31
+msgid "Stranica nije pronađena"
+msgstr ""
+
+#: 404.php:35
+msgid ""
+"Nažalost, stranica koju tražite ne postoji, premještena je ili je privremeno "
+"nedostupna."
+msgstr ""
+
+#: 404.php:38
+msgid "Mogućnosti navigacije"
+msgstr ""
+
+#: 404.php:40
+msgid "Povratak na početnu"
+msgstr ""
+
+#: 404.php:45
+msgid "Idi u trgovinu"
+msgstr ""
+
+#. translators: %d: wishlist item count
+#: inc/header-helpers.php:322
+#, php-format
+msgid "Wishlist, %d item"
+msgid_plural "Wishlist, %d items"
+msgstr[0] ""
+msgstr[1] ""
+
+#. translators: %d: cart item count
+#: inc/header-helpers.php:337
+#, php-format
+msgid "Cart, %d item"
+msgid_plural "Cart, %d items"
+msgstr[0] ""
+msgstr[1] ""
+
+#: inc/woocommerce/wishlist.php:48
+msgid "Moja lista želja"
+msgstr ""
+
+#: inc/woocommerce/wishlist.php:54
+#, php-format
+msgid "\"%s\" je dodano na vašu listu \"%s\"!"
+msgstr ""
+
+#: inc/woocommerce/ajax.php:16
+msgid "Košarica nije dostupna."
+msgstr ""
+
+#: inc/woocommerce/ajax.php:24
+msgid "Nevažeći artikl u košarici."
+msgstr ""
+
+#: inc/woocommerce/checkout.php:38
+msgid "Sigurno plaćanje karticama"
+msgstr ""
+
+#: inc/enqueue.php:243 inc/enqueue.php:244
+#, php-format
+msgid "Otvori podizbornik za %s"
+msgstr ""
+
+#: inc/enqueue.php:246 inc/enqueue.php:247
+msgid "Greška pri učitavanju košarice."
+msgstr ""
+
+#: inc/eu-projects.php:8 inc/eu-projects.php:10 archive-eu_project.php:17
+#: archive-eu_project.php:22
+msgid "EU Projekti"
+msgstr ""
+
+#: inc/eu-projects.php:9
+msgid "EU Projekt"
+msgstr ""
+
+#: inc/eu-projects.php:11
+msgid "Dodaj novi"
+msgstr ""
+
+#: inc/eu-projects.php:12
+msgid "Dodaj novi EU projekt"
+msgstr ""
+
+#: inc/eu-projects.php:13
+msgid "Uredi EU projekt"
+msgstr ""
+
+#: inc/eu-projects.php:14
+msgid "Novi EU projekt"
+msgstr ""
+
+#: inc/eu-projects.php:15
+msgid "Pogledaj EU projekt"
+msgstr ""
+
+#: inc/eu-projects.php:16
+msgid "Svi EU projekti"
+msgstr ""
+
+#: inc/eu-projects.php:17
+msgid "Traži EU projekte"
+msgstr ""
+
+#: inc/eu-projects.php:18
+msgid "Nema EU projekata."
+msgstr ""
+
+#: inc/eu-projects.php:19
+msgid "Nema EU projekata u smeću."
+msgstr ""
+
+#: inc/customizer.php:13
+msgid "Homepage options"
+msgstr ""
+
+#: inc/customizer.php:15
+msgid "Settings for front page layout and behavior."
+msgstr ""
+
+#: inc/customizer.php:33
+msgid "Show sidebar on homepage"
+msgstr ""
+
+#: inc/customizer.php:34
+msgid ""
+"If enabled, the primary sidebar is displayed on the front page when it has "
+"active widgets."
+msgstr ""
+
+#: inc/setup.php:69
+msgid "Primary menu"
+msgstr ""
+
+#: inc/setup.php:70
+msgid "Footer About menu"
+msgstr ""
+
+#: inc/setup.php:71
+msgid "Footer Legal menu"
+msgstr ""
+
+#: inc/setup.php:93
+msgid "Glavna bočna traka"
+msgstr ""
+
+#: inc/setup.php:95
+msgid "Widgeti za glavnu bočnu traku."
+msgstr ""
+
+#: inc/security.php:78
+msgid "Prijava nije uspela."
+msgstr ""
+
+#: index.php:12
+msgid "Content coming soon."
+msgstr ""
+
+#: archive-eu_project.php:12 single-eu_project.php:124
+msgid "Breadcrumbs"
+msgstr ""
+
+#: archive-eu_project.php:149
+msgid "Vidi projekt"
+msgstr ""
+
+#: archive-eu_project.php:162
+msgid "Prethodna"
+msgstr ""
+
+#: archive-eu_project.php:163
+msgid "Sljedeća"
+msgstr ""
+
+#: archive-eu_project.php:170
+msgid "Trenutno nema dostupnih EU projekata."
+msgstr ""
+
+#: archive-eu_project.php:174
+msgid "Kada projekti budu objavljeni, pojavit će se na ovoj stranici."
+msgstr ""
+
+#: header.php:30
+msgid "Preskoči na sadržaj"
+msgstr ""
+
+#: header.php:56
+msgid "Site header"
+msgstr ""
+
+#: header.php:65 footer.php:97
+#, php-format
+msgid "Go to homepage, %s"
+msgstr ""
+
+#: header.php:73
+msgid "Header actions"
+msgstr ""
+
+#: header.php:78
+msgid "Search products"
+msgstr ""
+
+#: header.php:134 header.php:135
+msgid "Open menu"
+msgstr ""
+
+#: header.php:136 template-parts/global/mobile-navigation.php:37
+msgid "Close menu"
+msgstr ""
+
+#: template-parts/home/bestsellers.php:59
+msgid "Bestsellers"
+msgstr ""
+
+#: template-parts/home/bestsellers.php:276
+#: template-parts/product/related-products.php:154
+msgid "Product tags"
+msgstr ""
+
+#: template-parts/home/promo-countdown.php:82
+msgid "Promotion countdown"
+msgstr ""
+
+#: template-parts/home/promo-banners.php:56
+msgid "Promotional banners"
+msgstr ""
+
+#: template-parts/home/hero-slider.php:54
+msgid "Featured promotions"
+msgstr ""
+
+#: template-parts/home/hero-slider.php:85
+#, php-format
+msgid "Slide %1$d of %2$d"
+msgstr ""
+
+#: template-parts/home/hero-slider.php:93
+msgid "Product pricing"
+msgstr ""
+
+#: template-parts/home/hero-slider.php:178
+msgid "Slider pagination"
+msgstr ""
+
+#: template-parts/home/hero-slider.php:183
+#, php-format
+msgid "Go to slide %d"
+msgstr ""
+
+#: template-parts/woocommerce/payment-security-badges.php:27
+msgid "Sigurno plaćanje"
+msgstr ""
+
+#: template-parts/woocommerce/payment-security-badges.php:49 footer.php:252
+msgid "Prihvaćene kartice"
+msgstr ""
+
+#: template-parts/woocommerce/payment-security-badges.php:51
+msgid "Prihvaćamo:"
+msgstr ""
+
+#: template-parts/woocommerce/payment-security-badges.php:64 footer.php:263
+#, php-format
+msgid "%s — službena stranica (otvara se u novom prozoru)"
+msgstr ""
+
+#: template-parts/woocommerce/payment-security-badges.php:79 footer.php:277
+msgid "Sigurnosni programi"
+msgstr ""
+
+#: template-parts/woocommerce/payment-security-badges.php:81
+msgid "Provjereno i sigurno:"
+msgstr ""
+
+#: template-parts/woocommerce/payment-security-badges.php:94 footer.php:288
+#, php-format
+msgid "%s — informacije o sigurnosnom programu (otvara se u novom prozoru)"
+msgstr ""
+
+#: template-parts/woocommerce/payment-security-badges.php:113 footer.php:215
+msgid ""
+"CorvusPay — sigurno online plaćanje karticama (otvara se u novom prozoru)"
+msgstr ""
+
+#: template-parts/product/related-products.php:79
+msgid "Slični proizvodi"
+msgstr ""
+
+#: template-parts/pages/contact/hero.php:39
+msgid "Get in touch with us. Send us a message"
+msgstr ""
+
+#: template-parts/pages/contact/map.php:27
+msgid "Company location on Google Maps"
+msgstr ""
+
+#: template-parts/pages/contact/map.php:40
+msgid "Company location map"
+msgstr ""
+
+#: template-parts/pages/contact/content.php:22
+#: template-parts/pages/about/cta-banner.php:36
+msgid "Contact Us"
+msgstr ""
+
+#: template-parts/pages/contact/content.php:23
+msgid "Call to Us:"
+msgstr ""
+
+#: template-parts/pages/contact/content.php:24
+#: template-parts/pages/contact/content.php:25
+msgid "We're available 24/7, 7 days a week."
+msgstr ""
+
+#: template-parts/pages/contact/content.php:30
+msgid "Write to Us:"
+msgstr ""
+
+#: template-parts/pages/contact/content.php:31
+msgid "Fill out our form and we will contact you within 24 hours."
+msgstr ""
+
+#: template-parts/pages/contact/content.php:32
+msgid "Email:"
+msgstr ""
+
+#: template-parts/pages/contact/content.php:35
+msgid "Headquarter:"
+msgstr ""
+
+#: template-parts/pages/contact/content.php:36
+msgid "Pon – Pet: 08:00 – 14:00"
+msgstr ""
+
+#: template-parts/pages/contact/content.php:38 footer.php:40
+msgid "Nikole Tesle 71, 31551 Črnkovci"
+msgstr ""
+
+#: template-parts/pages/contact/content.php:40
+msgid "We would love to hear from you."
+msgstr ""
+
+#: template-parts/pages/contact/content.php:126
+msgid "Podaci o tvrtki:"
+msgstr ""
+
+#: template-parts/pages/contact/content.php:128
+msgid "Naziv:"
+msgstr ""
+
+#: template-parts/pages/contact/content.php:132
+msgid "Djelatnost:"
+msgstr ""
+
+#: template-parts/pages/contact/content.php:136
+msgid "OIB:"
+msgstr ""
+
+#: template-parts/pages/contact/content.php:139
+msgid "MBS:"
+msgstr ""
+
+#: template-parts/pages/contact/content.php:142
+msgid "Registar:"
+msgstr ""
+
+#: template-parts/pages/contact/content.php:146
+msgid "Odgovorna osoba:"
+msgstr ""
+
+#: template-parts/pages/contact/content.php:151
+msgid "Temeljni kapital:"
+msgstr ""
+
+#: template-parts/pages/contact/content.php:156
+msgid "IBAN:"
+msgstr ""
+
+#: template-parts/pages/contact/content.php:166
+msgid "PDV ID:"
+msgstr ""
+
+#: template-parts/pages/contact/content.php:171
+msgid "Reklamacije i povrati:"
+msgstr ""
+
+#: template-parts/pages/about/hero.php:39
+#: template-parts/pages/about/cta-banner.php:34
+msgid "We Deliver Genuine Products"
+msgstr ""
+
+#: template-parts/pages/about/cta-banner.php:35
+msgid ""
+"Sed viverra consectetur risus nec ultricies. Curabitur tincidunt tincidunt "
+"urna id maximus."
+msgstr ""
+
+#: template-parts/pages/about/how-we-work.php:28
+msgid "Tersa team at work in the office"
+msgstr ""
+
+#: template-parts/pages/about/how-we-work.php:31
+msgid "How we works"
+msgstr ""
+
+#: template-parts/pages/about/how-we-work.php:32
+msgid "Production Design"
+msgstr ""
+
+#: template-parts/pages/about/how-we-work.php:33
+msgid ""
+"Integer dignissim sagittis quam. Maecenas sem eros, rutrum vitae risus eget, "
+"vulputate aliquam nisi."
+msgstr ""
+
+#: template-parts/pages/about/how-we-work.php:34
+msgid "Manufacturing"
+msgstr ""
+
+#: template-parts/pages/about/how-we-work.php:35
+msgid ""
+"Maecenas sem eros, rutrum vitae risus eget, vulputate aliquam nisi ex "
+"gravida neque tempus."
+msgstr ""
+
+#: template-parts/pages/about/how-we-work.php:36
+msgid "Marketing and selling"
+msgstr ""
+
+#: template-parts/pages/about/how-we-work.php:37
+msgid ""
+"Rutrum vitae risus eget, vulputate aliquam nisi ex gravida neque tempus."
+msgstr ""
+
+#: template-parts/global/breadcrumbs.php:11
+msgid "Breadcrumb"
+msgstr ""
+
+#: template-parts/global/search.php:21 template-parts/global/search.php:23
+msgid "Rezultati pretrage"
+msgstr ""
+
+#: template-parts/global/search.php:29
+msgid "Close search"
+msgstr ""
+
+#: template-parts/global/mobile-navigation.php:19
+msgid "Mobile menu"
+msgstr ""
+
+#: template-parts/global/mobile-navigation.php:20
+msgid "Mobile navigation"
+msgstr ""
+
+#: template-parts/global/cart-drawer.php:22
+msgid "Moja košarica"
+msgstr ""
+
+#: template-parts/global/cart-drawer.php:28
+msgid "Close cart"
+msgstr ""
+
+#: template-parts/global/cart-drawer.php:47
+msgid "Učitavanje košarice..."
+msgstr ""
+
+#: template-parts/global/navigation.php:17
+msgid "Primary navigation"
+msgstr ""
+
+#: template-parts/global/navigation.php:18
+#, php-format
+msgid "Open submenu for %s"
+msgstr ""
+
+#: footer.php:39
+msgid "Prerada drva i trgovina drvnim proizvodima"
+msgstr ""
+
+#: footer.php:59
+msgid "Our Story"
+msgstr ""
+
+#: footer.php:63
+msgid "Careers"
+msgstr ""
+
+#: footer.php:67
+msgid "Influencers"
+msgstr ""
+
+#: footer.php:71
+msgid "Join our team"
+msgstr ""
+
+#: footer.php:78
+msgid "Privacy Policy"
+msgstr ""
+
+#: footer.php:82
+msgid "Help"
+msgstr ""
+
+#: footer.php:86
+msgid "FAQs"
+msgstr ""
+
+#: footer.php:103
+msgid "Company information"
+msgstr ""
+
+#: footer.php:112
+msgid "E-mail:"
+msgstr ""
+
+#: footer.php:119
+msgid "About footer navigation"
+msgstr ""
+
+#: footer.php:120
+msgid "KORISNE POVEZNICE"
+msgstr ""
+
+#: footer.php:145
+msgid "Legal footer navigation"
+msgstr ""
+
+#: footer.php:146
+msgid "PRAVNE STRANICE"
+msgstr ""
+
+#: footer.php:175
+msgid "Prijavi se na naš newsletter"
+msgstr ""
+
+#: footer.php:178
+msgid "Promotivna poruka za newsletter"
+msgstr ""
+
+#: footer.php:235
+#, php-format
+msgid "© %1$s %2$s, sva prava pridržana"
+msgstr ""
+
+#: footer.php:247
+msgid "Prihvaćene kartice i sigurnosni programi"
+msgstr ""
+
+#: page.php:41
+msgid "Navigacija unutar stranice"
+msgstr ""
+
+#: page.php:43
+msgid "Stranica"
+msgstr ""
+
+#: single-eu_project.php:126
+msgid "EU projekti"
+msgstr ""
+
+#: single-eu_project.php:179
+msgid "Razdoblje projekta:"
+msgstr ""
+
+#: single-eu_project.php:189
+msgid "Preuzmi dokument"
+msgstr ""
+
+#: single-eu_project.php:211
+msgid "Korisnik sredstava"
+msgstr ""
+
+#: single-eu_project.php:220
+msgid "Vrijednost projekta"
+msgstr ""
+
+#: single-eu_project.php:229
+msgid "Iznos koji sufinancira EU"
+msgstr ""
+
+#: single-eu_project.php:238
+msgid "Trajanje projekta"
+msgstr ""
+
+#: single-eu_project.php:242
+msgid "Početak:"
+msgstr ""
+
+#: single-eu_project.php:249
+msgid "Završetak:"
+msgstr ""
+
+#: single-eu_project.php:265
+msgid "Projekt"
+msgstr ""
+
+#: single-eu_project.php:266
+msgid "Kratki opis projekta"
+msgstr ""
+
+#: single-eu_project.php:282
+msgid "Informacije"
+msgstr ""
+
+#: single-eu_project.php:283
+msgid "Kontakt osobe za više informacija"
+msgstr ""
+
+#: single-eu_project.php:299
+msgid "Dodatno"
+msgstr ""
+
+#: single-eu_project.php:300
+msgid "Dodatne informacije"
+msgstr ""
+
+#: sidebar.php:12
+msgid "Bočna traka"
+msgstr ""

@@ -4,13 +4,15 @@ if (!defined('ABSPATH')) {
 }
 
 get_header();
+
+$home_url = tersa_get_current_language_home_url();
 ?>
 
 <main id="main-content" class="site-main eu-projects-archive">
 	<section class="eu-projects-archive__hero">
 		<div class="container container--narrow">
-		<nav class="eu-projects-archive__breadcrumbs" aria-label="<?php esc_attr_e('Breadcrumbs', 'tersa-shop'); ?>">
-				<a href="<?php echo esc_url(home_url('/')); ?>">
+			<nav class="eu-projects-archive__breadcrumbs" aria-label="<?php esc_attr_e('Breadcrumbs', 'tersa-shop'); ?>">
+				<a href="<?php echo esc_url($home_url); ?>">
 					<?php esc_html_e('Naslovnica', 'tersa-shop'); ?>
 				</a>
 				<span>/</span>

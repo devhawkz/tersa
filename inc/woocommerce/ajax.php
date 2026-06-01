@@ -9,7 +9,35 @@ if (!defined('ABSPATH')) {
  * - fetch drawer fragments (mini cart HTML/count/total)
  */
 
+function tersa_ajax_maybe_switch_language(): void {
+	if (!function_exists('pll_switch_language')) {
+		return;
+	}
+
+	$lang = '';
+
+	if (isset($_POST['lang'])) {
+		$lang = sanitize_key((string) wp_unslash($_POST['lang']));
+	} elseif (isset($_GET['lang'])) {
+		$lang = sanitize_key((string) wp_unslash($_GET['lang']));
+	}
+
+	if ($lang === '') {
+		return;
+	}
+
+	if (function_exists('pll_languages_list')) {
+		$allowed_langs = (array) pll_languages_list(['fields' => 'slug']);
+		if (!in_array($lang, $allowed_langs, true)) {
+			return;
+		}
+	}
+
+	pll_switch_language($lang);
+}
+
 function tersa_ajax_update_mini_cart_qty() {
+	tersa_ajax_maybe_switch_language();
 	check_ajax_referer('tersa_cart_nonce', 'nonce');
 
 	if (!function_exists('WC') || !WC()->cart) {
@@ -40,6 +68,7 @@ add_action('wc_ajax_tersa_update_mini_cart_qty', 'tersa_ajax_update_mini_cart_qt
 add_action('wc_ajax_nopriv_tersa_update_mini_cart_qty', 'tersa_ajax_update_mini_cart_qty');
 
 function tersa_ajax_get_cart_drawer_fragments() {
+	tersa_ajax_maybe_switch_language();
 	// Read-only endpoint: do not hard-fail on stale nonce from cached pages.
 	// Quantity-changing endpoints still enforce nonce checks.
 	tersa_get_cart_drawer_fragments();

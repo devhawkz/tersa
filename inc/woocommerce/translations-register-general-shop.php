@@ -41,6 +41,7 @@ function tersa_pll_register_general_shop_strings(): void {
 	pll_register_string('tersa_bestsellers_title', 'Bestsellers', 'Tersa – naslovnica (bestsellers)', ['multiline' => false]);
 
 	pll_register_string('tersa_nav_open_submenu', 'Otvori podizbornik za %s', 'Tersa – navigacija', ['multiline' => false]);
+	pll_register_string('tersa_search_results', 'Rezultati pretrage', 'Tersa – pretraga', ['multiline' => false]);
 
 	pll_register_string('tersa_pagination_previous', 'Prethodna', 'Tersa – paginacija (arhiva)', ['multiline' => false]);
 	pll_register_string('tersa_pagination_next', 'Sljedeća', 'Tersa – paginacija (arhiva)', ['multiline' => false]);
@@ -55,8 +56,12 @@ function tersa_pll_register_general_shop_strings(): void {
 	// Single product — ARIA / accessibility labeli
 	pll_register_string('tersa_product_badges_label', 'Označke proizvoda', 'Tersa – proizvod (single)', ['multiline' => false]);
 	pll_register_string('tersa_product_open_image', 'Otvori sliku proizvoda', 'Tersa – proizvod (single)', ['multiline' => false]);
+	pll_register_string('tersa_product_prev_images', 'Prethodne slike', 'Tersa – proizvod (single)', ['multiline' => false]);
+	pll_register_string('tersa_product_next_images', 'Sljedeće slike', 'Tersa – proizvod (single)', ['multiline' => false]);
 	pll_register_string('tersa_product_gallery_thumbs', 'Minijature u galeriji', 'Tersa – proizvod (single)', ['multiline' => false]);
 	pll_register_string('tersa_product_show_image', 'Prikaži sliku %d', 'Tersa – proizvod (single)', ['multiline' => false]);
+	pll_register_string('tersa_product_image_preview', 'Pregled slike proizvoda', 'Tersa – proizvod (single)', ['multiline' => false]);
+	pll_register_string('tersa_product_close_preview', 'Zatvori pregled', 'Tersa – proizvod (single)', ['multiline' => false]);
 	pll_register_string('tersa_breadcrumb_nav', 'Navigacija', 'Tersa – navigacija (breadcrumb)', ['multiline' => false]);
 	pll_register_string('tersa_reviews_tab', 'Recenzije (%d)', 'Tersa – proizvod (tabovi)', ['multiline' => false]);
 
@@ -119,4 +124,3 @@ function tersa_pll_register_general_shop_strings(): void {
 	pll_register_string('tersa_wishlist_empty', 'Nema proizvoda na listi želja.', 'Tersa – wishlist', ['multiline' => false]);
 }
 add_action('init', 'tersa_pll_register_general_shop_strings', 20);
-

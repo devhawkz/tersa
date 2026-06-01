@@ -42,9 +42,9 @@ while (have_posts()) :
 
 	$pdf_url = '';
 	if (is_array($pdf) && !empty($pdf['url'])) {
-		$pdf_url = $pdf['url'];
+		$pdf_url = is_string($pdf['url']) ? esc_url_raw($pdf['url']) : '';
 	} elseif (is_string($pdf) && !empty($pdf)) {
-		$pdf_url = $pdf;
+		$pdf_url = esc_url_raw($pdf);
 	}
 
 	$format_date = static function ($date_value) {
@@ -74,23 +74,28 @@ while (have_posts()) :
 			return $data;
 		}
 
+		if (function_exists('tersa_get_acf_image_url')) {
+			$data['url'] = tersa_get_acf_image_url($image, 'medium_large');
+		}
+
 		if (is_array($image)) {
-			if (!empty($image['sizes']['medium_large'])) {
-				$data['url'] = $image['sizes']['medium_large'];
-			} elseif (!empty($image['url'])) {
-				$data['url'] = $image['url'];
+			if (!empty($image['alt']) && is_string($image['alt'])) {
+				$data['alt'] = $image['alt'];
 			}
 
-			if (!empty($image['alt'])) {
-				$data['alt'] = $image['alt'];
+			if (empty($data['alt'])) {
+				$image_id = isset($image['ID']) ? absint($image['ID']) : (isset($image['id']) ? absint($image['id']) : 0);
+				if ($image_id) {
+					$attachment_alt = get_post_meta($image_id, '_wp_attachment_image_alt', true);
+					$data['alt']    = is_string($attachment_alt) && '' !== $attachment_alt ? $attachment_alt : $data['alt'];
+				}
 			}
 
 			return $data;
 		}
 
 		if (is_numeric($image)) {
-			$image_id = (int) $image;
-			$data['url'] = wp_get_attachment_image_url($image_id, 'medium_large');
+			$image_id = absint($image);
 
 			$attachment_alt = get_post_meta($image_id, '_wp_attachment_image_alt', true);
 			if (!empty($attachment_alt)) {
@@ -98,10 +103,6 @@ while (have_posts()) :
 			}
 
 			return $data;
-		}
-
-		if (is_string($image)) {
-			$data['url'] = $image;
 		}
 
 		return $data;
@@ -113,7 +114,7 @@ while (have_posts()) :
 
 	$archive_url = get_post_type_archive_link('eu_project');
 	if (!$archive_url) {
-		$archive_url = home_url('/');
+		$archive_url = tersa_get_current_language_home_url();
 	}
 
 	$content = get_the_content();

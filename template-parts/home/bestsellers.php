@@ -26,6 +26,7 @@ $show_section_field = $instance === 2 ? 'show_home_bestsellers_section_2' : 'sho
 $title_field        = $instance === 2 ? 'home_bestsellers_section_title_2' : 'home_bestsellers_section_title_1';
 $badge_color_field  = $instance === 2 ? 'home_bestsellers_badge_color_2' : 'home_bestsellers_badge_color_1';
 $tag_slug_field     = $instance === 2 ? 'home_bestsellers_product_tag_slug_2' : 'home_bestsellers_product_tag_slug_1';
+$tag_term_field     = $instance === 2 ? 'home_bestsellers_product_tag_2' : 'home_bestsellers_product_tag_1';
 
 $show_section = false;
 if (function_exists('get_field')) {
@@ -57,12 +58,73 @@ if (function_exists('get_field')) {
 }
 
 $section_title = !empty($section_title) ? $section_title : (function_exists('pll__') ? pll__('Bestsellers') : __('Bestsellers', 'tersa-shop'));
-$badge_color   = !empty($badge_color) ? $badge_color : '#000000';
+$badge_color   = sanitize_hex_color($badge_color) ?: '#000000';
 
-$product_tag_slug = 'najprodavanije';
+$current_lang = function_exists('tersa_get_current_language_slug') ? tersa_get_current_language_slug() : (function_exists('pll_current_language') ? sanitize_key((string) call_user_func('pll_current_language', 'slug')) : '');
+
+$resolve_product_tag_id = static function ($term_value, string $slug) use ($current_lang): int {
+	$term_id = 0;
+	$find_term_id_by_slug = static function (string $raw_slug): int {
+		$slug = sanitize_title($raw_slug);
+		if ($slug === '') {
+			return 0;
+		}
+
+		$terms = get_terms([
+			'taxonomy'   => 'product_tag',
+			'slug'       => $slug,
+			'hide_empty' => false,
+			'number'     => 1,
+			'fields'     => 'ids',
+			'lang'       => '',
+		]);
+
+		if (is_wp_error($terms) || empty($terms)) {
+			return 0;
+		}
+
+		return absint($terms[0]);
+	};
+
+	if ($term_value instanceof WP_Term) {
+		$term_id = (int) $term_value->term_id;
+	} elseif (is_array($term_value)) {
+		$raw_term_id = $term_value['term_id'] ?? $term_value['id'] ?? $term_value['ID'] ?? 0;
+		$term_id     = absint($raw_term_id);
+	} elseif (is_numeric($term_value)) {
+		$term_id = absint($term_value);
+	} elseif (is_string($term_value) && trim($term_value) !== '') {
+		$term_id = $find_term_id_by_slug($term_value);
+	}
+
+	if (!$term_id && $slug !== '') {
+		$term_id = $find_term_id_by_slug($slug);
+	}
+
+	if ($term_id && function_exists('pll_get_term')) {
+		$translated_term_id = $current_lang
+			? pll_get_term($term_id, $current_lang)
+			: pll_get_term($term_id);
+
+		if ($translated_term_id) {
+			$term_id = (int) $translated_term_id;
+		}
+	}
+
+	return $term_id;
+};
+
+$product_tag_slug    = 'najprodavanije';
+$product_tag_term    = null;
+$product_tag_term_id = 0;
 
 if (function_exists('get_field')) {
 	// Izbor taga mora da bude eksplicitan (ACF), ne izveden iz naslova sekcije.
+	$product_tag_term = $get_acf_value($fields, $tag_term_field, null);
+	if ($product_tag_term === null) {
+		$product_tag_term = $get_acf_value($fields, 'home_bestsellers_product_tag', null);
+	}
+
 	$acf_product_tag_slug = $get_acf_value($fields, $tag_slug_field, null);
 	if ($acf_product_tag_slug === null) {
 		$acf_product_tag_slug = $get_acf_value($fields, 'home_bestsellers_product_tag_slug', '');
@@ -78,8 +140,13 @@ if (function_exists('get_field')) {
 	}
 }
 
-$current_lang     = function_exists('pll_current_language') ? (string) call_user_func('pll_current_language') : '';
-$transient_key    = 'tersa_bestsellers_' . $product_tag_slug . '_' . $instance . ($current_lang ? '_' . $current_lang : '');
+$product_tag_term_id = $resolve_product_tag_id($product_tag_term, $product_tag_slug);
+
+if (!$product_tag_term_id) {
+	return;
+}
+
+$transient_key    = 'tersa_bestsellers_term_' . $product_tag_term_id . '_' . $instance . ($current_lang ? '_' . $current_lang : '');
 $cached_post_ids  = get_transient($transient_key);
 static $request_post_ids_cache = [];
 
@@ -91,7 +158,7 @@ $translate = static function (string $text): string {
 };
 
 if (false === $cached_post_ids) {
-	$request_cache_key = $product_tag_slug . ($current_lang ? '_' . $current_lang : '');
+	$request_cache_key = $product_tag_term_id . ($current_lang ? '_' . $current_lang : '');
 
 	if (!array_key_exists($request_cache_key, $request_post_ids_cache)) {
 		$query_args = [
@@ -106,8 +173,8 @@ if (false === $cached_post_ids) {
 			'tax_query'              => [
 				[
 					'taxonomy' => 'product_tag',
-					'field'    => 'slug',
-					'terms'    => $product_tag_slug,
+					'field'    => 'term_id',
+					'terms'    => [$product_tag_term_id],
 				],
 			],
 		];
@@ -116,13 +183,19 @@ if (false === $cached_post_ids) {
 			$query_args['lang'] = $current_lang;
 		}
 
-		$id_query                                 = new WP_Query($query_args);
-		$request_post_ids_cache[$request_cache_key] = $id_query->posts ?: [];
+		$id_query = new WP_Query($query_args);
+		$post_ids = array_map('absint', $id_query->posts ?: []);
+		if (function_exists('tersa_filter_product_ids_for_current_language')) {
+			$post_ids = tersa_filter_product_ids_for_current_language($post_ids);
+		}
+		$request_post_ids_cache[$request_cache_key] = $post_ids;
 		wp_reset_postdata();
 	}
 
 	$cached_post_ids = $request_post_ids_cache[$request_cache_key];
 	set_transient($transient_key, $cached_post_ids, 6 * HOUR_IN_SECONDS);
+} elseif (function_exists('tersa_filter_product_ids_for_current_language')) {
+	$cached_post_ids = tersa_filter_product_ids_for_current_language(array_map('absint', (array) $cached_post_ids));
 }
 
 if (empty($cached_post_ids)) {
@@ -138,9 +211,12 @@ if (!empty($product_ids)) {
 	$terms = wp_get_object_terms(
 		$product_ids,
 		'product_tag',
-		[
+		array_merge(
+			[
 			'fields' => 'all_with_object_id',
-		]
+			],
+			function_exists('tersa_get_current_language_query_arg') ? tersa_get_current_language_query_arg() : []
+		)
 	);
 
 	if (!is_wp_error($terms) && is_array($terms)) {
@@ -179,7 +255,7 @@ if (!empty($product_ids)) {
 		'order'   => 'ASC',
 		'limit'   => count($product_ids),
 		'status'  => 'publish',
-	]);
+	] + (function_exists('tersa_get_current_language_query_arg') ? tersa_get_current_language_query_arg() : []));
 	foreach ($_bp_batch as $_bp) {
 		$bestsellers_products_map[$_bp->get_id()] = $_bp;
 	}
@@ -197,6 +273,17 @@ if (!empty($product_ids)) {
 		<ul class="home-bestsellers__grid" role="list">
 			<?php
 			$button_label_options  = $translate('Vidi opcije');
+			$allowed_add_to_cart_html = [
+				'a' => [
+					'href'             => true,
+					'class'            => true,
+					'aria-label'       => true,
+					'rel'              => true,
+					'data-quantity'    => true,
+					'data-product_id'  => true,
+					'data-product_sku' => true,
+				],
+			];
 			foreach ($product_ids as $iter_product_id) :
 				$product = $bestsellers_products_map[$iter_product_id] ?? null;
 
@@ -336,13 +423,13 @@ if (!empty($product_ids)) {
 						<div class="home-bestsellers__cart-wrap">
 							<?php
 							if ($has_multiple_variants) {
-								echo sprintf(
+								echo wp_kses(sprintf(
 									'<a %s>%s</a>',
 									wc_implode_html_attributes($button_attributes),
 									esc_html($button_label_options)
-								);
+								), $allowed_add_to_cart_html);
 							} else {
-								echo apply_filters(
+								echo wp_kses(apply_filters(
 									'woocommerce_loop_add_to_cart_link',
 									sprintf(
 										'<a %s>%s</a>',
@@ -354,7 +441,7 @@ if (!empty($product_ids)) {
 										'class'      => implode(' ', $button_classes),
 										'attributes' => $button_attributes,
 									]
-								);
+								), $allowed_add_to_cart_html);
 							}
 							?>
 						</div>
