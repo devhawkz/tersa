@@ -151,16 +151,16 @@ msgstr ""
 #, php-format
 msgid "Wishlist, %d item"
 msgid_plural "Wishlist, %d items"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "Wishlist, %d item"
+msgstr[1] "Wishlist, %d items"
 
 #. translators: %d: cart item count
 #: inc/header-helpers.php:337
 #, php-format
 msgid "Cart, %d item"
 msgid_plural "Cart, %d items"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "Cart, %d item"
+msgstr[1] "Cart, %d items"
 
 #: inc/woocommerce/wishlist.php:48
 msgid "Moja lista želja"
@@ -186,11 +186,11 @@ msgstr ""
 #: inc/enqueue.php:243 inc/enqueue.php:244
 #, php-format
 msgid "Otvori podizbornik za %s"
-msgstr ""
+msgstr "Open submenu for %s"
 
 #: inc/enqueue.php:246 inc/enqueue.php:247
 msgid "Greška pri učitavanju košarice."
-msgstr ""
+msgstr "Error loading cart."
 
 #: inc/eu-projects.php:8 inc/eu-projects.php:10 archive-eu_project.php:17
 #: archive-eu_project.php:22
@@ -309,32 +309,32 @@ msgstr ""
 
 #: header.php:30
 msgid "Preskoči na sadržaj"
-msgstr ""
+msgstr "Skip to content"
 
 #: header.php:56
 msgid "Site header"
-msgstr ""
+msgstr "Site header"
 
 #: header.php:65 footer.php:97
 #, php-format
 msgid "Go to homepage, %s"
-msgstr ""
+msgstr "Go to homepage, %s"
 
 #: header.php:73
 msgid "Header actions"
-msgstr ""
+msgstr "Header actions"
 
 #: header.php:78
 msgid "Search products"
-msgstr ""
+msgstr "Search products"
 
 #: header.php:134 header.php:135
 msgid "Open menu"
-msgstr ""
+msgstr "Open menu"
 
 #: header.php:136 template-parts/global/mobile-navigation.php:37
 msgid "Close menu"
-msgstr ""
+msgstr "Close menu"
 
 #: template-parts/home/bestsellers.php:59
 msgid "Bestsellers"
@@ -566,40 +566,40 @@ msgstr ""
 
 #: template-parts/global/search.php:21 template-parts/global/search.php:23
 msgid "Rezultati pretrage"
-msgstr ""
+msgstr "Search results"
 
 #: template-parts/global/search.php:29
 msgid "Close search"
-msgstr ""
+msgstr "Close search"
 
 #: template-parts/global/mobile-navigation.php:19
 msgid "Mobile menu"
-msgstr ""
+msgstr "Mobile menu"
 
 #: template-parts/global/mobile-navigation.php:20
 msgid "Mobile navigation"
-msgstr ""
+msgstr "Mobile navigation"
 
 #: template-parts/global/cart-drawer.php:22
 msgid "Moja košarica"
-msgstr ""
+msgstr "My cart"
 
 #: template-parts/global/cart-drawer.php:28
 msgid "Close cart"
-msgstr ""
+msgstr "Close cart"
 
 #: template-parts/global/cart-drawer.php:47
 msgid "Učitavanje košarice..."
-msgstr ""
+msgstr "Loading cart..."
 
 #: template-parts/global/navigation.php:17
 msgid "Primary navigation"
-msgstr ""
+msgstr "Primary navigation"
 
 #: template-parts/global/navigation.php:18
 #, php-format
 msgid "Open submenu for %s"
-msgstr ""
+msgstr "Open submenu for %s"
 
 #: footer.php:39
 msgid "Prerada drva i trgovina drvnim proizvodima"

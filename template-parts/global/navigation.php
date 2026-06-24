@@ -18,16 +18,7 @@ add_filter('nav_menu_link_attributes', 'tersa_nav_link_external_rel', 10, 4);
 	data-submenu-label="<?php echo esc_attr(__('Open submenu for %s', 'tersa-shop')); ?>"
 >
 	<?php
-	wp_nav_menu([
-		'theme_location' => 'primary',
-		'container'      => false,
-		'menu_class'     => 'menu',
-		'menu_id'        => '',
-		'fallback_cb'    => false,
-		// role="list" je neophodan jer CSS list-style:none uklanja list semantiku u Safari VoiceOver
-		// aria-current="page" se automatski dodaje od WordPress 5.7+
-		'items_wrap'     => '<ul class="%2$s" role="list">%3$s</ul>',
-	]);
+	wp_nav_menu(tersa_get_primary_nav_menu_args());
 	?>
 </nav>
 <?php

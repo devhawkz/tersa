@@ -14,14 +14,177 @@ function tersa_get_header_settings_slug(): string {
 }
 
 /**
+ * Vraća osnovni transient key za header settings.
+ *
+ * @return string
+ */
+function tersa_get_header_settings_cache_base_key(): string {
+	return 'tersa_header_settings_v2';
+}
+
+/**
  * Vraća transient key za header settings.
  * Uključuje Polylang jezični sufiks kako bi svaki jezik imao vlastiti cache.
  *
  * @return string
  */
 function tersa_get_header_settings_cache_key(): string {
-	$lang = function_exists('pll_current_language') ? (string) pll_current_language() : '';
-	return 'tersa_header_settings' . ($lang ? '_' . $lang : '');
+	$lang = tersa_get_current_language_slug();
+	return tersa_get_header_settings_cache_base_key() . ($lang ? '_' . $lang : '');
+}
+
+/**
+ * Vraća slug trenutnog Polylang jezika.
+ *
+ * @return string
+ */
+if (!function_exists('tersa_get_current_language_slug')) {
+	function tersa_get_current_language_slug(): string {
+		if (function_exists('pll_current_language')) {
+			$lang = pll_current_language('slug');
+
+			if (!empty($lang)) {
+				return sanitize_key((string) $lang);
+			}
+		}
+
+		return '';
+	}
+}
+
+/**
+ * Vraća slug defaultnog Polylang jezika.
+ *
+ * @return string
+ */
+function tersa_get_default_language_slug(): string {
+	if (function_exists('pll_default_language')) {
+		$lang = pll_default_language('slug');
+
+		if (empty($lang)) {
+			$lang = pll_default_language();
+		}
+
+		if (!empty($lang)) {
+			return sanitize_key((string) $lang);
+		}
+	}
+
+	return '';
+}
+
+/**
+ * Vraća ID osnovne Header Settings stranice.
+ *
+ * @return int
+ */
+function tersa_get_header_settings_base_page_id(): int {
+	$page = get_page_by_path(tersa_get_header_settings_slug());
+
+	return $page instanceof WP_Post ? (int) $page->ID : 0;
+}
+
+/**
+ * Vraća Header Settings stranicu za određeni jezik, uz fallback na osnovnu.
+ *
+ * @param string $lang Polylang slug jezika.
+ * @return int
+ */
+function tersa_get_header_settings_page_id(string $lang = ''): int {
+	$page_id = tersa_get_header_settings_base_page_id();
+
+	if (!$page_id) {
+		return 0;
+	}
+
+	if (function_exists('pll_get_post')) {
+		$translated_id = $lang !== ''
+			? pll_get_post($page_id, $lang)
+			: pll_get_post($page_id);
+
+		if ($translated_id) {
+			return (int) $translated_id;
+		}
+	}
+
+	return $page_id;
+}
+
+/**
+ * Vraća sve poznate jezičke varijante Header Settings stranice.
+ *
+ * @return int[]
+ */
+function tersa_get_header_settings_page_ids(): array {
+	$page_id = tersa_get_header_settings_base_page_id();
+
+	if (!$page_id) {
+		return [];
+	}
+
+	$page_ids = [$page_id];
+
+	if (function_exists('pll_languages_list') && function_exists('pll_get_post')) {
+		foreach ((array) pll_languages_list(['fields' => 'slug']) as $lang_slug) {
+			$translated_id = pll_get_post($page_id, (string) $lang_slug);
+
+			if ($translated_id) {
+				$page_ids[] = (int) $translated_id;
+			}
+		}
+	}
+
+	return array_values(array_unique(array_filter(array_map('intval', $page_ids))));
+}
+
+/**
+ * Učitava ACF header podešavanja sa jedne stranice.
+ *
+ * @param int $page_id ID stranice.
+ * @return array{topbar_enabled: bool|null, topbar_message: string, topbar_link_text: string, topbar_link_url: string}
+ */
+function tersa_read_header_settings_from_page(int $page_id): array {
+	$settings = [
+		'topbar_enabled'   => null,
+		'topbar_message'   => '',
+		'topbar_link_text' => '',
+		'topbar_link_url'  => '',
+	];
+
+	if (!$page_id || !function_exists('get_field')) {
+		return $settings;
+	}
+
+	if (get_post_meta($page_id, 'topbar_enabled', true) !== '') {
+		$settings['topbar_enabled'] = (bool) get_field('topbar_enabled', $page_id);
+	}
+
+	$settings['topbar_message']   = (string) get_field('topbar_message', $page_id);
+	$settings['topbar_link_text'] = (string) get_field('topbar_link_text', $page_id);
+	$settings['topbar_link_url']  = (string) get_field('topbar_link_url', $page_id);
+
+	return $settings;
+}
+
+/**
+ * Spaja header podešavanja tako da prazna prevedena polja nasleđuju default jezik.
+ *
+ * @param array<string, mixed> $base
+ * @param array<string, mixed> $override
+ * @return array<string, mixed>
+ */
+function tersa_merge_header_settings(array $base, array $override): array {
+	if (array_key_exists('topbar_enabled', $override) && null !== $override['topbar_enabled']) {
+		$base['topbar_enabled'] = (bool) $override['topbar_enabled'];
+	}
+
+	foreach (['topbar_message', 'topbar_link_text', 'topbar_link_url'] as $key) {
+		if (!empty($override[$key])) {
+			$base[$key] = (string) $override[$key];
+		}
+	}
+
+	return $base;
 }
 
 /**
@@ -46,25 +209,26 @@ function tersa_get_header_settings(): array {
 		);
 	}
 
-	$page    = get_page_by_path(tersa_get_header_settings_slug());
-	$page_id = $page ? (int) $page->ID : 0;
-
-	// Polylang: dohvati prevedenu verziju settings stranice za trenutni jezik.
-	if ($page_id && function_exists('pll_get_post')) {
-		$translated_id = pll_get_post($page_id);
-		if ($translated_id) {
-			$page_id = (int) $translated_id;
-		}
-	}
-
-	$get_field = function_exists('get_field');
-
 	$settings = [
-		'topbar_enabled'   => ($page_id && $get_field) ? (bool) get_field('topbar_enabled', $page_id) : false,
-		'topbar_message'   => ($page_id && $get_field) ? (string) get_field('topbar_message', $page_id) : '',
-		'topbar_link_text' => ($page_id && $get_field) ? (string) get_field('topbar_link_text', $page_id) : '',
-		'topbar_link_url'  => ($page_id && $get_field) ? (string) get_field('topbar_link_url', $page_id) : '',
+		'topbar_enabled'   => false,
+		'topbar_message'   => '',
+		'topbar_link_text' => '',
+		'topbar_link_url'  => '',
 	];
+
+	$base_page_id    = tersa_get_header_settings_base_page_id();
+	$current_lang    = tersa_get_current_language_slug();
+	$default_lang    = tersa_get_default_language_slug();
+	$default_page_id = $default_lang ? tersa_get_header_settings_page_id($default_lang) : $base_page_id;
+	$current_page_id = $current_lang ? tersa_get_header_settings_page_id($current_lang) : $base_page_id;
+
+	$default_settings = tersa_read_header_settings_from_page($default_page_id ?: $base_page_id);
+	$current_settings = $current_page_id === $default_page_id
+		? $default_settings
+		: tersa_read_header_settings_from_page($current_page_id);
+
+	$settings = tersa_merge_header_settings($settings, $default_settings);
+	$settings = tersa_merge_header_settings($settings, $current_settings);
 
 	set_transient($cache_key, $settings, DAY_IN_SECONDS);
 
@@ -88,16 +252,19 @@ function tersa_maybe_clear_header_settings_cache(int $post_id, $post = null): vo
 		return;
 	}
 
-	if (tersa_get_header_settings_slug() !== $post_obj->post_name) {
+	$settings_page_ids = tersa_get_header_settings_page_ids();
+
+	if (!in_array($post_id, $settings_page_ids, true) && tersa_get_header_settings_slug() !== $post_obj->post_name) {
 		return;
 	}
 
-	// Briše base key + sve jezičke varijante.
-	$base = 'tersa_header_settings';
-	delete_transient($base);
-	if (function_exists('pll_languages_list')) {
-		foreach ((array) pll_languages_list(['fields' => 'slug']) as $lang_slug) {
-			delete_transient($base . '_' . $lang_slug);
+	// Briše base key + sve jezičke varijante, uključujući legacy key bez _v2.
+	foreach (['tersa_header_settings', tersa_get_header_settings_cache_base_key()] as $base) {
+		delete_transient($base);
+		if (function_exists('pll_languages_list')) {
+			foreach ((array) pll_languages_list(['fields' => 'slug']) as $lang_slug) {
+				delete_transient($base . '_' . $lang_slug);
+			}
 		}
 	}
 }
@@ -463,6 +630,61 @@ function tersa_nav_link_external_rel(array $atts, $item, $args, $depth): array {
 	}
 
 	return $atts;
+}
+
+/**
+ * Vraća ID menija za primarnu navigaciju sa Polylang fallback-om.
+ *
+ * @return int
+ */
+function tersa_get_primary_nav_menu_id(): int {
+	$locations = get_nav_menu_locations();
+	$menu_id   = !empty($locations['primary']) ? (int) $locations['primary'] : 0;
+
+	if (!$menu_id) {
+		$theme_mods = get_option('theme_mods_' . get_option('stylesheet'), []);
+
+		if (is_array($theme_mods) && !empty($theme_mods['nav_menu_locations']['primary'])) {
+			$menu_id = (int) $theme_mods['nav_menu_locations']['primary'];
+		}
+	}
+
+	if ($menu_id && function_exists('pll_get_term')) {
+		$current_lang = tersa_get_current_language_slug();
+		$translated   = $current_lang ? (int) pll_get_term($menu_id, $current_lang) : 0;
+
+		if ($translated) {
+			return $translated;
+		}
+	}
+
+	return $menu_id > 0 ? $menu_id : 0;
+}
+
+/**
+ * Vraća argumente za primarni meni.
+ *
+ * @return array<string, mixed>
+ */
+function tersa_get_primary_nav_menu_args(): array {
+	$args = [
+		'theme_location' => 'primary',
+		'container'      => false,
+		'menu_class'     => 'menu',
+		'menu_id'        => '',
+		'fallback_cb'    => false,
+		// role="list" je neophodan jer CSS list-style:none uklanja list semantiku u Safari VoiceOver
+		// aria-current="page" se automatski dodaje od WordPress 5.7+
+		'items_wrap'     => '<ul class="%2$s" role="list">%3$s</ul>',
+	];
+
+	$menu_id = tersa_get_primary_nav_menu_id();
+
+	if ($menu_id) {
+		$args['menu'] = $menu_id;
+	}
+
+	return $args;
 }
 
 /**

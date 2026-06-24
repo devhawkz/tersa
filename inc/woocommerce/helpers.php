@@ -91,14 +91,16 @@ function tersa_pagination_next_text(): string {
  *
  * @return string
  */
-function tersa_get_current_language_slug(): string {
-	if (!function_exists('pll_current_language')) {
-		return '';
+if (!function_exists('tersa_get_current_language_slug')) {
+	function tersa_get_current_language_slug(): string {
+		if (!function_exists('pll_current_language')) {
+			return '';
+		}
+
+		$lang = pll_current_language('slug');
+
+		return is_string($lang) ? sanitize_key($lang) : '';
 	}
-
-	$lang = pll_current_language('slug');
-
-	return is_string($lang) ? sanitize_key($lang) : '';
 }
 
 /**
