@@ -30,6 +30,8 @@ while (have_posts()) :
 	$logo_four  = $has_acf ? get_field('eu_project_logos_four') : '';
 	$logo_five  = $has_acf ? get_field('eu_project_logos_five') : '';
 
+	$status = function_exists('tersa_translate_eu_project_status') ? tersa_translate_eu_project_status($status) : $status;
+
 	$logos = array_filter([
 		$logo_one,
 		$logo_two,
@@ -53,7 +55,7 @@ while (have_posts()) :
 		}
 
 		if (preg_match('/^\d{2}\.\d{2}\.\d{4}\.?$/', (string) $date_value)) {
-			return $date_value;
+			return (string) $date_value;
 		}
 
 		$timestamp = strtotime((string) $date_value);
@@ -61,7 +63,7 @@ while (have_posts()) :
 			return (string) $date_value;
 		}
 
-		return date_i18n('d.m.Y.', $timestamp);
+		return date_i18n(tersa_get_eu_project_text('date_format'), $timestamp);
 	};
 
 	$get_image_data = static function ($image, $fallback_alt = '') {
@@ -122,9 +124,9 @@ while (have_posts()) :
 	<main id="main-content" class="site-main eu-project-single">
 		<section class="eu-project-single__hero">
 			<div class="container container--narrow">
-				<nav class="eu-project-breadcrumbs" aria-label="<?php esc_attr_e('Breadcrumbs', 'tersa-shop'); ?>">
+				<nav class="eu-project-breadcrumbs" aria-label="<?php echo esc_attr(tersa_get_eu_project_text('breadcrumbs')); ?>">
 					<a href="<?php echo esc_url($archive_url); ?>">
-						<?php esc_html_e('EU projekti', 'tersa-shop'); ?>
+						<?php echo esc_html(tersa_get_eu_project_text('archive_link')); ?>
 					</a>
 					<span>/</span>
 					<span><?php echo esc_html(get_the_title()); ?></span>
@@ -177,7 +179,7 @@ while (have_posts()) :
 					<?php if ($period_label) : ?>
 						<div class="eu-project-single__period">
 							<p>
-								<strong><?php esc_html_e('Razdoblje projekta:', 'tersa-shop'); ?></strong>
+								<strong><?php echo esc_html(tersa_get_eu_project_text('project_period')); ?></strong>
 								<?php echo esc_html($period_label); ?>
 							</p>
 						</div>
@@ -187,7 +189,7 @@ while (have_posts()) :
 						<div class="eu-project-single__actions">
 							<?php if ($pdf_url) : ?>
 								<a class="button button--secondary" href="<?php echo esc_url($pdf_url); ?>" target="_blank" rel="noopener">
-									<?php esc_html_e('Preuzmi dokument', 'tersa-shop'); ?>
+									<?php echo esc_html(tersa_get_eu_project_text('download_document')); ?>
 								</a>
 							<?php endif; ?>
 
@@ -209,7 +211,7 @@ while (have_posts()) :
 				<div class="eu-project-single__facts-grid">
 					<?php if ($beneficiary) : ?>
 						<div class="eu-project-single__fact-card">
-							<h2><?php esc_html_e('Korisnik sredstava', 'tersa-shop'); ?></h2>
+							<h2><?php echo esc_html(tersa_get_eu_project_text('beneficiary')); ?></h2>
 							<div class="eu-project-single__fact-content">
 								<?php echo wpautop(wp_kses_post($beneficiary)); ?>
 							</div>
@@ -218,7 +220,7 @@ while (have_posts()) :
 
 					<?php if ($total_value) : ?>
 						<div class="eu-project-single__fact-card">
-							<h2><?php esc_html_e('Vrijednost projekta', 'tersa-shop'); ?></h2>
+							<h2><?php echo esc_html(tersa_get_eu_project_text('project_value')); ?></h2>
 							<div class="eu-project-single__fact-content">
 								<p><?php echo esc_html($total_value); ?></p>
 							</div>
@@ -227,7 +229,7 @@ while (have_posts()) :
 
 					<?php if ($eu_funding) : ?>
 						<div class="eu-project-single__fact-card">
-							<h2><?php esc_html_e('Iznos koji sufinancira EU', 'tersa-shop'); ?></h2>
+							<h2><?php echo esc_html(tersa_get_eu_project_text('eu_funding')); ?></h2>
 							<div class="eu-project-single__fact-content">
 								<?php echo wpautop(wp_kses_post($eu_funding)); ?>
 							</div>
@@ -236,18 +238,18 @@ while (have_posts()) :
 
 					<?php if ($start_date_formatted || $end_date_formatted) : ?>
 						<div class="eu-project-single__fact-card">
-							<h2><?php esc_html_e('Trajanje projekta', 'tersa-shop'); ?></h2>
+							<h2><?php echo esc_html(tersa_get_eu_project_text('project_duration')); ?></h2>
 							<div class="eu-project-single__fact-content">
 								<?php if ($start_date_formatted) : ?>
 									<p>
-										<strong><?php esc_html_e('Početak:', 'tersa-shop'); ?></strong>
+										<strong><?php echo esc_html(tersa_get_eu_project_text('start')); ?></strong>
 										<?php echo esc_html($start_date_formatted); ?>
 									</p>
 								<?php endif; ?>
 
 								<?php if ($end_date_formatted) : ?>
 									<p>
-										<strong><?php esc_html_e('Završetak:', 'tersa-shop'); ?></strong>
+										<strong><?php echo esc_html(tersa_get_eu_project_text('end')); ?></strong>
 										<?php echo esc_html($end_date_formatted); ?>
 									</p>
 								<?php endif; ?>
@@ -263,8 +265,8 @@ while (have_posts()) :
 				<div class="container container--narrow">
 					<div class="eu-project-single__content-card">
 						<div class="eu-project-single__section-head">
-							<span class="eu-project-single__section-kicker"><?php esc_html_e('Projekt', 'tersa-shop'); ?></span>
-							<h2><?php esc_html_e('Kratki opis projekta', 'tersa-shop'); ?></h2>
+							<span class="eu-project-single__section-kicker"><?php echo esc_html(tersa_get_eu_project_text('project')); ?></span>
+							<h2><?php echo esc_html(tersa_get_eu_project_text('short_description')); ?></h2>
 						</div>
 
 						<div class="eu-project-single__richtext">
@@ -280,8 +282,8 @@ while (have_posts()) :
 				<div class="container container--narrow">
 					<div class="eu-project-single__content-card">
 						<div class="eu-project-single__section-head">
-							<span class="eu-project-single__section-kicker"><?php esc_html_e('Informacije', 'tersa-shop'); ?></span>
-							<h2><?php esc_html_e('Kontakt osobe za više informacija', 'tersa-shop'); ?></h2>
+							<span class="eu-project-single__section-kicker"><?php echo esc_html(tersa_get_eu_project_text('information')); ?></span>
+							<h2><?php echo esc_html(tersa_get_eu_project_text('contact_more_info')); ?></h2>
 						</div>
 
 						<div class="eu-project-single__richtext">
@@ -297,8 +299,8 @@ while (have_posts()) :
 				<div class="container container--narrow">
 					<div class="eu-project-single__content-card">
 						<div class="eu-project-single__section-head">
-							<span class="eu-project-single__section-kicker"><?php esc_html_e('Dodatno', 'tersa-shop'); ?></span>
-							<h2><?php esc_html_e('Dodatne informacije', 'tersa-shop'); ?></h2>
+							<span class="eu-project-single__section-kicker"><?php echo esc_html(tersa_get_eu_project_text('additional')); ?></span>
+							<h2><?php echo esc_html(tersa_get_eu_project_text('additional_info')); ?></h2>
 						</div>
 
 						<div class="eu-project-single__richtext entry-content">

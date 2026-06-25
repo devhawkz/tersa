@@ -1,11 +1,11 @@
 {
-    "key": "group_69bad24d63b2d",
-    "title": "Home Shop By Category",
+    "key": "group_69bae2b530631",
+    "title": "Homepage promo banners",
     "fields": [
         {
-            "key": "field_69bad24d43ee4",
-            "label": "Show Section Shop By Category",
-            "name": "show_home_shop_by_category",
+            "key": "field_69bae2b5c44ca",
+            "label": "Prikaži promo banere",
+            "name": "show_home_promo_banners",
             "aria-label": "",
             "type": "true_false",
             "instructions": "",
@@ -24,38 +24,9 @@
             "ui_off_text": ""
         },
         {
-            "key": "field_69bad28643ee5",
-            "label": "Shop By Category Title",
-            "name": "home_shop_by_category_title",
-            "aria-label": "",
-            "type": "text",
-            "instructions": "",
-            "required": 0,
-            "conditional_logic": [
-                [
-                    {
-                        "field": "field_69bad24d43ee4",
-                        "operator": "==",
-                        "value": "1"
-                    }
-                ]
-            ],
-            "wrapper": {
-                "width": "",
-                "class": "",
-                "id": ""
-            },
-            "default_value": "",
-            "maxlength": "",
-            "allow_in_bindings": 0,
-            "placeholder": "",
-            "prepend": "",
-            "append": ""
-        },
-        {
-            "key": "field_69bad2b0f24b0",
-            "label": "Home category item 1",
-            "name": "home_category_item_1",
+            "key": "field_69bae310c44cb",
+            "label": "Banner 1",
+            "name": "home_promo_banner_1",
             "aria-label": "",
             "type": "group",
             "instructions": "",
@@ -63,7 +34,7 @@
             "conditional_logic": [
                 [
                     {
-                        "field": "field_69bad24d43ee4",
+                        "field": "field_69bae2b5c44ca",
                         "operator": "==",
                         "value": "1"
                     }
@@ -77,7 +48,28 @@
             "layout": "block",
             "sub_fields": [
                 {
-                    "key": "field_69bad2d2f24b1",
+                    "key": "field_69bae32bc44cc",
+                    "label": "Eyebrow",
+                    "name": "eyebrow",
+                    "aria-label": "",
+                    "type": "text",
+                    "instructions": "",
+                    "required": 0,
+                    "conditional_logic": 0,
+                    "wrapper": {
+                        "width": "",
+                        "class": "",
+                        "id": ""
+                    },
+                    "default_value": "",
+                    "maxlength": "",
+                    "allow_in_bindings": 0,
+                    "placeholder": "",
+                    "prepend": "",
+                    "append": ""
+                },
+                {
+                    "key": "field_69bae351c44ce",
                     "label": "Title",
                     "name": "title",
                     "aria-label": "",
@@ -98,7 +90,28 @@
                     "append": ""
                 },
                 {
-                    "key": "field_69bad3fef24b2",
+                    "key": "field_69bae370c44cf",
+                    "label": "Description",
+                    "name": "description",
+                    "aria-label": "",
+                    "type": "textarea",
+                    "instructions": "",
+                    "required": 0,
+                    "conditional_logic": 0,
+                    "wrapper": {
+                        "width": "",
+                        "class": "",
+                        "id": ""
+                    },
+                    "default_value": "",
+                    "maxlength": "",
+                    "allow_in_bindings": 0,
+                    "rows": "",
+                    "placeholder": "",
+                    "new_lines": ""
+                },
+                {
+                    "key": "field_69bae389d20cd",
                     "label": "Link",
                     "name": "link",
                     "aria-label": "",
@@ -114,13 +127,39 @@
                     "default_value": "",
                     "allow_in_bindings": 0,
                     "placeholder": ""
+                },
+                {
+                    "key": "field_69bae398d20ce",
+                    "label": "Slika",
+                    "name": "image",
+                    "aria-label": "",
+                    "type": "image",
+                    "instructions": "",
+                    "required": 0,
+                    "conditional_logic": 0,
+                    "wrapper": {
+                        "width": "",
+                        "class": "",
+                        "id": ""
+                    },
+                    "return_format": "",
+                    "library": "",
+                    "min_width": "",
+                    "min_height": "",
+                    "min_size": "",
+                    "max_width": "",
+                    "max_height": "",
+                    "max_size": "",
+                    "mime_types": "",
+                    "allow_in_bindings": 0,
+                    "preview_size": "medium"
                 }
             ]
         },
         {
-            "key": "field_69bad494f24b3",
-            "label": "Home category item 2",
-            "name": "home_category_item_2",
+            "key": "field_69bae3b3d20cf",
+            "label": "Banner 2",
+            "name": "home_promo_banner_2",
             "aria-label": "",
             "type": "group",
             "instructions": "",
@@ -128,7 +167,7 @@
             "conditional_logic": [
                 [
                     {
-                        "field": "field_69bad24d43ee4",
+                        "field": "field_69bae2b5c44ca",
                         "operator": "==",
                         "value": "1"
                     }
@@ -142,7 +181,28 @@
             "layout": "block",
             "sub_fields": [
                 {
-                    "key": "field_69bad494f24b4",
+                    "key": "field_69bae3b3d20d0",
+                    "label": "Eyebrow",
+                    "name": "eyebrow",
+                    "aria-label": "",
+                    "type": "text",
+                    "instructions": "",
+                    "required": 0,
+                    "conditional_logic": 0,
+                    "wrapper": {
+                        "width": "",
+                        "class": "",
+                        "id": ""
+                    },
+                    "default_value": "",
+                    "maxlength": "",
+                    "allow_in_bindings": 0,
+                    "placeholder": "",
+                    "prepend": "",
+                    "append": ""
+                },
+                {
+                    "key": "field_69bae3b3d20d2",
                     "label": "Title",
                     "name": "title",
                     "aria-label": "",
@@ -163,55 +223,11 @@
                     "append": ""
                 },
                 {
-                    "key": "field_69bad494f24b5",
-                    "label": "Link",
-                    "name": "link",
+                    "key": "field_69bae3b3d20d3",
+                    "label": "Description",
+                    "name": "description",
                     "aria-label": "",
-                    "type": "url",
-                    "instructions": "",
-                    "required": 0,
-                    "conditional_logic": 0,
-                    "wrapper": {
-                        "width": "",
-                        "class": "",
-                        "id": ""
-                    },
-                    "default_value": "",
-                    "allow_in_bindings": 0,
-                    "placeholder": ""
-                }
-            ]
-        },
-        {
-            "key": "field_69bad498f24b6",
-            "label": "Home category item 3",
-            "name": "home_category_item_3",
-            "aria-label": "",
-            "type": "group",
-            "instructions": "",
-            "required": 0,
-            "conditional_logic": [
-                [
-                    {
-                        "field": "field_69bad24d43ee4",
-                        "operator": "==",
-                        "value": "1"
-                    }
-                ]
-            ],
-            "wrapper": {
-                "width": "",
-                "class": "",
-                "id": ""
-            },
-            "layout": "block",
-            "sub_fields": [
-                {
-                    "key": "field_69bad498f24b7",
-                    "label": "Title",
-                    "name": "title",
-                    "aria-label": "",
-                    "type": "text",
+                    "type": "textarea",
                     "instructions": "",
                     "required": 0,
                     "conditional_logic": 0,
@@ -223,12 +239,12 @@
                     "default_value": "",
                     "maxlength": "",
                     "allow_in_bindings": 0,
+                    "rows": "",
                     "placeholder": "",
-                    "prepend": "",
-                    "append": ""
+                    "new_lines": ""
                 },
                 {
-                    "key": "field_69bad498f24b8",
+                    "key": "field_69bae3b3d20d4",
                     "label": "Link",
                     "name": "link",
                     "aria-label": "",
@@ -244,60 +260,13 @@
                     "default_value": "",
                     "allow_in_bindings": 0,
                     "placeholder": ""
-                }
-            ]
-        },
-        {
-            "key": "field_69bad49af24b9",
-            "label": "Home category item 4",
-            "name": "home_category_item_4",
-            "aria-label": "",
-            "type": "group",
-            "instructions": "",
-            "required": 0,
-            "conditional_logic": [
-                [
-                    {
-                        "field": "field_69bad24d43ee4",
-                        "operator": "==",
-                        "value": "1"
-                    }
-                ]
-            ],
-            "wrapper": {
-                "width": "",
-                "class": "",
-                "id": ""
-            },
-            "layout": "block",
-            "sub_fields": [
-                {
-                    "key": "field_69bad49af24ba",
-                    "label": "Title",
-                    "name": "title",
-                    "aria-label": "",
-                    "type": "text",
-                    "instructions": "",
-                    "required": 0,
-                    "conditional_logic": 0,
-                    "wrapper": {
-                        "width": "",
-                        "class": "",
-                        "id": ""
-                    },
-                    "default_value": "",
-                    "maxlength": "",
-                    "allow_in_bindings": 0,
-                    "placeholder": "",
-                    "prepend": "",
-                    "append": ""
                 },
                 {
-                    "key": "field_69bad49af24bb",
-                    "label": "Link",
-                    "name": "link",
+                    "key": "field_69bae3b3d20d5",
+                    "label": "Slika",
+                    "name": "image",
                     "aria-label": "",
-                    "type": "url",
+                    "type": "image",
                     "instructions": "",
                     "required": 0,
                     "conditional_logic": 0,
@@ -306,9 +275,17 @@
                         "class": "",
                         "id": ""
                     },
-                    "default_value": "",
+                    "return_format": "id",
+                    "library": "all",
+                    "min_width": "",
+                    "min_height": "",
+                    "min_size": "",
+                    "max_width": "",
+                    "max_height": "",
+                    "max_size": "",
+                    "mime_types": "",
                     "allow_in_bindings": 0,
-                    "placeholder": ""
+                    "preview_size": "medium"
                 }
             ]
         }
@@ -348,5 +325,5 @@
     "display_title": "",
     "allow_ai_access": false,
     "ai_description": "",
-    "modified": 1782408549
+    "modified": 1782408627
 }

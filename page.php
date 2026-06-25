@@ -10,6 +10,19 @@ get_header();
 	<section class="tersa-page__section page-spacing" aria-labelledby="tersa-page-title">
 		<div class="container">
 			<?php while (have_posts()) : the_post(); ?>
+				<?php
+				$page_title = get_the_title();
+				if (
+					function_exists('tersa_is_wishlist_page')
+					&& tersa_is_wishlist_page()
+					&& function_exists('tersa_pll_wishlist')
+				) {
+					$wishlist_title = tersa_pll_wishlist('title');
+					if ('' !== $wishlist_title) {
+						$page_title = $wishlist_title;
+					}
+				}
+				?>
 				<header class="tersa-page__header">
 					<?php if (function_exists('woocommerce_breadcrumb')) : ?>
 						<?php
@@ -25,7 +38,7 @@ get_header();
 					<?php endif; ?>
 
 				<h1 id="tersa-page-title" class="tersa-page__title">
-					<?php echo esc_html(get_the_title()); ?>
+					<?php echo esc_html($page_title); ?>
 				</h1>
 				</header>
 

@@ -29,6 +29,7 @@
     grid-template-columns: 1.2fr 1fr 1fr 1.3fr;
     gap: clamp(28px, 4vw, 56px);
     align-items: start;
+    justify-items: center;
   }
   
   .site-footer__logo-wrap {

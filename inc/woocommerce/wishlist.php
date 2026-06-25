@@ -45,15 +45,12 @@ function tersa_yith_wcwl_ajax_add_response(array $response): array {
 	}
 
 	$product_name   = $response['product_name'] ?? '';
-	$wishlist_title = function_exists('pll__') ? pll__('Moja lista želja') : 'Moja lista želja';
+	$wishlist_title = tersa_pll_wishlist('title_mine');
 
 	if ($product_name !== '') {
 		$safe_product_name   = esc_html(wp_strip_all_tags((string) $product_name));
-		$safe_wishlist_title = esc_html((string) $wishlist_title);
-		$hr = function_exists('pll__')
-			? pll__('"%s" je dodano na vašu listu "%s"!')
-			: '"%s" je dodano na vašu listu "%s"!';
-		$response['message'] = sprintf($hr, $safe_product_name, $safe_wishlist_title);
+		$safe_wishlist_title = esc_html(wp_strip_all_tags((string) $wishlist_title));
+		$response['message'] = sprintf(tersa_pll_wishlist('added_notification'), $safe_product_name, $safe_wishlist_title);
 	}
 
 	return $response;

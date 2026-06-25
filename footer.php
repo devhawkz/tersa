@@ -113,6 +113,12 @@ $footer_legal_menu_args = function_exists('tersa_get_footer_nav_menu_args')
 	];
 $has_footer_about_menu = !empty($footer_about_menu_args['menu']) || has_nav_menu('footer_about');
 $has_footer_legal_menu = !empty($footer_legal_menu_args['menu']) || has_nav_menu('footer_legal');
+$footer_about_heading = function_exists('tersa_get_footer_nav_menu_name')
+	? tersa_get_footer_nav_menu_name('footer_about', _x('Useful links', 'footer section heading', 'tersa-shop'))
+	: _x('Useful links', 'footer section heading', 'tersa-shop');
+$footer_legal_heading = function_exists('tersa_get_footer_nav_menu_name')
+	? tersa_get_footer_nav_menu_name('footer_legal', _x('Legal pages', 'footer section heading', 'tersa-shop'))
+	: _x('Legal pages', 'footer section heading', 'tersa-shop');
 ?>
 	<footer class="site-footer" role="contentinfo">
 		<div class="site-footer__main">
@@ -147,7 +153,7 @@ $has_footer_legal_menu = !empty($footer_legal_menu_args['menu']) || has_nav_menu
 					</section>
 
 					<nav class="site-footer__nav-col" aria-label="<?php esc_attr_e('About footer navigation', 'tersa-shop'); ?>">
-						<h2 class="site-footer__heading"><?php esc_html_e('KORISNE POVEZNICE', 'tersa-shop'); ?></h2>
+						<h2 class="site-footer__heading"><?php echo esc_html($footer_about_heading); ?></h2>
 
 						<?php if ($has_footer_about_menu) : ?>
 							<?php
@@ -167,7 +173,7 @@ $has_footer_legal_menu = !empty($footer_legal_menu_args['menu']) || has_nav_menu
 					</nav>
 
 					<nav class="site-footer__nav-col" aria-label="<?php esc_attr_e('Legal footer navigation', 'tersa-shop'); ?>">
-						<h2 class="site-footer__heading"><?php esc_html_e('PRAVNE STRANICE', 'tersa-shop'); ?></h2>
+						<h2 class="site-footer__heading"><?php echo esc_html($footer_legal_heading); ?></h2>
 
 						<?php if ($has_footer_legal_menu) : ?>
 							<?php
@@ -250,12 +256,21 @@ $has_footer_legal_menu = !empty($footer_legal_menu_args['menu']) || has_nav_menu
 							);
 
 							$copyright_markup = sprintf(
-								__('© %1$s %2$s, sva prava pridržana', 'tersa-shop'),
-								date_i18n('Y'),
+								function_exists('tersa_get_footer_copyright_format')
+									? tersa_get_footer_copyright_format()
+									: '© %1$s %2$s, all rights reserved',
+								esc_html(date_i18n('Y')),
 								$company_link
 							);
 
-							echo wp_kses_post($copyright_markup);
+							echo wp_kses(
+								$copyright_markup,
+								[
+									'a' => [
+										'href' => true,
+									],
+								]
+							);
 							?>
 						</p>
 					</div>

@@ -37,31 +37,137 @@ function tersa_is_wishlist_page(): bool {
 }
 
 /**
- * Wishlist helper za Polylang stringove.
+ * Normalizuje jezik za wishlist UI tekstove.
  */
-function tersa_pll_wishlist(string $key): string {
-	$map = [
-		'add'                => 'Dodaj na listu želja',
-		'browse'             => 'Pregledaj listu želja',
-		'added'              => 'Dodano na listu želja',
-		'added_notification' => '"%s" je dodano na vašu listu "%s"!',
-		'remove'             => 'Ukloni s liste želja',
-		'already_in'         => 'Proizvod je već na listi želja!',
-		'title'              => 'Lista želja',
-		'title_mine'         => 'Moja lista želja',
-		'product_name'       => 'Naziv proizvoda',
-		'unit_price'         => 'Cijena',
-		'price'              => 'Cijena',
-		'stock'              => 'Status zaliha',
-		'stock_status'       => 'Status zaliha',
-		'add_to_cart'        => 'Dodaj u košaricu',
-		'remove_product'     => 'Ukloni ovaj proizvod',
-		'empty'              => 'Nema proizvoda na listi želja.',
-		'in_stock'           => 'Na stanju',
+function tersa_get_wishlist_language_slug(): string {
+	$lang = function_exists('tersa_get_current_language_slug') ? tersa_get_current_language_slug() : '';
+
+	if ('' === $lang && function_exists('pll_current_language')) {
+		$current_lang = pll_current_language('slug');
+		$lang         = is_string($current_lang) ? sanitize_key($current_lang) : '';
+	}
+
+	if ('' === $lang && function_exists('determine_locale')) {
+		$lang = (string) determine_locale();
+	}
+
+	$lang = strtolower(str_replace('_', '-', trim($lang)));
+	$lang = $lang ? substr($lang, 0, 2) : '';
+
+	return in_array($lang, ['hr', 'en', 'de'], true) ? $lang : 'hr';
+}
+
+/**
+ * Wishlist UI tekstovi po jeziku.
+ *
+ * @return array<string, array<string, string>>
+ */
+function tersa_get_wishlist_text_labels(): array {
+	static $labels = null;
+
+	if (null !== $labels) {
+		return $labels;
+	}
+
+	$labels = [
+		'add'                => [
+			'hr' => 'Dodaj na listu želja',
+			'en' => 'Add to wishlist',
+			'de' => 'Zur Wunschliste hinzufügen',
+		],
+		'browse'             => [
+			'hr' => 'Pregledaj listu želja',
+			'en' => 'View wishlist',
+			'de' => 'Wunschliste ansehen',
+		],
+		'added'              => [
+			'hr' => 'Dodano na listu želja',
+			'en' => 'Added to wishlist',
+			'de' => 'Zur Wunschliste hinzugefügt',
+		],
+		'added_notification' => [
+			'hr' => '"%s" je dodano na vašu listu "%s"!',
+			'en' => '"%s" has been added to your "%s" list!',
+			'de' => '"%s" wurde zu deiner Liste "%s" hinzugefügt!',
+		],
+		'remove'             => [
+			'hr' => 'Ukloni s liste želja',
+			'en' => 'Remove from wishlist',
+			'de' => 'Von der Wunschliste entfernen',
+		],
+		'already_in'         => [
+			'hr' => 'Proizvod je već na listi želja!',
+			'en' => 'The product is already in the wishlist!',
+			'de' => 'Das Produkt ist bereits auf der Wunschliste!',
+		],
+		'title'              => [
+			'hr' => 'Lista želja',
+			'en' => 'Wishlist',
+			'de' => 'Wunschliste',
+		],
+		'title_mine'         => [
+			'hr' => 'Moja lista želja',
+			'en' => 'My wishlist',
+			'de' => 'Meine Wunschliste',
+		],
+		'product_name'       => [
+			'hr' => 'Naziv proizvoda',
+			'en' => 'Product name',
+			'de' => 'Produktname',
+		],
+		'unit_price'         => [
+			'hr' => 'Cijena',
+			'en' => 'Price',
+			'de' => 'Preis',
+		],
+		'price'              => [
+			'hr' => 'Cijena',
+			'en' => 'Price',
+			'de' => 'Preis',
+		],
+		'stock'              => [
+			'hr' => 'Status zaliha',
+			'en' => 'Stock status',
+			'de' => 'Lagerstatus',
+		],
+		'stock_status'       => [
+			'hr' => 'Status zaliha',
+			'en' => 'Stock status',
+			'de' => 'Lagerstatus',
+		],
+		'add_to_cart'        => [
+			'hr' => 'Dodaj u košaricu',
+			'en' => 'Add to cart',
+			'de' => 'In den Warenkorb',
+		],
+		'remove_product'     => [
+			'hr' => 'Ukloni ovaj proizvod',
+			'en' => 'Remove this product',
+			'de' => 'Dieses Produkt entfernen',
+		],
+		'empty'              => [
+			'hr' => 'Nema proizvoda na listi želja.',
+			'en' => 'No products on the wishlist.',
+			'de' => 'Keine Produkte auf der Wunschliste.',
+		],
+		'in_stock'           => [
+			'hr' => 'Na stanju',
+			'en' => 'In stock',
+			'de' => 'Auf Lager',
+		],
 	];
 
-	$string = $map[$key] ?? '';
-	return ($string !== '' && function_exists('pll__')) ? pll__($string) : $string;
+	return $labels;
+}
+
+/**
+ * Wishlist helper za statične HR/EN/DE tekstove.
+ */
+function tersa_pll_wishlist(string $key): string {
+	$labels = tersa_get_wishlist_text_labels();
+	$lang   = tersa_get_wishlist_language_slug();
+
+	return $labels[$key][$lang] ?? $labels[$key]['hr'] ?? '';
 }
 
 /**

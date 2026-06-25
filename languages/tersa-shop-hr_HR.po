@@ -648,17 +648,19 @@ msgstr ""
 msgid "About footer navigation"
 msgstr ""
 
-#: footer.php:120
-msgid "KORISNE POVEZNICE"
-msgstr ""
+#: footer.php:150
+msgctxt "footer section heading"
+msgid "Useful links"
+msgstr "Korisne poveznice"
 
 #: footer.php:145
 msgid "Legal footer navigation"
 msgstr ""
 
-#: footer.php:146
-msgid "PRAVNE STRANICE"
-msgstr ""
+#: footer.php:170
+msgctxt "footer section heading"
+msgid "Legal pages"
+msgstr "Pravne stranice"
 
 #: footer.php:175
 msgid "Prijavi se na naš newsletter"
@@ -668,10 +670,10 @@ msgstr ""
 msgid "Promotivna poruka za newsletter"
 msgstr ""
 
-#: footer.php:235
+#: footer.php:254
 #, php-format
-msgid "© %1$s %2$s, sva prava pridržana"
-msgstr ""
+msgid "© %1$s %2$s, all rights reserved"
+msgstr "© %1$s %2$s, sva prava pridržana"
 
 #: footer.php:247
 msgid "Prihvaćene kartice i sigurnosni programi"

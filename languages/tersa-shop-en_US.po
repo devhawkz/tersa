@@ -645,16 +645,18 @@ msgstr "Email:"
 msgid "About footer navigation"
 msgstr "About footer navigation"
 
-#: footer.php:120
-msgid "KORISNE POVEZNICE"
+#: footer.php:150
+msgctxt "footer section heading"
+msgid "Useful links"
 msgstr "Useful links"
 
 #: footer.php:145
 msgid "Legal footer navigation"
 msgstr "Legal footer navigation"
 
-#: footer.php:146
-msgid "PRAVNE STRANICE"
+#: footer.php:170
+msgctxt "footer section heading"
+msgid "Legal pages"
 msgstr "Legal pages"
 
 #: footer.php:175
@@ -665,9 +667,9 @@ msgstr "Sign up for our newsletter"
 msgid "Promotivna poruka za newsletter"
 msgstr "Promotional newsletter message"
 
-#: footer.php:235
+#: footer.php:254
 #, php-format
-msgid "© %1$s %2$s, sva prava pridržana"
+msgid "© %1$s %2$s, all rights reserved"
 msgstr "© %1$s %2$s, all rights reserved"
 
 #: footer.php:247

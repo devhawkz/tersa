@@ -51,6 +51,43 @@ function tersa_get_footer_current_language_slug(): string {
 }
 
 /**
+ * Normalizuje jezik za statične footer UI tekstove.
+ *
+ * @param string $lang Polylang/WP locale slug.
+ * @return string
+ */
+function tersa_normalize_footer_language_slug(string $lang = ''): string {
+	$lang = strtolower(str_replace('_', '-', trim($lang)));
+	$lang = $lang ? substr($lang, 0, 2) : '';
+
+	return in_array($lang, ['hr', 'en', 'de'], true) ? $lang : 'hr';
+}
+
+/**
+ * Copyright format po jeziku. Placeholderi:
+ * %1$s = godina, %2$s = linked company name.
+ *
+ * @return string
+ */
+function tersa_get_footer_copyright_format(): string {
+	$lang = tersa_get_footer_current_language_slug();
+
+	if ('' === $lang && function_exists('determine_locale')) {
+		$lang = (string) determine_locale();
+	}
+
+	$formats = [
+		'hr' => '© %1$s %2$s, sva prava pridržana',
+		'en' => '© %1$s %2$s, all rights reserved',
+		'de' => '© %1$s %2$s, alle Rechte vorbehalten',
+	];
+
+	$lang = tersa_normalize_footer_language_slug($lang);
+
+	return $formats[$lang] ?? $formats['hr'];
+}
+
+/**
  * Vraća slug defaultnog jezika.
  *
  * @return string
@@ -844,6 +881,29 @@ function tersa_get_footer_nav_menu_id(string $location): int {
 	}
 
 	return $menu_id > 0 ? $menu_id : 0;
+}
+
+/**
+ * Vraća naziv footer menija za zadatu lokaciju, uključujući Polylang prevod menija.
+ *
+ * @param string $location Theme menu location.
+ * @param string $fallback Fallback naziv.
+ * @return string
+ */
+function tersa_get_footer_nav_menu_name(string $location, string $fallback = ''): string {
+	$menu_id = tersa_get_footer_nav_menu_id($location);
+
+	if (!$menu_id) {
+		return $fallback;
+	}
+
+	$menu = wp_get_nav_menu_object($menu_id);
+
+	if (!$menu instanceof WP_Term || trim((string) $menu->name) === '') {
+		return $fallback;
+	}
+
+	return (string) $menu->name;
 }
 
 /**
