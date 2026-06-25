@@ -28,7 +28,7 @@ function tersa_get_footer_settings_cache_base_key(): string {
  * @return string
  */
 function tersa_get_company_settings_cache_base_key(): string {
-	return 'tersa_company_settings_v2';
+	return 'tersa_company_settings_v4';
 }
 
 /**
@@ -149,6 +149,140 @@ function tersa_get_footer_settings_page_ids(): array {
 
 	return array_values(array_unique(array_filter(array_map('intval', $page_ids))));
 }
+
+/**
+ * Proširuje Footer Settings ACF grupu na sve Polylang prevode stranice.
+ *
+ * @param array<string, mixed> $field_group ACF field group.
+ * @return array<string, mixed>
+ */
+function tersa_acf_extend_footer_settings_locations(array $field_group): array {
+	if (($field_group['key'] ?? '') !== 'group_69b97bda6fd6a') {
+		return $field_group;
+	}
+
+	$page_ids = tersa_get_footer_settings_page_ids();
+
+	if (!$page_ids) {
+		return $field_group;
+	}
+
+	$field_group['location'] = array_map(
+		static function (int $page_id): array {
+			return [
+				[
+					'param'    => 'page',
+					'operator' => '==',
+					'value'    => (string) $page_id,
+				],
+			];
+		},
+		$page_ids
+	);
+
+	return $field_group;
+}
+add_filter('acf/load_field_group', 'tersa_acf_extend_footer_settings_locations', 20);
+
+/**
+ * Admin obavijest na Footer Settings stranicama — prikazuje jezik i linkove na prevode.
+ *
+ * @return void
+ */
+function tersa_footer_settings_admin_language_notice(): void {
+	if (!is_admin() || !function_exists('get_current_screen')) {
+		return;
+	}
+
+	$screen = get_current_screen();
+
+	if (!$screen || 'post' !== $screen->base || 'page' !== $screen->post_type) {
+		return;
+	}
+
+	global $post;
+
+	if (!$post instanceof WP_Post) {
+		return;
+	}
+
+	$page_ids = tersa_get_footer_settings_page_ids();
+
+	if (!in_array((int) $post->ID, $page_ids, true)) {
+		return;
+	}
+
+	$lang_label = '';
+
+	if (function_exists('pll_get_post_language')) {
+		$lang_slug = pll_get_post_language($post->ID, 'slug');
+		$lang_name = pll_get_post_language($post->ID, 'name');
+
+		if ($lang_name) {
+			$lang_label = (string) $lang_name;
+		} elseif ($lang_slug) {
+			$lang_label = strtoupper((string) $lang_slug);
+		}
+	}
+
+	$translation_links = [];
+
+	if (function_exists('pll_get_post_translations')) {
+		$translations = pll_get_post_translations($post->ID);
+
+		foreach ((array) $translations as $translation_lang => $translation_id) {
+			$translation_id = (int) $translation_id;
+
+			if ($translation_id <= 0 || $translation_id === (int) $post->ID) {
+				continue;
+			}
+
+			$edit_url = get_edit_post_link($translation_id, '');
+
+			if (!$edit_url) {
+				continue;
+			}
+
+			$label = strtoupper((string) $translation_lang);
+
+			if (function_exists('PLL')) {
+				$language = PLL()->model->get_language($translation_lang);
+
+				if ($language && !empty($language->name)) {
+					$label = (string) $language->name;
+				}
+			}
+
+			$translation_links[] = sprintf(
+				'<a href="%s">%s</a>',
+				esc_url($edit_url),
+				esc_html($label)
+			);
+		}
+	}
+
+	$message = $lang_label
+		? sprintf(
+			/* translators: %s: language name */
+			__('Uređujete Footer Settings za jezik: %s. Polja na ovoj stranici vrijede samo za taj jezik. Prazna polja na frontendu nasljeđuju vrijednost iz default jezika.', 'tersa-shop'),
+			'<strong>' . esc_html($lang_label) . '</strong>'
+		)
+		: __('Uređujete Footer Settings. Za višejezični sadržaj povežite stranicu u Polylangu i popunite polja na svakom jezičnom prevodu.', 'tersa-shop');
+
+	if ($translation_links) {
+		$message .= ' ' . sprintf(
+			/* translators: %s: comma-separated edit links */
+			__('Otvori prevod: %s', 'tersa-shop'),
+			implode(', ', $translation_links)
+		);
+	}
+
+	printf(
+		'<div class="notice notice-info"><p>%s</p></div>',
+		wp_kses_post($message)
+	);
+}
+add_action('admin_notices', 'tersa_footer_settings_admin_language_notice');
 
 /**
  * Učitava newsletter footer podešavanja sa jedne stranice.
@@ -338,6 +472,174 @@ function tersa_safe_rich_text(string $value): string {
 }
 
 /**
+ * Validira Google Maps iframe src.
+ *
+ * @param string $src Iframe src URL.
+ * @return bool
+ */
+function tersa_is_allowed_map_embed_src(string $src): bool {
+	$src = esc_url_raw(trim($src), ['https']);
+
+	if ($src === '') {
+		return false;
+	}
+
+	$parts = wp_parse_url($src);
+
+	if (!is_array($parts) || empty($parts['host'])) {
+		return false;
+	}
+
+	$scheme = strtolower((string) ($parts['scheme'] ?? ''));
+	$host   = strtolower(trim((string) $parts['host'], '.'));
+	$path   = '/' . ltrim((string) ($parts['path'] ?? ''), '/');
+
+	if ($scheme !== 'https') {
+		return false;
+	}
+
+	$allowed_hosts = ['maps.google.com', 'www.google.com', 'google.com'];
+	if (function_exists('apply_filters')) {
+		$allowed_hosts = (array) apply_filters('tersa_allowed_map_embed_hosts', $allowed_hosts);
+	}
+	$allowed_hosts = array_map(
+		static function ($allowed_host): string {
+			return strtolower(trim((string) $allowed_host, '.'));
+		},
+		$allowed_hosts
+	);
+
+	if (!in_array($host, $allowed_hosts, true)) {
+		return false;
+	}
+
+	return $path === '/maps' || strpos($path, '/maps/') === 0;
+}
+
+/**
+ * Izvlači atribute prvog iframe-a iz embed HTML-a.
+ *
+ * @param string $embed Iframe HTML.
+ * @return array<string, string>
+ */
+function tersa_get_map_iframe_attributes(string $embed): array {
+	$attrs = [];
+
+	if (class_exists('DOMDocument')) {
+		$previous_errors = function_exists('libxml_use_internal_errors')
+			? libxml_use_internal_errors(true)
+			: null;
+		$dom             = new DOMDocument();
+		$loaded          = $dom->loadHTML('<?xml encoding="utf-8" ?><!doctype html><html><body>' . $embed . '</body></html>');
+
+		if (function_exists('libxml_clear_errors')) {
+			libxml_clear_errors();
+		}
+		if ($previous_errors !== null && function_exists('libxml_use_internal_errors')) {
+			libxml_use_internal_errors($previous_errors);
+		}
+
+		if ($loaded) {
+			$iframe = $dom->getElementsByTagName('iframe')->item(0);
+
+			if ($iframe instanceof DOMElement) {
+				foreach ($iframe->attributes as $attribute) {
+					$attrs[strtolower((string) $attribute->name)] = html_entity_decode(
+						(string) $attribute->value,
+						ENT_QUOTES | ENT_HTML5,
+						'UTF-8'
+					);
+				}
+			}
+		}
+	}
+
+	if (!$attrs && preg_match('/<iframe\b([^>]*)>/i', $embed, $tag_match)) {
+		if (preg_match_all('/\s([a-zA-Z:-]+)\s*=\s*([\'"])(.*?)\2/s', $tag_match[1], $attr_matches, PREG_SET_ORDER)) {
+			foreach ($attr_matches as $attr_match) {
+				$attrs[strtolower((string) $attr_match[1])] = html_entity_decode(
+					(string) $attr_match[3],
+					ENT_QUOTES | ENT_HTML5,
+					'UTF-8'
+				);
+			}
+		}
+	}
+
+	return $attrs;
+}
+
+/**
+ * Sanitizuje Google Maps iframe embed iz ACF-a.
+ *
+ * @param string $embed Iframe HTML.
+ * @return string
+ */
+function tersa_safe_map_embed(string $embed): string {
+	$attrs = tersa_get_map_iframe_attributes(trim($embed));
+	$src   = (string) ($attrs['src'] ?? '');
+
+	if (!tersa_is_allowed_map_embed_src($src)) {
+		return '';
+	}
+
+	$class_names = preg_split('/\s+/', (string) ($attrs['class'] ?? ''), -1, PREG_SPLIT_NO_EMPTY);
+	$class_names = is_array($class_names) ? $class_names : [];
+	$class_names[] = 'embed-map-frame';
+	$class_names = array_values(array_unique(array_filter(array_map('sanitize_html_class', $class_names))));
+
+	$scrolling = sanitize_key((string) ($attrs['scrolling'] ?? 'no'));
+	if (!in_array($scrolling, ['yes', 'no', 'auto'], true)) {
+		$scrolling = 'no';
+	}
+
+	$loading = sanitize_key((string) ($attrs['loading'] ?? 'lazy'));
+	if (!in_array($loading, ['lazy', 'eager'], true)) {
+		$loading = 'lazy';
+	}
+
+	$output_attrs = [
+		'class'        => implode(' ', $class_names),
+		'title'        => sanitize_text_field((string) ($attrs['title'] ?? __('Company location on Google Maps', 'tersa-shop'))),
+		'frameborder'  => preg_replace('/[^0-9]/', '', (string) ($attrs['frameborder'] ?? '0')) ?: '0',
+		'scrolling'    => $scrolling,
+		'marginheight' => (string) absint($attrs['marginheight'] ?? 0),
+		'marginwidth'  => (string) absint($attrs['marginwidth'] ?? 0),
+		'loading'      => $loading,
+		'src'          => esc_url_raw($src, ['https']),
+	];
+
+	if (!empty($attrs['referrerpolicy'])) {
+		$referrer_policy = sanitize_key((string) $attrs['referrerpolicy']);
+		$allowed_policies = [
+			'no-referrer',
+			'no-referrer-when-downgrade',
+			'origin',
+			'origin-when-cross-origin',
+			'same-origin',
+			'strict-origin',
+			'strict-origin-when-cross-origin',
+			'unsafe-url',
+		];
+
+		if (in_array($referrer_policy, $allowed_policies, true)) {
+			$output_attrs['referrerpolicy'] = $referrer_policy;
+		}
+	}
+
+	$html = '<iframe';
+	foreach ($output_attrs as $name => $value) {
+		$html .= sprintf(
+			' %s="%s"',
+			esc_attr($name),
+			'src' === $name ? esc_url((string) $value, ['https']) : esc_attr((string) $value)
+		);
+	}
+
+	return $html . '></iframe>';
+}
+
+/**
  * Normalizuje ACF image vrednost (ID, array ili URL) u bezbedan URL.
  *
  * @param mixed  $image ACF image vrednost.
@@ -364,15 +666,6 @@ function tersa_get_acf_image_url($image, string $size = 'full'): string {
 	}
 
 	return $url ? esc_url_raw((string) $url) : '';
-}
-
-/**
- * Slug stranice koja cuva globalna podešavanja za ACF Free.
- *
- * @return string
- */
-function tersa_get_global_settings_slug(): string {
-	return 'global-settings';
 }
 
 /**
@@ -411,6 +704,8 @@ function tersa_get_empty_company_settings(): array {
 		'company_vat_id'                  => '',
 		'company_support_hours'           => '',
 		'footer_newsletter_cf7_shortcode' => '',
+		'contact_cf7_shortcode'           => '',
+		'contact_map_embed'               => '',
 	];
 }
 
@@ -577,97 +872,6 @@ function tersa_get_footer_nav_menu_args(string $location): array {
 }
 
 /**
- * Registruje footer/global ACF stringove za Polylang String Translation.
- *
- * @return void
- */
-function tersa_register_footer_polylang_strings(): void {
-	if (!function_exists('pll_register_string')) {
-		return;
-	}
-
-	$register = static function (string $name, string $value, string $group, bool $multiline = false): void {
-		if (trim($value) === '') {
-			return;
-		}
-
-		pll_register_string($name, $value, $group, $multiline);
-	};
-
-	$footer_settings = tersa_get_footer_settings();
-	$company_settings = tersa_get_company_settings();
-
-	$register('footer_newsletter_heading', (string) ($footer_settings['footer_newsletter_heading'] ?? ''), 'Tersa – footer', false);
-	$register('footer_newsletter_text', (string) ($footer_settings['footer_newsletter_text'] ?? ''), 'Tersa – footer', true);
-	$register('footer_newsletter_cf7_shortcode', (string) ($company_settings['footer_newsletter_cf7_shortcode'] ?? ''), 'Tersa – forme', false);
-
-	$company_string_fields = [
-		'company_name'          => false,
-		'company_full_name'     => false,
-		'company_activity'      => false,
-		'company_address'       => true,
-		'company_court'         => false,
-		'company_director'      => false,
-		'company_share_capital' => false,
-		'company_bank'          => false,
-		'company_support_hours' => false,
-	];
-
-	foreach ($company_string_fields as $field => $multiline) {
-		$register($field, (string) ($company_settings[$field] ?? ''), 'Tersa – podaci tvrtke', (bool) $multiline);
-	}
-
-	$company_fallback_strings = [
-		'company_activity_fallback'      => ['Prerada drva i trgovina drvnim proizvodima', false],
-		'company_address_fallback'       => ['Nikole Tesle 71, 31551 Črnkovci, Hrvatska', true],
-		'company_court_fallback'         => ['Trgovački sud u Osijeku', false],
-		'company_director_fallback'      => ['Vlado Šakić, direktor', false],
-		'company_support_hours_fallback' => ['Pon – Pet: 08:00 – 14:00', false],
-	];
-
-	foreach ($company_fallback_strings as $name => [$value, $multiline]) {
-		$register($name, $value, 'Tersa – podaci tvrtke', (bool) $multiline);
-	}
-
-	$global_settings_page_id = tersa_get_global_settings_page_id();
-	if ($global_settings_page_id && function_exists('get_field')) {
-		$register('contact_cf7_shortcode', (string) get_field('contact_cf7_shortcode', $global_settings_page_id), 'Tersa – forme', false);
-		$register('contact_map_embed', (string) get_field('contact_map_embed', $global_settings_page_id), 'Tersa – kontakt', true);
-	}
-}
-add_action('init', 'tersa_register_footer_polylang_strings', 20);
-
-/**
- * ID global settings stranice za trenutni Polylang jezik (ACF Free pristup).
- * Static cache je per-language — isti request nema više od jednog jezičnog konteksta.
- *
- * @return int
- */
-function tersa_get_global_settings_page_id(): int {
-	static $cached_ids = [];
-
-	$lang     = function_exists('pll_current_language') ? (string) pll_current_language() : '';
-	$lang_key = $lang ?: '_default';
-
-	if (isset($cached_ids[$lang_key])) {
-		return $cached_ids[$lang_key];
-	}
-
-	$page    = get_page_by_path(tersa_get_global_settings_slug());
-	$page_id = $page ? (int) $page->ID : 0;
-
-	// Polylang: dohvati prevedenu verziju stranice za trenutni jezik.
-	if ($page_id && $lang && function_exists('pll_get_post')) {
-		$translated_id = pll_get_post($page_id, $lang);
-		if ($translated_id) {
-			$page_id = (int) $translated_id;
-		}
-	}
-
-	return $cached_ids[$lang_key] = $page_id;
-}
-
-/**
  * Vraća kompletan impressum sa fallback vrijednostima iz dopisa klijenta (2026-05-20).
  * Koristi se na Kontakt stranici i u footeru.
  *
@@ -682,28 +886,25 @@ function tersa_get_company_impressum(): array {
 	$pick = static function (string $value, string $fallback): string {
 		return trim($value) !== '' ? $value : $fallback;
 	};
-	$translate = static function (string $value): string {
-		return function_exists('tersa_translate_string') ? tersa_translate_string($value) : $value;
-	};
 
 	return [
-		'name'           => $translate($pick($s['company_name']             ?? '', 'Tersa d.o.o.')),
-		'full_name'      => $translate($pick($s['company_full_name']        ?? '', 'Tersa d.o.o.')),
-		'activity'       => $translate($pick($s['company_activity']         ?? '', 'Prerada drva i trgovina drvnim proizvodima')),
-		'address'        => $translate($pick($s['company_address']          ?? '', 'Nikole Tesle 71, 31551 Črnkovci, Hrvatska')),
+		'name'           => $pick($s['company_name']             ?? '', 'Tersa d.o.o.'),
+		'full_name'      => $pick($s['company_full_name']        ?? '', 'Tersa d.o.o.'),
+		'activity'       => $pick($s['company_activity']         ?? '', 'Prerada drva i trgovina drvnim proizvodima'),
+		'address'        => $pick($s['company_address']          ?? '', 'Nikole Tesle 71, 31551 Črnkovci, Hrvatska'),
 		'oib'            => $pick($s['company_oib']              ?? '', '80835896442'),
 		'mbs'            => $pick($s['company_mbs']              ?? '', '030014012'),
-		'court'          => $translate($pick($s['company_court']            ?? '', 'Trgovački sud u Osijeku')),
-		'director'       => $translate($pick($s['company_director']         ?? '', 'Vlado Šakić, direktor')),
-		'share_capital'  => $translate((string) ($s['company_share_capital'] ?? '')),
+		'court'          => $pick($s['company_court']            ?? '', 'Trgovački sud u Osijeku'),
+		'director'       => $pick($s['company_director']         ?? '', 'Vlado Šakić, direktor'),
+		'share_capital'  => (string) ($s['company_share_capital'] ?? ''),
 		'iban'           => (string) ($s['company_iban']         ?? ''),
-		'bank'           => $translate((string) ($s['company_bank']         ?? '')),
+		'bank'           => (string) ($s['company_bank']         ?? ''),
 		'vat_id'         => (string) ($s['company_vat_id']       ?? ''),
 		'email'          => $pick($s['company_email']            ?? '', 'tersa@tersa.hr'),
 		'email_complaints' => $pick($s['company_email_complaints'] ?? '', 'tersa@tersa.hr'),
 		'phone'          => $pick($s['company_phone_primary']    ?? '', '031/355 900'),
 		'phone_secondary'=> (string) ($s['company_phone_secondary'] ?? ''),
-		'support_hours'  => $translate($pick($s['company_support_hours']    ?? '', 'Pon – Pet: 08:00 – 14:00')),
+		'support_hours'  => $pick($s['company_support_hours']    ?? '', 'Pon – Pet: 08:00 – 14:00'),
 	];
 }
 

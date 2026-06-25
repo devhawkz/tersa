@@ -3,6 +3,24 @@
     "title": "Footer Settings",
     "fields": [
         {
+            "key": "field_69c58001footer_msg",
+            "label": "Višejezičnost",
+            "name": "",
+            "aria-label": "",
+            "type": "message",
+            "instructions": "",
+            "required": 0,
+            "conditional_logic": 0,
+            "wrapper": {
+                "width": "",
+                "class": "",
+                "id": ""
+            },
+            "message": "Footer Settings koristi Polylang prevode stranice. Svaki jezik ima vlastita ACF polja — otvorite prevod stranice za EN/DE i popunite samo vrijednosti koje se razlikuju. Prazna polja na frontendu nasljeđuju vrijednost iz default jezika.",
+            "new_lines": "wpautop",
+            "esc_html": 0
+        },
+        {
             "key": "field_69b97bda701b0",
             "label": "Footer Newsletter Heading",
             "name": "footer_newsletter_heading",
@@ -74,6 +92,27 @@
             "append": ""
         },
         {
+            "key": "field_69c58002full_name",
+            "label": "Company Full Name",
+            "name": "company_full_name",
+            "aria-label": "",
+            "type": "text",
+            "instructions": "Puni pravni naziv tvrtke (npr. Tersa d.o.o.).",
+            "required": 0,
+            "conditional_logic": 0,
+            "wrapper": {
+                "width": "",
+                "class": "",
+                "id": ""
+            },
+            "default_value": "",
+            "maxlength": "",
+            "allow_in_bindings": 0,
+            "placeholder": "",
+            "prepend": "",
+            "append": ""
+        },
+        {
             "key": "field_69c573b80f9be",
             "label": "Company activity",
             "name": "company_activity",
@@ -116,6 +155,228 @@
             "delay": 0
         },
         {
+            "key": "field_69c58003legal_tab",
+            "label": "Pravni podaci",
+            "name": "",
+            "aria-label": "",
+            "type": "tab",
+            "instructions": "",
+            "required": 0,
+            "conditional_logic": 0,
+            "wrapper": {
+                "width": "",
+                "class": "",
+                "id": ""
+            },
+            "placement": "top",
+            "endpoint": 0,
+            "selected": 0
+        },
+        {
+            "key": "field_69c58004company_oib",
+            "label": "Company OIB",
+            "name": "company_oib",
+            "aria-label": "",
+            "type": "text",
+            "instructions": "",
+            "required": 0,
+            "conditional_logic": 0,
+            "wrapper": {
+                "width": "33",
+                "class": "",
+                "id": ""
+            },
+            "default_value": "",
+            "maxlength": "",
+            "allow_in_bindings": 0,
+            "placeholder": "",
+            "prepend": "",
+            "append": ""
+        },
+        {
+            "key": "field_69c58005company_mbs",
+            "label": "Company MBS",
+            "name": "company_mbs",
+            "aria-label": "",
+            "type": "text",
+            "instructions": "",
+            "required": 0,
+            "conditional_logic": 0,
+            "wrapper": {
+                "width": "33",
+                "class": "",
+                "id": ""
+            },
+            "default_value": "",
+            "maxlength": "",
+            "allow_in_bindings": 0,
+            "placeholder": "",
+            "prepend": "",
+            "append": ""
+        },
+        {
+            "key": "field_69c58006company_vat",
+            "label": "Company VAT ID",
+            "name": "company_vat_id",
+            "aria-label": "",
+            "type": "text",
+            "instructions": "",
+            "required": 0,
+            "conditional_logic": 0,
+            "wrapper": {
+                "width": "34",
+                "class": "",
+                "id": ""
+            },
+            "default_value": "",
+            "maxlength": "",
+            "allow_in_bindings": 0,
+            "placeholder": "",
+            "prepend": "",
+            "append": ""
+        },
+        {
+            "key": "field_69c58007company_court",
+            "label": "Company Court",
+            "name": "company_court",
+            "aria-label": "",
+            "type": "text",
+            "instructions": "",
+            "required": 0,
+            "conditional_logic": 0,
+            "wrapper": {
+                "width": "50",
+                "class": "",
+                "id": ""
+            },
+            "default_value": "",
+            "maxlength": "",
+            "allow_in_bindings": 0,
+            "placeholder": "",
+            "prepend": "",
+            "append": ""
+        },
+        {
+            "key": "field_69c58008company_director",
+            "label": "Company Director",
+            "name": "company_director",
+            "aria-label": "",
+            "type": "text",
+            "instructions": "",
+            "required": 0,
+            "conditional_logic": 0,
+            "wrapper": {
+                "width": "50",
+                "class": "",
+                "id": ""
+            },
+            "default_value": "",
+            "maxlength": "",
+            "allow_in_bindings": 0,
+            "placeholder": "",
+            "prepend": "",
+            "append": ""
+        },
+        {
+            "key": "field_69c58009share_capital",
+            "label": "Company Share Capital",
+            "name": "company_share_capital",
+            "aria-label": "",
+            "type": "text",
+            "instructions": "",
+            "required": 0,
+            "conditional_logic": 0,
+            "wrapper": {
+                "width": "",
+                "class": "",
+                "id": ""
+            },
+            "default_value": "",
+            "maxlength": "",
+            "allow_in_bindings": 0,
+            "placeholder": "",
+            "prepend": "",
+            "append": ""
+        },
+        {
+            "key": "field_69c58010bank_tab",
+            "label": "Bankovni podaci",
+            "name": "",
+            "aria-label": "",
+            "type": "tab",
+            "instructions": "",
+            "required": 0,
+            "conditional_logic": 0,
+            "wrapper": {
+                "width": "",
+                "class": "",
+                "id": ""
+            },
+            "placement": "top",
+            "endpoint": 0,
+            "selected": 0
+        },
+        {
+            "key": "field_69c58011company_iban",
+            "label": "Company IBAN",
+            "name": "company_iban",
+            "aria-label": "",
+            "type": "text",
+            "instructions": "",
+            "required": 0,
+            "conditional_logic": 0,
+            "wrapper": {
+                "width": "50",
+                "class": "",
+                "id": ""
+            },
+            "default_value": "",
+            "maxlength": "",
+            "allow_in_bindings": 0,
+            "placeholder": "",
+            "prepend": "",
+            "append": ""
+        },
+        {
+            "key": "field_69c58012company_bank",
+            "label": "Company Bank",
+            "name": "company_bank",
+            "aria-label": "",
+            "type": "text",
+            "instructions": "",
+            "required": 0,
+            "conditional_logic": 0,
+            "wrapper": {
+                "width": "50",
+                "class": "",
+                "id": ""
+            },
+            "default_value": "",
+            "maxlength": "",
+            "allow_in_bindings": 0,
+            "placeholder": "",
+            "prepend": "",
+            "append": ""
+        },
+        {
+            "key": "field_69c58013contact_tab",
+            "label": "Kontakt",
+            "name": "",
+            "aria-label": "",
+            "type": "tab",
+            "instructions": "",
+            "required": 0,
+            "conditional_logic": 0,
+            "wrapper": {
+                "width": "",
+                "class": "",
+                "id": ""
+            },
+            "placement": "top",
+            "endpoint": 0,
+            "selected": 0
+        },
+        {
             "key": "field_69c573dc0f9c0",
             "label": "Company Email",
             "name": "company_email",
@@ -130,6 +391,47 @@
                 "id": ""
             },
             "default_value": "",
+            "allow_in_bindings": 0,
+            "placeholder": "",
+            "prepend": "",
+            "append": ""
+        },
+        {
+            "key": "field_69c58014email_complaints",
+            "label": "Company Email Complaints",
+            "name": "company_email_complaints",
+            "aria-label": "",
+            "type": "email",
+            "instructions": "E-mail za reklamacije i povrate. Ostavite prazno ako je isti kao glavni e-mail.",
+            "required": 0,
+            "conditional_logic": 0,
+            "wrapper": {
+                "width": "50",
+                "class": "",
+                "id": ""
+            },
+            "default_value": "",
+            "allow_in_bindings": 0,
+            "placeholder": "",
+            "prepend": "",
+            "append": ""
+        },
+        {
+            "key": "field_69c58015support_hours",
+            "label": "Company Support Hours",
+            "name": "company_support_hours",
+            "aria-label": "",
+            "type": "text",
+            "instructions": "Radno vrijeme (npr. Pon – Pet: 08:00 – 14:00).",
+            "required": 0,
+            "conditional_logic": 0,
+            "wrapper": {
+                "width": "50",
+                "class": "",
+                "id": ""
+            },
+            "default_value": "",
+            "maxlength": "",
             "allow_in_bindings": 0,
             "placeholder": "",
             "prepend": "",
@@ -269,5 +571,5 @@
     "display_title": "",
     "allow_ai_access": false,
     "ai_description": "",
-    "modified": 1782372117
+    "modified": 1782500000
 }

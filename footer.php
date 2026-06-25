@@ -47,9 +47,6 @@ $company_address_plain = wp_strip_all_tags((string) $company_address);
 $footer_newsletter_shortcode = !empty($company_settings['footer_newsletter_cf7_shortcode'])
 	? (string) $company_settings['footer_newsletter_cf7_shortcode']
 	: '';
-if ($footer_newsletter_shortcode !== '' && function_exists('tersa_translate_string')) {
-	$footer_newsletter_shortcode = tersa_translate_string($footer_newsletter_shortcode);
-}
 
 $tersa_payment_methods   = function_exists('tersa_get_payment_methods') ? tersa_get_payment_methods() : [];
 $tersa_security_badges   = function_exists('tersa_get_security_badges') ? tersa_get_security_badges('light') : [];
@@ -197,10 +194,6 @@ $has_footer_legal_menu = !empty($footer_legal_menu_args['menu']) || has_nav_menu
 						$newsletter_text = !empty($footer_settings['footer_newsletter_text'])
 							? $footer_settings['footer_newsletter_text']
 							: __('Promotivna poruka za newsletter', 'tersa-shop');
-						if (function_exists('tersa_translate_string')) {
-							$newsletter_heading = tersa_translate_string((string) $newsletter_heading);
-							$newsletter_text    = tersa_translate_string((string) $newsletter_text);
-						}
 						?>
 						<h2 id="footer-newsletter-heading" class="site-footer__heading">
 							<?php echo esc_html($newsletter_heading); ?>

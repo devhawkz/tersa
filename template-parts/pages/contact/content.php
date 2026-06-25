@@ -4,44 +4,39 @@ if (!defined('ABSPATH')) {
 }
 
 $page_id = get_the_ID();
-$settings_page_id = function_exists('tersa_get_global_settings_page_id') ? tersa_get_global_settings_page_id() : 0;
 $get = function_exists('get_field') ? function ($key, $fallback = '') use ($page_id) {
 	$v = get_field($key, $page_id);
 	return (is_string($v) && trim($v) !== '') ? $v : $fallback;
 } : null;
-$get_option = function_exists('get_field') ? function ($key, $fallback = '') use ($settings_page_id) {
-	if (!$settings_page_id) {
-		return $fallback;
-	}
-	$v = get_field($key, $settings_page_id);
-	return (is_string($v) && trim($v) !== '') ? $v : $fallback;
-} : null;
 
+$company_settings = function_exists('tersa_get_company_settings') ? tersa_get_company_settings() : [];
 $impressum = function_exists('tersa_get_company_impressum') ? tersa_get_company_impressum() : [];
+$company_value = static function (string $key, string $fallback = '') use ($company_settings): string {
+	$value = (string) ($company_settings[$key] ?? '');
+
+	return trim($value) !== '' ? $value : $fallback;
+};
 
 $card_heading    = $get ? $get('contact_card_heading', __('Contact Us', 'tersa-shop')) : __('Contact Us', 'tersa-shop');
 $call_label       = $get ? $get('contact_call_label', __('Call to Us:', 'tersa-shop')) : __('Call to Us:', 'tersa-shop');
 $call_text        = $get ? $get('contact_call_text', __("We're available 24/7, 7 days a week.", 'tersa-shop')) : __("We're available 24/7, 7 days a week.", 'tersa-shop');
 $call_text_second = $get ? $get('contact_call_text_second', __("We're available 24/7, 7 days a week.", 'tersa-shop')) : __("We're available 24/7, 7 days a week.", 'tersa-shop');
-$phone_default    = $impressum['phone'] ?? ($get_option ? $get_option('company_phone_primary', '031/355 900') : '031/355 900');
-$phone_2_default  = $impressum['phone_secondary'] ?? ($get_option ? $get_option('company_phone_secondary', '') : '');
+$phone_default    = $impressum['phone'] ?? $company_value('company_phone_primary', '031/355 900');
+$phone_2_default  = $impressum['phone_secondary'] ?? $company_value('company_phone_secondary', '');
 $phone            = $get ? $get('contact_phone', $phone_default) : $phone_default;
 $phone_second     = $get ? $get('contact_phone_second', $phone_2_default) : $phone_2_default;
 $write_label      = $get ? $get('contact_write_label', __('Write to Us:', 'tersa-shop')) : __('Write to Us:', 'tersa-shop');
 $write_text       = $get ? $get('contact_write_text', __('Fill out our form and we will contact you within 24 hours.', 'tersa-shop')) : __('Fill out our form and we will contact you within 24 hours.', 'tersa-shop');
 $email_label      = $get ? $get('contact_email_label', __('Email:', 'tersa-shop')) : __('Email:', 'tersa-shop');
-$email_default    = $impressum['email'] ?? ($get_option ? $get_option('company_email', 'tersa@tersa.hr') : 'tersa@tersa.hr');
+$email_default    = $impressum['email'] ?? $company_value('company_email', 'tersa@tersa.hr');
 $email            = $get ? $get('contact_email', $email_default) : $email_default;
 $hq_label         = $get ? $get('contact_hq_label', __('Headquarter:', 'tersa-shop')) : __('Headquarter:', 'tersa-shop');
 $hq_hours_week    = $get ? $get('contact_hq_hours_week', $impressum['support_hours'] ?? __('Pon – Pet: 08:00 – 14:00', 'tersa-shop')) : ($impressum['support_hours'] ?? __('Pon – Pet: 08:00 – 14:00', 'tersa-shop'));
 $hq_hours_sat     = $get ? $get('contact_hq_hours_sat', '') : '';
-$hq_address_default = $impressum['address'] ?? ($get_option ? $get_option('company_address', __('Nikole Tesle 71, 31551 Črnkovci', 'tersa-shop')) : __('Nikole Tesle 71, 31551 Črnkovci', 'tersa-shop'));
+$hq_address_default = $impressum['address'] ?? $company_value('company_address', __('Nikole Tesle 71, 31551 Črnkovci', 'tersa-shop'));
 $hq_address       = $get ? $get('contact_hq_address', $hq_address_default) : $hq_address_default;
 $form_heading     = $get ? $get('contact_form_heading', __('We would love to hear from you.', 'tersa-shop')) : __('We would love to hear from you.', 'tersa-shop');
-$contact_cf7_shortcode = $get_option ? $get_option('contact_cf7_shortcode', '') : '';
-if ($contact_cf7_shortcode !== '' && function_exists('tersa_translate_string')) {
-	$contact_cf7_shortcode = tersa_translate_string((string) $contact_cf7_shortcode);
-}
+$contact_cf7_shortcode = $company_value('contact_cf7_shortcode');
 $hq_address_markup = function_exists('tersa_safe_rich_text')
 	? tersa_safe_rich_text((string) $hq_address)
 	: wp_kses_post(wpautop((string) $hq_address));
@@ -55,6 +50,59 @@ $email_href = sanitize_email((string) $email);
 $email_complaints_href = !empty($impressum['email_complaints'])
 	? sanitize_email((string) $impressum['email_complaints'])
 	: '';
+
+$current_language = function_exists('tersa_get_footer_current_language_slug')
+	? tersa_get_footer_current_language_slug()
+	: '';
+if ($current_language === '' && function_exists('pll_current_language')) {
+	$current_language = (string) pll_current_language('slug');
+}
+if ($current_language === '' && function_exists('get_locale')) {
+	$current_language = substr((string) get_locale(), 0, 2);
+}
+$current_language = strtolower(substr((string) $current_language, 0, 2));
+$impressum_label_sets = [
+	'hr' => [
+		'heading'       => 'Podaci o tvrtki:',
+		'name'          => 'Naziv:',
+		'activity'      => 'Djelatnost:',
+		'oib'           => 'OIB:',
+		'mbs'           => 'MBS:',
+		'registry'      => 'Registar:',
+		'director'      => 'Odgovorna osoba:',
+		'share_capital' => 'Temeljni kapital:',
+		'iban'          => 'IBAN:',
+		'vat_id'        => 'PDV ID:',
+		'complaints'    => 'Reklamacije i povrati:',
+	],
+	'en' => [
+		'heading'       => 'Company details:',
+		'name'          => 'Name:',
+		'activity'      => 'Activity:',
+		'oib'           => 'OIB:',
+		'mbs'           => 'MBS:',
+		'registry'      => 'Registry:',
+		'director'      => 'Responsible person:',
+		'share_capital' => 'Share capital:',
+		'iban'          => 'IBAN:',
+		'vat_id'        => 'VAT ID:',
+		'complaints'    => 'Complaints and returns:',
+	],
+	'de' => [
+		'heading'       => 'Firmendaten:',
+		'name'          => 'Name:',
+		'activity'      => 'Tätigkeit:',
+		'oib'           => 'OIB:',
+		'mbs'           => 'MBS:',
+		'registry'      => 'Register:',
+		'director'      => 'Verantwortliche Person:',
+		'share_capital' => 'Stammkapital:',
+		'iban'          => 'IBAN:',
+		'vat_id'        => 'USt-IdNr.:',
+		'complaints'    => 'Reklamationen und Rücksendungen:',
+	],
+];
+$impressum_labels = $impressum_label_sets[$current_language] ?? $impressum_label_sets['hr'];
 ?>
 
 <section class="contact-section">
@@ -145,37 +193,37 @@ $email_complaints_href = !empty($impressum['email_complaints'])
 			 */
 			if (!empty($impressum)) : ?>
 				<div class="contact-card__block contact-card__block--impressum">
-					<h3 class="contact-card__label"><?php esc_html_e('Podaci o tvrtki:', 'tersa-shop'); ?></h3>
+					<h3 class="contact-card__label"><?php echo esc_html($impressum_labels['heading']); ?></h3>
 					<dl class="contact-card__impressum">
-						<dt><?php esc_html_e('Naziv:', 'tersa-shop'); ?></dt>
+						<dt><?php echo esc_html($impressum_labels['name']); ?></dt>
 						<dd><?php echo esc_html($impressum['full_name']); ?></dd>
 
 						<?php if (!empty($impressum['activity'])) : ?>
-							<dt><?php esc_html_e('Djelatnost:', 'tersa-shop'); ?></dt>
+							<dt><?php echo esc_html($impressum_labels['activity']); ?></dt>
 							<dd><?php echo esc_html($impressum['activity']); ?></dd>
 						<?php endif; ?>
 
-						<dt><?php esc_html_e('OIB:', 'tersa-shop'); ?></dt>
+						<dt><?php echo esc_html($impressum_labels['oib']); ?></dt>
 						<dd><?php echo esc_html($impressum['oib']); ?></dd>
 
-						<dt><?php esc_html_e('MBS:', 'tersa-shop'); ?></dt>
+						<dt><?php echo esc_html($impressum_labels['mbs']); ?></dt>
 						<dd><?php echo esc_html($impressum['mbs']); ?></dd>
 
-						<dt><?php esc_html_e('Registar:', 'tersa-shop'); ?></dt>
+						<dt><?php echo esc_html($impressum_labels['registry']); ?></dt>
 						<dd><?php echo esc_html($impressum['court']); ?></dd>
 
 						<?php if (!empty($impressum['director'])) : ?>
-							<dt><?php esc_html_e('Odgovorna osoba:', 'tersa-shop'); ?></dt>
+							<dt><?php echo esc_html($impressum_labels['director']); ?></dt>
 							<dd><?php echo esc_html($impressum['director']); ?></dd>
 						<?php endif; ?>
 
 						<?php if (!empty($impressum['share_capital'])) : ?>
-							<dt><?php esc_html_e('Temeljni kapital:', 'tersa-shop'); ?></dt>
+							<dt><?php echo esc_html($impressum_labels['share_capital']); ?></dt>
 							<dd><?php echo esc_html($impressum['share_capital']); ?></dd>
 						<?php endif; ?>
 
 						<?php if (!empty($impressum['iban'])) : ?>
-							<dt><?php esc_html_e('IBAN:', 'tersa-shop'); ?></dt>
+							<dt><?php echo esc_html($impressum_labels['iban']); ?></dt>
 							<dd>
 								<?php echo esc_html($impressum['iban']); ?>
 								<?php if (!empty($impressum['bank'])) : ?>
@@ -185,12 +233,12 @@ $email_complaints_href = !empty($impressum['email_complaints'])
 						<?php endif; ?>
 
 						<?php if (!empty($impressum['vat_id'])) : ?>
-							<dt><?php esc_html_e('PDV ID:', 'tersa-shop'); ?></dt>
+							<dt><?php echo esc_html($impressum_labels['vat_id']); ?></dt>
 							<dd><?php echo esc_html($impressum['vat_id']); ?></dd>
 						<?php endif; ?>
 
 						<?php if (!empty($impressum['email_complaints']) && $impressum['email_complaints'] !== $impressum['email']) : ?>
-							<dt><?php esc_html_e('Reklamacije i povrati:', 'tersa-shop'); ?></dt>
+							<dt><?php echo esc_html($impressum_labels['complaints']); ?></dt>
 							<dd>
 								<?php if ($email_complaints_href) : ?>
 									<a href="mailto:<?php echo esc_attr($email_complaints_href); ?>">

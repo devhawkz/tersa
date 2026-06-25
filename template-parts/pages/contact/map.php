@@ -3,29 +3,12 @@ if (!defined('ABSPATH')) {
 	exit;
 }
 
-$allowed_map_tags = [
-	'iframe' => [
-		'class'         => true,
-		'title'         => true,
-		'frameborder'   => true,
-		'scrolling'     => true,
-		'marginheight'  => true,
-		'marginwidth'   => true,
-		'src'           => true,
-		'loading'       => true,
-	],
-];
-
-$settings_page_id = function_exists('tersa_get_global_settings_page_id') ? tersa_get_global_settings_page_id() : 0;
-$map_embed = (function_exists('get_field') && $settings_page_id)
-	? (string) get_field('contact_map_embed', $settings_page_id)
-	: '';
-if ($map_embed !== '' && function_exists('tersa_translate_string')) {
-	$map_embed = tersa_translate_string($map_embed);
-}
+$company_settings = function_exists('tersa_get_company_settings') ? tersa_get_company_settings() : [];
+$map_embed_raw    = (string) ($company_settings['contact_map_embed'] ?? '');
+$map_embed        = function_exists('tersa_safe_map_embed') ? tersa_safe_map_embed($map_embed_raw) : '';
 
 if (trim($map_embed) === '') {
-	$map_embed = '<iframe
+	$map_embed_fallback = '<iframe
 	class="embed-map-frame"
 	title="' . esc_attr__('Company location on Google Maps', 'tersa-shop') . '"
 	frameborder="0"
@@ -35,6 +18,7 @@ if (trim($map_embed) === '') {
 	loading="lazy"
 	src="https://maps.google.com/maps?q=Nikole%20Tesle%2071%2C%2031553%20%C4%8Crnkovci&t=m&z=14&ie=UTF8&iwloc=B&output=embed"
 ></iframe>';
+	$map_embed = function_exists('tersa_safe_map_embed') ? tersa_safe_map_embed($map_embed_fallback) : '';
 }
 ?>
 
@@ -46,7 +30,7 @@ if (trim($map_embed) === '') {
 	<div class="contact-map">
 		<div class="embed-map-responsive">
 			<div class="embed-map-container">
-				<?php echo wp_kses($map_embed, $allowed_map_tags); ?>
+				<?php echo $map_embed; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
 			</div>
 		</div>
 	</div>
