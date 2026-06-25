@@ -95,6 +95,27 @@ $legal_fallback = [
 		'url'   => $_pll_url('faq'),
 	],
 ];
+
+$footer_about_menu_args = function_exists('tersa_get_footer_nav_menu_args')
+	? tersa_get_footer_nav_menu_args('footer_about')
+	: [
+		'theme_location' => 'footer_about',
+		'container'      => false,
+		'menu_class'     => 'site-footer__menu',
+		'fallback_cb'    => false,
+		'depth'          => 1,
+	];
+$footer_legal_menu_args = function_exists('tersa_get_footer_nav_menu_args')
+	? tersa_get_footer_nav_menu_args('footer_legal')
+	: [
+		'theme_location' => 'footer_legal',
+		'container'      => false,
+		'menu_class'     => 'site-footer__menu',
+		'fallback_cb'    => false,
+		'depth'          => 1,
+	];
+$has_footer_about_menu = !empty($footer_about_menu_args['menu']) || has_nav_menu('footer_about');
+$has_footer_legal_menu = !empty($footer_legal_menu_args['menu']) || has_nav_menu('footer_legal');
 ?>
 	<footer class="site-footer" role="contentinfo">
 		<div class="site-footer__main">
@@ -131,15 +152,9 @@ $legal_fallback = [
 					<nav class="site-footer__nav-col" aria-label="<?php esc_attr_e('About footer navigation', 'tersa-shop'); ?>">
 						<h2 class="site-footer__heading"><?php esc_html_e('KORISNE POVEZNICE', 'tersa-shop'); ?></h2>
 
-						<?php if (has_nav_menu('footer_about')) : ?>
+						<?php if ($has_footer_about_menu) : ?>
 							<?php
-							wp_nav_menu([
-								'theme_location' => 'footer_about',
-								'container'      => false,
-								'menu_class'     => 'site-footer__menu',
-								'fallback_cb'    => false,
-								'depth'          => 1,
-							]);
+							wp_nav_menu($footer_about_menu_args);
 							?>
 						<?php else : ?>
 							<ul class="site-footer__menu">
@@ -157,15 +172,9 @@ $legal_fallback = [
 					<nav class="site-footer__nav-col" aria-label="<?php esc_attr_e('Legal footer navigation', 'tersa-shop'); ?>">
 						<h2 class="site-footer__heading"><?php esc_html_e('PRAVNE STRANICE', 'tersa-shop'); ?></h2>
 
-						<?php if (has_nav_menu('footer_legal')) : ?>
+						<?php if ($has_footer_legal_menu) : ?>
 							<?php
-							wp_nav_menu([
-								'theme_location' => 'footer_legal',
-								'container'      => false,
-								'menu_class'     => 'site-footer__menu',
-								'fallback_cb'    => false,
-								'depth'          => 1,
-							]);
+							wp_nav_menu($footer_legal_menu_args);
 							?>
 						<?php else : ?>
 							<ul class="site-footer__menu">

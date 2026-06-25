@@ -14,35 +14,105 @@ function tersa_get_footer_settings_slug(): string {
 }
 
 /**
+ * Vraća osnovni transient key za footer newsletter settings.
+ *
+ * @return string
+ */
+function tersa_get_footer_settings_cache_base_key(): string {
+	return 'tersa_footer_settings_v2';
+}
+
+/**
+ * Vraća osnovni transient key za company/footer settings.
+ *
+ * @return string
+ */
+function tersa_get_company_settings_cache_base_key(): string {
+	return 'tersa_company_settings_v2';
+}
+
+/**
+ * Vraća slug trenutnog jezika.
+ *
+ * @return string
+ */
+function tersa_get_footer_current_language_slug(): string {
+	if (function_exists('tersa_get_current_language_slug')) {
+		return tersa_get_current_language_slug();
+	}
+
+	if (function_exists('pll_current_language')) {
+		$lang = pll_current_language('slug');
+
+		return is_string($lang) ? sanitize_key($lang) : '';
+	}
+
+	return '';
+}
+
+/**
+ * Vraća slug defaultnog jezika.
+ *
+ * @return string
+ */
+function tersa_get_footer_default_language_slug(): string {
+	if (function_exists('tersa_get_default_language_slug')) {
+		return tersa_get_default_language_slug();
+	}
+
+	if (function_exists('pll_default_language')) {
+		$lang = pll_default_language('slug');
+
+		if (empty($lang)) {
+			$lang = pll_default_language();
+		}
+
+		return is_string($lang) ? sanitize_key($lang) : '';
+	}
+
+	return '';
+}
+
+/**
  * Vraća transient key za footer settings.
  * Uključuje Polylang jezični sufiks kako bi svaki jezik imao vlastiti cache.
  *
  * @return string
  */
 function tersa_get_footer_settings_cache_key(): string {
-	$lang = function_exists('pll_current_language') ? (string) pll_current_language() : '';
-	return 'tersa_footer_settings' . ($lang ? '_' . $lang : '');
+	$lang = tersa_get_footer_current_language_slug();
+	return tersa_get_footer_settings_cache_base_key() . ($lang ? '_' . $lang : '');
 }
 
 /**
- * ID footer settings stranice za trenutni Polylang jezik (ACF Free pristup).
+ * ID osnovne footer settings stranice.
  *
  * @return int
  */
-function tersa_get_footer_settings_page_id(): int {
+function tersa_get_footer_settings_base_page_id(): int {
+	$page = get_page_by_path(tersa_get_footer_settings_slug());
+
+	return $page instanceof WP_Post ? (int) $page->ID : 0;
+}
+
+/**
+ * ID footer settings stranice za zadati Polylang jezik (ACF Free pristup).
+ *
+ * @param string $lang Polylang slug jezika.
+ * @return int
+ */
+function tersa_get_footer_settings_page_id(string $lang = ''): int {
 	static $cached_ids = [];
 
-	$lang     = function_exists('pll_current_language') ? (string) pll_current_language() : '';
-	$lang_key = $lang ?: '_default';
+	$lang     = $lang !== '' ? sanitize_key($lang) : tersa_get_footer_current_language_slug();
+	$lang_key = $lang ?: '_base';
 
 	if (isset($cached_ids[$lang_key])) {
 		return $cached_ids[$lang_key];
 	}
 
-	$page    = get_page_by_path(tersa_get_footer_settings_slug());
-	$page_id = $page ? (int) $page->ID : 0;
+	$page_id = tersa_get_footer_settings_base_page_id();
 
-	// Polylang: dohvati prevedenu verziju settings stranice za trenutni jezik.
 	if ($page_id && $lang && function_exists('pll_get_post')) {
 		$translated_id = pll_get_post($page_id, $lang);
 		if ($translated_id) {
@@ -51,6 +121,73 @@ function tersa_get_footer_settings_page_id(): int {
 	}
 
 	return $cached_ids[$lang_key] = $page_id;
+}
+
+/**
+ * Vraća sve poznate jezičke varijante Footer Settings stranice.
+ *
+ * @return int[]
+ */
+function tersa_get_footer_settings_page_ids(): array {
+	$page_id = tersa_get_footer_settings_base_page_id();
+
+	if (!$page_id) {
+		return [];
+	}
+
+	$page_ids = [$page_id];
+
+	if (function_exists('pll_languages_list') && function_exists('pll_get_post')) {
+		foreach ((array) pll_languages_list(['fields' => 'slug']) as $lang_slug) {
+			$translated_id = pll_get_post($page_id, (string) $lang_slug);
+
+			if ($translated_id) {
+				$page_ids[] = (int) $translated_id;
+			}
+		}
+	}
+
+	return array_values(array_unique(array_filter(array_map('intval', $page_ids))));
+}
+
+/**
+ * Učitava newsletter footer podešavanja sa jedne stranice.
+ *
+ * @param int $page_id ID stranice.
+ * @return array<string, string>
+ */
+function tersa_read_footer_settings_from_page(int $page_id): array {
+	$settings = [
+		'footer_newsletter_heading' => '',
+		'footer_newsletter_text'    => '',
+	];
+
+	if (!$page_id || !function_exists('get_field')) {
+		return $settings;
+	}
+
+	foreach (array_keys($settings) as $field) {
+		$settings[$field] = (string) get_field($field, $page_id);
+	}
+
+	return $settings;
+}
+
+/**
+ * Spaja footer podešavanja tako da prazna prevedena polja nasleđuju default jezik.
+ *
+ * @param array<string, string> $base
+ * @param array<string, string> $override
+ * @return array<string, string>
+ */
+function tersa_merge_string_settings(array $base, array $override): array {
+	foreach ($override as $key => $value) {
+		if (is_scalar($value) && trim((string) $value) !== '') {
+			$base[$key] = (string) $value;
+		}
+	}
+
+	return $base;
 }
 
 /**
@@ -73,13 +210,24 @@ function tersa_get_footer_settings(): array {
 		);
 	}
 
-	$page_id   = tersa_get_footer_settings_page_id();
-	$get_field = function_exists('get_field');
-
 	$settings = [
-		'footer_newsletter_heading' => ($page_id && $get_field) ? (string) get_field('footer_newsletter_heading', $page_id) : '',
-		'footer_newsletter_text'   => ($page_id && $get_field) ? (string) get_field('footer_newsletter_text', $page_id) : '',
+		'footer_newsletter_heading' => '',
+		'footer_newsletter_text'    => '',
 	];
+
+	$base_page_id    = tersa_get_footer_settings_base_page_id();
+	$current_lang    = tersa_get_footer_current_language_slug();
+	$default_lang    = tersa_get_footer_default_language_slug();
+	$default_page_id = $default_lang ? tersa_get_footer_settings_page_id($default_lang) : $base_page_id;
+	$current_page_id = $current_lang ? tersa_get_footer_settings_page_id($current_lang) : $base_page_id;
+
+	$default_settings = tersa_read_footer_settings_from_page($default_page_id ?: $base_page_id);
+	$current_settings = $current_page_id === $default_page_id
+		? $default_settings
+		: tersa_read_footer_settings_from_page($current_page_id);
+
+	$settings = tersa_merge_string_settings($settings, $default_settings);
+	$settings = tersa_merge_string_settings($settings, $current_settings);
 
 	set_transient($cache_key, $settings, DAY_IN_SECONDS);
 
@@ -103,12 +251,19 @@ function tersa_maybe_clear_footer_settings_cache(int $post_id, $post = null): vo
 		return;
 	}
 
-	if (tersa_get_footer_settings_slug() !== $post_obj->post_name) {
+	$settings_page_ids = tersa_get_footer_settings_page_ids();
+
+	if (!in_array($post_id, $settings_page_ids, true) && tersa_get_footer_settings_slug() !== $post_obj->post_name) {
 		return;
 	}
 
-	// Briše base key + sve jezičke varijante.
-	$bases = ['tersa_footer_settings', 'tersa_company_settings'];
+	// Briše base key + sve jezičke varijante, uključujući legacy keys bez _v2.
+	$bases = [
+		'tersa_footer_settings',
+		'tersa_company_settings',
+		tersa_get_footer_settings_cache_base_key(),
+		tersa_get_company_settings_cache_base_key(),
+	];
 	foreach ($bases as $base) {
 		delete_transient($base);
 	}
@@ -227,8 +382,68 @@ function tersa_get_global_settings_slug(): string {
  * @return string
  */
 function tersa_get_company_settings_cache_key(): string {
-	$lang = function_exists('pll_current_language') ? (string) pll_current_language() : '';
-	return 'tersa_company_settings' . ($lang ? '_' . $lang : '');
+	$lang = tersa_get_footer_current_language_slug();
+	return tersa_get_company_settings_cache_base_key() . ($lang ? '_' . $lang : '');
+}
+
+/**
+ * Prazan shape za ACF company/footer podešavanja.
+ *
+ * @return array<string, string>
+ */
+function tersa_get_empty_company_settings(): array {
+	return [
+		'company_name'                    => '',
+		'company_full_name'               => '',
+		'company_activity'                => '',
+		'company_address'                 => '',
+		'company_email'                   => '',
+		'company_email_complaints'        => '',
+		'company_phone_primary'           => '',
+		'company_phone_secondary'         => '',
+		'company_oib'                     => '',
+		'company_mbs'                     => '',
+		'company_court'                   => '',
+		'company_share_capital'           => '',
+		'company_director'                => '',
+		'company_iban'                    => '',
+		'company_bank'                    => '',
+		'company_vat_id'                  => '',
+		'company_support_hours'           => '',
+		'footer_newsletter_cf7_shortcode' => '',
+	];
+}
+
+/**
+ * Učitava ACF company/footer podešavanja sa jedne stranice.
+ *
+ * @param int $page_id ID stranice.
+ * @return array<string, string>
+ */
+function tersa_read_company_settings_from_page(int $page_id): array {
+	$settings = tersa_get_empty_company_settings();
+
+	if (!$page_id || !function_exists('get_field')) {
+		return $settings;
+	}
+
+	foreach (array_keys($settings) as $field) {
+		if ('company_phone_secondary' === $field) {
+			$value = get_field('company_phone_secondary', $page_id);
+
+			if (!is_scalar($value) || '' === trim((string) $value)) {
+				$value = get_field('company_phone_primary_secondary', $page_id);
+			}
+
+			$settings[$field] = is_scalar($value) ? (string) $value : '';
+			continue;
+		}
+
+		$value = get_field($field, $page_id);
+		$settings[$field] = is_scalar($value) ? (string) $value : '';
+	}
+
+	return $settings;
 }
 
 /**
@@ -242,43 +457,24 @@ function tersa_get_company_settings(): array {
 	$settings  = get_transient($cache_key);
 
 	if (false !== $settings && is_array($settings)) {
-		return $settings;
+		return wp_parse_args($settings, tersa_get_empty_company_settings());
 	}
 
-	$page_id   = tersa_get_footer_settings_page_id();
-	$get_field = function_exists('get_field');
+	$settings = tersa_get_empty_company_settings();
 
-	$company_phone_secondary = '';
-	if ($page_id && $get_field) {
-		$company_phone_secondary_raw = get_field('company_phone_secondary', $page_id);
+	$base_page_id    = tersa_get_footer_settings_base_page_id();
+	$current_lang    = tersa_get_footer_current_language_slug();
+	$default_lang    = tersa_get_footer_default_language_slug();
+	$default_page_id = $default_lang ? tersa_get_footer_settings_page_id($default_lang) : $base_page_id;
+	$current_page_id = $current_lang ? tersa_get_footer_settings_page_id($current_lang) : $base_page_id;
 
-		if (!is_scalar($company_phone_secondary_raw) || '' === trim((string) $company_phone_secondary_raw)) {
-			$company_phone_secondary_raw = get_field('company_phone_primary_secondary', $page_id);
-		}
+	$default_settings = tersa_read_company_settings_from_page($default_page_id ?: $base_page_id);
+	$current_settings = $current_page_id === $default_page_id
+		? $default_settings
+		: tersa_read_company_settings_from_page($current_page_id);
 
-		$company_phone_secondary = is_scalar($company_phone_secondary_raw) ? (string) $company_phone_secondary_raw : '';
-	}
-
-	$settings = [
-		'company_name'                    => ($page_id && $get_field) ? (string) get_field('company_name', $page_id) : '',
-		'company_full_name'               => ($page_id && $get_field) ? (string) get_field('company_full_name', $page_id) : '',
-		'company_activity'                => ($page_id && $get_field) ? (string) get_field('company_activity', $page_id) : '',
-		'company_address'                 => ($page_id && $get_field) ? (string) get_field('company_address', $page_id) : '',
-		'company_email'                   => ($page_id && $get_field) ? (string) get_field('company_email', $page_id) : '',
-		'company_email_complaints'        => ($page_id && $get_field) ? (string) get_field('company_email_complaints', $page_id) : '',
-		'company_phone_primary'           => ($page_id && $get_field) ? (string) get_field('company_phone_primary', $page_id) : '',
-		'company_phone_secondary'         => $company_phone_secondary,
-		'company_oib'                     => ($page_id && $get_field) ? (string) get_field('company_oib', $page_id) : '',
-		'company_mbs'                     => ($page_id && $get_field) ? (string) get_field('company_mbs', $page_id) : '',
-		'company_court'                   => ($page_id && $get_field) ? (string) get_field('company_court', $page_id) : '',
-		'company_share_capital'           => ($page_id && $get_field) ? (string) get_field('company_share_capital', $page_id) : '',
-		'company_director'                => ($page_id && $get_field) ? (string) get_field('company_director', $page_id) : '',
-		'company_iban'                    => ($page_id && $get_field) ? (string) get_field('company_iban', $page_id) : '',
-		'company_bank'                    => ($page_id && $get_field) ? (string) get_field('company_bank', $page_id) : '',
-		'company_vat_id'                  => ($page_id && $get_field) ? (string) get_field('company_vat_id', $page_id) : '',
-		'company_support_hours'           => ($page_id && $get_field) ? (string) get_field('company_support_hours', $page_id) : '',
-		'footer_newsletter_cf7_shortcode' => ($page_id && $get_field) ? (string) get_field('footer_newsletter_cf7_shortcode', $page_id) : '',
-	];
+	$settings = tersa_merge_string_settings($settings, $default_settings);
+	$settings = tersa_merge_string_settings($settings, $current_settings);
 
 	set_transient($cache_key, $settings, DAY_IN_SECONDS);
 
@@ -302,20 +498,83 @@ function tersa_maybe_clear_company_settings_cache(int $post_id, $post = null): v
 		return;
 	}
 
-	if (tersa_get_footer_settings_slug() !== $post_obj->post_name) {
+	$settings_page_ids = tersa_get_footer_settings_page_ids();
+
+	if (!in_array($post_id, $settings_page_ids, true) && tersa_get_footer_settings_slug() !== $post_obj->post_name) {
 		return;
 	}
 
-	// Briše base key + sve jezičke varijante.
-	$base = 'tersa_company_settings';
-	delete_transient($base);
-	if (function_exists('pll_languages_list')) {
-		foreach ((array) pll_languages_list(['fields' => 'slug']) as $lang_slug) {
-			delete_transient($base . '_' . $lang_slug);
+	// Briše base key + sve jezičke varijante, uključujući legacy key bez _v2.
+	foreach (['tersa_company_settings', tersa_get_company_settings_cache_base_key()] as $base) {
+		delete_transient($base);
+		if (function_exists('pll_languages_list')) {
+			foreach ((array) pll_languages_list(['fields' => 'slug']) as $lang_slug) {
+				delete_transient($base . '_' . $lang_slug);
+			}
 		}
 	}
 }
 add_action('save_post_page', 'tersa_maybe_clear_company_settings_cache', 10, 2);
+
+/**
+ * Vraća ID menija za footer lokaciju sa Polylang fallback-om.
+ *
+ * @param string $location Theme menu location.
+ * @return int
+ */
+function tersa_get_footer_nav_menu_id(string $location): int {
+	$location = sanitize_key($location);
+	if ($location === '') {
+		return 0;
+	}
+
+	$locations = get_nav_menu_locations();
+	$menu_id   = !empty($locations[$location]) ? (int) $locations[$location] : 0;
+
+	if (!$menu_id) {
+		$theme_mods = get_option('theme_mods_' . get_option('stylesheet'), []);
+
+		if (is_array($theme_mods) && !empty($theme_mods['nav_menu_locations'][$location])) {
+			$menu_id = (int) $theme_mods['nav_menu_locations'][$location];
+		}
+	}
+
+	if ($menu_id && function_exists('pll_get_term')) {
+		$current_lang = tersa_get_footer_current_language_slug();
+		$translated   = $current_lang ? (int) pll_get_term($menu_id, $current_lang) : 0;
+
+		if ($translated) {
+			return $translated;
+		}
+	}
+
+	return $menu_id > 0 ? $menu_id : 0;
+}
+
+/**
+ * Vraća argumente za footer meni.
+ *
+ * @param string $location Theme menu location.
+ * @return array<string, mixed>
+ */
+function tersa_get_footer_nav_menu_args(string $location): array {
+	$location = sanitize_key($location);
+	$args     = [
+		'theme_location' => $location,
+		'container'      => false,
+		'menu_class'     => 'site-footer__menu',
+		'fallback_cb'    => false,
+		'depth'          => 1,
+	];
+
+	$menu_id = tersa_get_footer_nav_menu_id($location);
+
+	if ($menu_id) {
+		$args['menu'] = $menu_id;
+	}
+
+	return $args;
+}
 
 /**
  * Registruje footer/global ACF stringove za Polylang String Translation.

@@ -377,38 +377,38 @@ msgstr ""
 
 #: template-parts/woocommerce/payment-security-badges.php:27
 msgid "Sigurno plaćanje"
-msgstr ""
+msgstr "Secure payment"
 
 #: template-parts/woocommerce/payment-security-badges.php:49 footer.php:252
 msgid "Prihvaćene kartice"
-msgstr ""
+msgstr "Accepted cards"
 
 #: template-parts/woocommerce/payment-security-badges.php:51
 msgid "Prihvaćamo:"
-msgstr ""
+msgstr "We accept:"
 
 #: template-parts/woocommerce/payment-security-badges.php:64 footer.php:263
 #, php-format
 msgid "%s — službena stranica (otvara se u novom prozoru)"
-msgstr ""
+msgstr "%s — official website (opens in a new window)"
 
 #: template-parts/woocommerce/payment-security-badges.php:79 footer.php:277
 msgid "Sigurnosni programi"
-msgstr ""
+msgstr "Security programs"
 
 #: template-parts/woocommerce/payment-security-badges.php:81
 msgid "Provjereno i sigurno:"
-msgstr ""
+msgstr "Verified and secure:"
 
 #: template-parts/woocommerce/payment-security-badges.php:94 footer.php:288
 #, php-format
 msgid "%s — informacije o sigurnosnom programu (otvara se u novom prozoru)"
-msgstr ""
+msgstr "%s — security program information (opens in a new window)"
 
 #: template-parts/woocommerce/payment-security-badges.php:113 footer.php:215
 msgid ""
 "CorvusPay — sigurno online plaćanje karticama (otvara se u novom prozoru)"
-msgstr ""
+msgstr "CorvusPay — secure online card payment (opens in a new window)"
 
 #: template-parts/product/related-products.php:79
 msgid "Slični proizvodi"
@@ -603,76 +603,76 @@ msgstr "Open submenu for %s"
 
 #: footer.php:39
 msgid "Prerada drva i trgovina drvnim proizvodima"
-msgstr ""
+msgstr "Wood processing and trade in wood products"
 
 #: footer.php:59
 msgid "Our Story"
-msgstr ""
+msgstr "Our Story"
 
 #: footer.php:63
 msgid "Careers"
-msgstr ""
+msgstr "Careers"
 
 #: footer.php:67
 msgid "Influencers"
-msgstr ""
+msgstr "Influencers"
 
 #: footer.php:71
 msgid "Join our team"
-msgstr ""
+msgstr "Join our team"
 
 #: footer.php:78
 msgid "Privacy Policy"
-msgstr ""
+msgstr "Privacy Policy"
 
 #: footer.php:82
 msgid "Help"
-msgstr ""
+msgstr "Help"
 
 #: footer.php:86
 msgid "FAQs"
-msgstr ""
+msgstr "FAQs"
 
 #: footer.php:103
 msgid "Company information"
-msgstr ""
+msgstr "Company information"
 
 #: footer.php:112
 msgid "E-mail:"
-msgstr ""
+msgstr "Email:"
 
 #: footer.php:119
 msgid "About footer navigation"
-msgstr ""
+msgstr "About footer navigation"
 
 #: footer.php:120
 msgid "KORISNE POVEZNICE"
-msgstr ""
+msgstr "Useful links"
 
 #: footer.php:145
 msgid "Legal footer navigation"
-msgstr ""
+msgstr "Legal footer navigation"
 
 #: footer.php:146
 msgid "PRAVNE STRANICE"
-msgstr ""
+msgstr "Legal pages"
 
 #: footer.php:175
 msgid "Prijavi se na naš newsletter"
-msgstr ""
+msgstr "Sign up for our newsletter"
 
 #: footer.php:178
 msgid "Promotivna poruka za newsletter"
-msgstr ""
+msgstr "Promotional newsletter message"
 
 #: footer.php:235
 #, php-format
 msgid "© %1$s %2$s, sva prava pridržana"
-msgstr ""
+msgstr "© %1$s %2$s, all rights reserved"
 
 #: footer.php:247
 msgid "Prihvaćene kartice i sigurnosni programi"
-msgstr ""
+msgstr "Accepted cards and security programs"
 
 #: page.php:41
 msgid "Navigacija unutar stranice"
