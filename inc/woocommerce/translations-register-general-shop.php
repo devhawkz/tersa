@@ -42,6 +42,9 @@ function tersa_pll_register_general_shop_strings(): void {
 
 	pll_register_string('tersa_nav_open_submenu', 'Otvori podizbornik za %s', 'Tersa – navigacija', ['multiline' => false]);
 	pll_register_string('tersa_search_results', 'Rezultati pretrage', 'Tersa – pretraga', ['multiline' => false]);
+	pll_register_string('tersa_search_placeholder', 'Pretraga', 'Tersa – pretraga', ['multiline' => false]);
+	pll_register_string('tersa_search_close', 'Zatvori pretragu', 'Tersa – pretraga', ['multiline' => false]);
+	pll_register_string('tersa_search_products', 'Pretraži proizvode', 'Tersa – pretraga', ['multiline' => false]);
 
 	pll_register_string('tersa_pagination_previous', 'Prethodna', 'Tersa – paginacija (arhiva)', ['multiline' => false]);
 	pll_register_string('tersa_pagination_next', 'Sljedeća', 'Tersa – paginacija (arhiva)', ['multiline' => false]);

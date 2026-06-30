@@ -76,7 +76,7 @@ $topbar_link_is_external = $data['topbar_link_is_external'];
 							<button
 								type="button"
 								class="site-header__icon-link site-header__icon-link--search"
-								aria-label="<?php esc_attr_e('Search products', 'tersa-shop'); ?>"
+								aria-label="<?php echo esc_attr(function_exists('tersa_translate_search_string') ? tersa_translate_search_string('toggle') : __('Pretraži proizvode', 'tersa-shop')); ?>"
 								aria-expanded="false"
 								aria-controls="header-search-overlay"
 								data-search-toggle

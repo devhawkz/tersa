@@ -45,11 +45,57 @@ if (!empty($end_raw)) {
 	}
 }
 
-$translate = static function (string $text): string {
+$countdown_label_fallbacks = [
+	'hr' => [
+		'Dana'    => 'Dana',
+		'Sati'    => 'Sati',
+		'Minuta'  => 'Minuta',
+		'Sekunde' => 'Sekunde',
+	],
+	'sr' => [
+		'Dana'    => 'Dana',
+		'Sati'    => 'Sati',
+		'Minuta'  => 'Minuta',
+		'Sekunde' => 'Sekunde',
+	],
+	'en' => [
+		'Dana'    => 'Days',
+		'Sati'    => 'Hours',
+		'Minuta'  => 'Minutes',
+		'Sekunde' => 'Seconds',
+	],
+	'de' => [
+		'Dana'    => 'Tage',
+		'Sati'    => 'Stunden',
+		'Minuta'  => 'Minuten',
+		'Sekunde' => 'Sekunden',
+	],
+];
+
+$translate = static function (string $text) use ($countdown_label_fallbacks): string {
+	$translated = $text;
+
 	if (function_exists('pll__')) {
-		return (string) call_user_func('pll__', $text);
+		$translated = (string) call_user_func('pll__', $text);
 	}
-	return $text;
+
+	if ($translated !== '' && $translated !== $text) {
+		return $translated;
+	}
+
+	$lang = '';
+
+	if (function_exists('pll_current_language')) {
+		$lang = (string) call_user_func('pll_current_language', 'slug');
+	}
+
+	if ($lang === '') {
+		$lang = substr((string) determine_locale(), 0, 2);
+	}
+
+	$lang = strtolower(substr($lang, 0, 2));
+
+	return $countdown_label_fallbacks[$lang][$text] ?? $translated;
 };
 ?>
 
@@ -68,9 +114,7 @@ $translate = static function (string $text): string {
 
 			<?php if ($end_timestamp > 0) : ?>
 				<?php
-				// Polylang stringovi: ako postoji `pll__()`, uzmi prevod za trenutni jezik.
-				// U suprotnom fallback na WP gettext prevod (standardni __()/esc_html__ mehanizam).
-				// (Koristimo srpske ključeve da se ne dešava fallback na engleski.)
+				// Polylang prevod ima prednost; ako nije popunjen, koristi se jezični fallback iz ove sekcije.
 				$label_days    = $translate('Dana');
 				$label_hours   = $translate('Sati');
 				$label_minutes = $translate('Minuta');

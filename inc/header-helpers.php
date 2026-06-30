@@ -576,6 +576,67 @@ function tersa_translate_string(string $string): string {
 }
 
 /**
+ * Prevodi tekstove search overlay-a uz Polylang i HR/EN/DE fallback.
+ *
+ * @param string $key Search string key.
+ * @return string
+ */
+function tersa_translate_search_string(string $key): string {
+	$labels = [
+		'results'     => [
+			'hr' => 'Rezultati pretrage',
+			'en' => 'Search results',
+			'de' => 'Suchergebnisse',
+		],
+		'placeholder' => [
+			'hr' => 'Pretraga',
+			'en' => 'Search',
+			'de' => 'Suche',
+		],
+		'close'       => [
+			'hr' => 'Zatvori pretragu',
+			'en' => 'Close search',
+			'de' => 'Suche schließen',
+		],
+		'toggle'      => [
+			'hr' => 'Pretraži proizvode',
+			'en' => 'Search products',
+			'de' => 'Produkte suchen',
+		],
+	];
+
+	if (!isset($labels[$key])) {
+		return '';
+	}
+
+	$source     = $labels[$key]['hr'];
+	$translated = $source;
+
+	if (function_exists('pll__')) {
+		$translated = (string) pll__($source);
+	}
+
+	if ($translated !== '' && $translated !== $source) {
+		return $translated;
+	}
+
+	$lang = function_exists('tersa_get_current_language_slug') ? tersa_get_current_language_slug() : '';
+
+	if ($lang === '' && function_exists('pll_current_language')) {
+		$lang = sanitize_key((string) pll_current_language('slug'));
+	}
+
+	if ($lang === '' && function_exists('determine_locale')) {
+		$lang = (string) determine_locale();
+	}
+
+	$lang = strtolower(str_replace('_', '-', trim($lang)));
+	$lang = $lang ? substr($lang, 0, 2) : 'hr';
+
+	return $labels[$key][$lang] ?? $source;
+}
+
+/**
  * Registruje ACF topbar stringove u Polylang String Translations.
  * Potrebno da prevodioci mogu prevesti topbar poruku i link tekst/URL.
  *

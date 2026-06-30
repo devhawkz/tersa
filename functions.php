@@ -8,6 +8,7 @@ defined('TERSA_THEME_DIR') || define('TERSA_THEME_DIR', get_template_directory()
 // Theme setup
 require_once TERSA_THEME_DIR . '/inc/setup.php';
 require_once TERSA_THEME_DIR . '/inc/customizer.php';
+require_once TERSA_THEME_DIR . '/inc/acf-json.php';
 
 require_once TERSA_THEME_DIR . '/inc/enqueue.php';
 require_once TERSA_THEME_DIR . '/inc/eu-projects.php';

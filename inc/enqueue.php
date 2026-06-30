@@ -264,9 +264,12 @@ function tersa_enqueue_assets() {
 		'cartLoadError' => function_exists('pll__')
 			? pll__('Greška pri učitavanju košarice.')
 			: __('Greška pri učitavanju košarice.', 'tersa-shop'),
-		'searchResults' => function_exists('pll__')
-			? pll__('Rezultati pretrage')
+		'searchResults' => function_exists('tersa_translate_search_string')
+			? tersa_translate_search_string('results')
 			: __('Rezultati pretrage', 'tersa-shop'),
+		'searchPlaceholder' => function_exists('tersa_translate_search_string')
+			? tersa_translate_search_string('placeholder')
+			: __('Pretraga', 'tersa-shop'),
 	]);
 }
 add_action('wp_enqueue_scripts', 'tersa_enqueue_assets');

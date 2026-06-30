@@ -547,6 +547,19 @@ document.addEventListener('DOMContentLoaded', function () {
     searchTitle.textContent = count > 0 ? baseLabel + ' (' + count + ')' : baseLabel;
   }
 
+  function localizeSearchInput() {
+    if (!searchOverlay) {
+      return;
+    }
+
+    var input = searchOverlay.querySelector('.aws-search-field, input[type="search"], input[type="text"]');
+    var placeholder = getHeaderText('searchPlaceholder', 'Search');
+
+    if (input && placeholder) {
+      input.setAttribute('placeholder', placeholder);
+    }
+  }
+
   var debouncedUpdateSearchTitle = debounce(updateSearchTitle, 150);
 
   function disconnectSearchObservers() {
@@ -560,6 +573,8 @@ document.addEventListener('DOMContentLoaded', function () {
     if (!searchOverlay) {
       return;
     }
+
+    localizeSearchInput();
 
     var input = searchOverlay.querySelector('.aws-search-field, input[type="search"], input[type="text"]');
     if (input && !input.dataset.tersaBound) {
@@ -606,6 +621,7 @@ document.addEventListener('DOMContentLoaded', function () {
     document.body.classList.add('is-search-open');
 
     attachSearchObservers();
+    localizeSearchInput();
     updateSearchTitle();
 
     lockScroll();
