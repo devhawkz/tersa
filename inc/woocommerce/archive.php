@@ -38,7 +38,11 @@ add_filter('woocommerce_cart_fragments_params', 'tersa_woocommerce_cart_fragment
 
 function tersa_get_allowed_catalog_orderby(): array {
 	$t = function (string $str): string {
-		return function_exists('pll__') ? pll__($str) : $str;
+		if (function_exists('tersa_translate_ui_string')) {
+			return tersa_translate_ui_string($str);
+		}
+
+		return function_exists('pll__') ? (string) pll__($str) : $str;
 	};
 
 	return [

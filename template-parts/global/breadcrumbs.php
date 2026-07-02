@@ -8,7 +8,7 @@ if (!function_exists('woocommerce_breadcrumb')) {
 }
 ?>
 
-<nav class="tersa-breadcrumbs" aria-label="<?php esc_attr_e('Breadcrumb', 'tersa-shop'); ?>">
+<nav class="tersa-breadcrumbs" aria-label="<?php echo esc_attr(function_exists('tersa_translate_ui_string') ? tersa_translate_ui_string('Breadcrumb') : __('Breadcrumb', 'tersa-shop')); ?>">
 	<?php
 	woocommerce_breadcrumb([
 		'delimiter'   => ' / ',
@@ -16,7 +16,7 @@ if (!function_exists('woocommerce_breadcrumb')) {
 		'wrap_after'  => '</ol>',
 		'before'      => '<li class="tersa-breadcrumbs__item">',
 		'after'       => '</li>',
-		'home'        => esc_html__('Naslovnica', 'tersa-shop'),
+		'home'        => esc_html(function_exists('tersa_translate_ui_string') ? tersa_translate_ui_string('Naslovnica') : __('Naslovnica', 'tersa-shop')),
 	]);
 	?>
 </nav>

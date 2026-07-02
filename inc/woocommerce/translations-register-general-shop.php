@@ -66,7 +66,18 @@ function tersa_pll_register_general_shop_strings(): void {
 	pll_register_string('tersa_product_image_preview', 'Pregled slike proizvoda', 'Tersa – proizvod (single)', ['multiline' => false]);
 	pll_register_string('tersa_product_close_preview', 'Zatvori pregled', 'Tersa – proizvod (single)', ['multiline' => false]);
 	pll_register_string('tersa_breadcrumb_nav', 'Navigacija', 'Tersa – navigacija (breadcrumb)', ['multiline' => false]);
+	pll_register_string('tersa_breadcrumb_home', 'Naslovnica', 'Tersa – navigacija (breadcrumb)', ['multiline' => false]);
+	pll_register_string('tersa_breadcrumb_label', 'Breadcrumb', 'Tersa – navigacija (breadcrumb)', ['multiline' => false]);
+	pll_register_string('tersa_breadcrumb_page_path', 'Putanja stranice', 'Tersa – navigacija (breadcrumb)', ['multiline' => false]);
 	pll_register_string('tersa_reviews_tab', 'Recenzije (%d)', 'Tersa – proizvod (tabovi)', ['multiline' => false]);
+
+	// 404 stranica
+	pll_register_string('tersa_404_eyebrow', 'Greška 404', 'Tersa – 404 stranica', ['multiline' => false]);
+	pll_register_string('tersa_404_title', 'Stranica nije pronađena', 'Tersa – 404 stranica', ['multiline' => false]);
+	pll_register_string('tersa_404_text', 'Nažalost, stranica koju tražite ne postoji, premještena je ili je privremeno nedostupna.', 'Tersa – 404 stranica', ['multiline' => false]);
+	pll_register_string('tersa_404_actions_label', 'Mogućnosti navigacije', 'Tersa – 404 stranica', ['multiline' => false]);
+	pll_register_string('tersa_404_home_button', 'Povratak na početnu', 'Tersa – 404 stranica', ['multiline' => false]);
+	pll_register_string('tersa_404_shop_button', 'Idi u trgovinu', 'Tersa – 404 stranica', ['multiline' => false]);
 
 	// Wishlist (YITH poruke)
 	pll_register_string('tersa_wishlist_title', 'Moja lista želja', 'Tersa – wishlist', ['multiline' => false]);

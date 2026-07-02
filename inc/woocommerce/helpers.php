@@ -210,6 +210,292 @@ if (!function_exists('tersa_get_current_language_slug')) {
 }
 
 /**
+ * Normalizovan jezik za statične UI stringove.
+ */
+function tersa_get_ui_language_slug(): string {
+	$lang = function_exists('tersa_get_current_language_slug') ? tersa_get_current_language_slug() : '';
+
+	if ('' === $lang && function_exists('pll_current_language')) {
+		$current_lang = pll_current_language('slug');
+		$lang         = is_string($current_lang) ? sanitize_key($current_lang) : '';
+	}
+
+	if ('' === $lang && function_exists('determine_locale')) {
+		$lang = (string) determine_locale();
+	}
+
+	$lang = strtolower(str_replace('_', '-', trim($lang)));
+	$lang = $lang ? substr($lang, 0, 2) : '';
+
+	return in_array($lang, ['hr', 'sr', 'en', 'de'], true) ? $lang : 'hr';
+}
+
+/**
+ * Fallback prevodi za statične shop/breadcrumb stringove.
+ *
+ * Polylang prevod ima prednost; ovo pokriva slučaj kada string postoji u kodu,
+ * ali prevod još nije unesen u Polylang Strings translations.
+ *
+ * @return array<string, array<string, string>>
+ */
+function tersa_get_ui_string_fallbacks(): array {
+	return [
+		'Naslovnica' => [
+			'hr' => 'Naslovnica',
+			'sr' => 'Početna',
+			'en' => 'Home',
+			'de' => 'Startseite',
+		],
+		'Breadcrumb' => [
+			'hr' => 'Breadcrumb',
+			'sr' => 'Putanja',
+			'en' => 'Breadcrumb',
+			'de' => 'Breadcrumb',
+		],
+		'Putanja stranice' => [
+			'hr' => 'Putanja stranice',
+			'sr' => 'Putanja stranice',
+			'en' => 'Page path',
+			'de' => 'Seitenpfad',
+		],
+		'Navigacija' => [
+			'hr' => 'Navigacija',
+			'sr' => 'Navigacija',
+			'en' => 'Navigation',
+			'de' => 'Navigation',
+		],
+		'Sortiraj po najnovijim' => [
+			'hr' => 'Sortiraj po najnovijim',
+			'sr' => 'Sortiraj po najnovijim',
+			'en' => 'Sort by latest',
+			'de' => 'Nach neuesten sortieren',
+		],
+		'Zadano sortiranje' => [
+			'hr' => 'Zadano sortiranje',
+			'sr' => 'Podrazumevano sortiranje',
+			'en' => 'Default sorting',
+			'de' => 'Standardsortierung',
+		],
+		'Sortiraj po cijeni: nisko na visoko' => [
+			'hr' => 'Sortiraj po cijeni: nisko na visoko',
+			'sr' => 'Sortiraj po ceni: od niže ka višoj',
+			'en' => 'Sort by price: low to high',
+			'de' => 'Nach Preis sortieren: niedrig nach hoch',
+		],
+		'Sortiraj po cijeni: visoko na nisko' => [
+			'hr' => 'Sortiraj po cijeni: visoko na nisko',
+			'sr' => 'Sortiraj po ceni: od više ka nižoj',
+			'en' => 'Sort by price: high to low',
+			'de' => 'Nach Preis sortieren: hoch nach niedrig',
+		],
+		'Sortiraj po popularnosti' => [
+			'hr' => 'Sortiraj po popularnosti',
+			'sr' => 'Sortiraj po popularnosti',
+			'en' => 'Sort by popularity',
+			'de' => 'Nach Beliebtheit sortieren',
+		],
+		'Sortiraj po ocjeni' => [
+			'hr' => 'Sortiraj po ocjeni',
+			'sr' => 'Sortiraj po oceni',
+			'en' => 'Sort by rating',
+			'de' => 'Nach Bewertung sortieren',
+		],
+		'Prikaži samo proizvode na popustu' => [
+			'hr' => 'Prikaži samo proizvode na popustu',
+			'sr' => 'Prikaži samo proizvode na popustu',
+			'en' => 'Show only discounted products',
+			'de' => 'Nur reduzierte Produkte anzeigen',
+		],
+		'Primijeni' => [
+			'hr' => 'Primijeni',
+			'sr' => 'Primeni',
+			'en' => 'Apply',
+			'de' => 'Anwenden',
+		],
+		'Primijeni filtre' => [
+			'hr' => 'Primijeni filtre',
+			'sr' => 'Primeni filtere',
+			'en' => 'Apply filters',
+			'de' => 'Filter anwenden',
+		],
+		'Poništi filtre' => [
+			'hr' => 'Poništi filtre',
+			'sr' => 'Poništi filtere',
+			'en' => 'Reset filters',
+			'de' => 'Filter zurücksetzen',
+		],
+		'Prikaži sve proizvode' => [
+			'hr' => 'Prikaži sve proizvode',
+			'sr' => 'Prikaži sve proizvode',
+			'en' => 'Show all products',
+			'de' => 'Alle Produkte anzeigen',
+		],
+		'Kategorija' => [
+			'hr' => 'Kategorija',
+			'sr' => 'Kategorija',
+			'en' => 'Category',
+			'de' => 'Kategorie',
+		],
+		'Boja' => [
+			'hr' => 'Boja',
+			'sr' => 'Boja',
+			'en' => 'Color',
+			'de' => 'Farbe',
+		],
+		'Materijal' => [
+			'hr' => 'Materijal',
+			'sr' => 'Materijal',
+			'en' => 'Material',
+			'de' => 'Material',
+		],
+		'Dimenzija' => [
+			'hr' => 'Dimenzija',
+			'sr' => 'Dimenzija',
+			'en' => 'Size',
+			'de' => 'Größe',
+		],
+		'Patterns & Textures' => [
+			'hr' => 'Uzorci i teksture',
+			'sr' => 'Uzorci i teksture',
+			'en' => 'Patterns & Textures',
+			'de' => 'Muster & Texturen',
+		],
+		'Product filters' => [
+			'hr' => 'Filteri proizvoda',
+			'sr' => 'Filteri proizvoda',
+			'en' => 'Product filters',
+			'de' => 'Produktfilter',
+		],
+		'Product view' => [
+			'hr' => 'Prikaz proizvoda',
+			'sr' => 'Prikaz proizvoda',
+			'en' => 'Product view',
+			'de' => 'Produktansicht',
+		],
+		'List view' => [
+			'hr' => 'Prikaz liste',
+			'sr' => 'Prikaz liste',
+			'en' => 'List view',
+			'de' => 'Listenansicht',
+		],
+		'Grid view' => [
+			'hr' => 'Prikaz mreže',
+			'sr' => 'Prikaz mreže',
+			'en' => 'Grid view',
+			'de' => 'Rasteransicht',
+		],
+		'Sort products' => [
+			'hr' => 'Sortiraj proizvode',
+			'sr' => 'Sortiraj proizvode',
+			'en' => 'Sort products',
+			'de' => 'Produkte sortieren',
+		],
+		'Products' => [
+			'hr' => 'Proizvodi',
+			'sr' => 'Proizvodi',
+			'en' => 'Products',
+			'de' => 'Produkte',
+		],
+		'Pročitaj više' => [
+			'hr' => 'Pročitaj više',
+			'sr' => 'Pročitaj više',
+			'en' => 'Read more',
+			'de' => 'Mehr lesen',
+		],
+		'Sažmi opis' => [
+			'hr' => 'Sažmi opis',
+			'sr' => 'Sakrij opis',
+			'en' => 'Collapse description',
+			'de' => 'Beschreibung einklappen',
+		],
+		'Aktivni filter kategorije' => [
+			'hr' => 'Aktivni filter kategorije',
+			'sr' => 'Aktivni filter kategorije',
+			'en' => 'Active category filter',
+			'de' => 'Aktiver Kategoriefilter',
+		],
+		'Nema pronađenih proizvoda za odabrane filtere.' => [
+			'hr' => 'Nema pronađenih proizvoda za odabrane filtere.',
+			'sr' => 'Nema pronađenih proizvoda za odabrane filtere.',
+			'en' => 'No products found for the selected filters.',
+			'de' => 'Keine Produkte für die ausgewählten Filter gefunden.',
+		],
+		'Navigacija kroz proizvode' => [
+			'hr' => 'Navigacija kroz proizvode',
+			'sr' => 'Navigacija kroz proizvode',
+			'en' => 'Product navigation',
+			'de' => 'Produktnavigation',
+		],
+		'Prethodna' => [
+			'hr' => 'Prethodna',
+			'sr' => 'Prethodna',
+			'en' => 'Previous',
+			'de' => 'Vorherige',
+		],
+		'Sljedeća' => [
+			'hr' => 'Sljedeća',
+			'sr' => 'Sledeća',
+			'en' => 'Next',
+			'de' => 'Nächste',
+		],
+		'Greška 404' => [
+			'hr' => 'Greška 404',
+			'sr' => 'Greška 404',
+			'en' => 'Error 404',
+			'de' => 'Fehler 404',
+		],
+		'Stranica nije pronađena' => [
+			'hr' => 'Stranica nije pronađena',
+			'sr' => 'Stranica nije pronađena',
+			'en' => 'Page not found',
+			'de' => 'Seite nicht gefunden',
+		],
+		'Nažalost, stranica koju tražite ne postoji, premještena je ili je privremeno nedostupna.' => [
+			'hr' => 'Nažalost, stranica koju tražite ne postoji, premještena je ili je privremeno nedostupna.',
+			'sr' => 'Nažalost, stranica koju tražite ne postoji, premeštena je ili je privremeno nedostupna.',
+			'en' => 'Unfortunately, the page you are looking for does not exist, has been moved, or is temporarily unavailable.',
+			'de' => 'Leider existiert die gesuchte Seite nicht, wurde verschoben oder ist vorübergehend nicht verfügbar.',
+		],
+		'Mogućnosti navigacije' => [
+			'hr' => 'Mogućnosti navigacije',
+			'sr' => 'Opcije navigacije',
+			'en' => 'Navigation options',
+			'de' => 'Navigationsoptionen',
+		],
+		'Povratak na početnu' => [
+			'hr' => 'Povratak na početnu',
+			'sr' => 'Povratak na početnu',
+			'en' => 'Back to homepage',
+			'de' => 'Zur Startseite',
+		],
+		'Idi u trgovinu' => [
+			'hr' => 'Idi u trgovinu',
+			'sr' => 'Idi u prodavnicu',
+			'en' => 'Go to shop',
+			'de' => 'Zum Shop',
+		],
+	];
+}
+
+/**
+ * Polylang-aware prevod statičnih UI stringova.
+ */
+function tersa_translate_ui_string(string $string): string {
+	$translated = function_exists('pll__')
+		? (string) pll__($string)
+		: (string) __($string, 'tersa-shop');
+
+	if ($translated !== $string) {
+		return $translated;
+	}
+
+	$fallbacks = tersa_get_ui_string_fallbacks();
+	$lang      = tersa_get_ui_language_slug();
+
+	return $fallbacks[$string][$lang] ?? $fallbacks[$string]['hr'] ?? $translated;
+}
+
+/**
  * Argument za Polylang-aware WP/Woo query-je.
  *
  * @return array{lang?: string}

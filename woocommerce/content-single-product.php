@@ -232,7 +232,7 @@ foreach ($tersa_parent_attachment_ids as $tersa_pid) {
 
 		<div class="product-single__summary-column">
 			<div class="product-single__summary">
-				<nav class="product-single__breadcrumbs" aria-label="<?php echo esc_attr(function_exists('pll__') ? pll__('Navigacija') : __('Navigacija', 'tersa-shop')); ?>">
+				<nav class="product-single__breadcrumbs" aria-label="<?php echo esc_attr(function_exists('tersa_translate_ui_string') ? tersa_translate_ui_string('Navigacija') : (function_exists('pll__') ? pll__('Navigacija') : __('Navigacija', 'tersa-shop'))); ?>">
 					<?php
 					woocommerce_breadcrumb([
 						'delimiter'   => ' / ',
@@ -240,7 +240,7 @@ foreach ($tersa_parent_attachment_ids as $tersa_pid) {
 						'wrap_after'  => '</ol>',
 						'before'      => '<li class="product-single__breadcrumb-item">',
 						'after'       => '</li>',
-						'home'        => esc_html__('Naslovnica', 'tersa-shop'),
+						'home'        => esc_html(function_exists('tersa_translate_ui_string') ? tersa_translate_ui_string('Naslovnica') : __('Naslovnica', 'tersa-shop')),
 					]);
 					?>
 				</nav>

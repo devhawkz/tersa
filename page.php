@@ -28,11 +28,11 @@ get_header();
 						<?php
 						woocommerce_breadcrumb([
 							'delimiter'   => '<span class="tersa-breadcrumbs__sep" aria-hidden="true">/</span>',
-							'wrap_before' => '<nav class="woocommerce-breadcrumb tersa-breadcrumbs" aria-label="' . esc_attr__('Putanja stranice', 'tersa-shop') . '">',
+							'wrap_before' => '<nav class="woocommerce-breadcrumb tersa-breadcrumbs" aria-label="' . esc_attr(function_exists('tersa_translate_ui_string') ? tersa_translate_ui_string('Putanja stranice') : __('Putanja stranice', 'tersa-shop')) . '">',
 							'wrap_after'  => '</nav>',
 							'before'      => '<span class="tersa-breadcrumbs__item">',
 							'after'       => '</span>',
-							'home'        => esc_html__('Naslovnica', 'tersa-shop'),
+							'home'        => esc_html(function_exists('tersa_translate_ui_string') ? tersa_translate_ui_string('Naslovnica') : __('Naslovnica', 'tersa-shop')),
 						]);
 						?>
 					<?php endif; ?>

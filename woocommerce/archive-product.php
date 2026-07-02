@@ -10,6 +10,10 @@ get_header();
  * inače fallback na __() s tekstualnom domenom 'tersa-shop'.
  */
 $tersa_t = static function (string $string): string {
+	if (function_exists('tersa_translate_ui_string')) {
+		return tersa_translate_ui_string($string);
+	}
+
 	if (function_exists('pll__')) {
 		return (string) pll__($string);
 	}
