@@ -582,8 +582,8 @@
   
   .home-shop-categories__icon-bg {
     position: absolute;
-    width: 120px;
-    height: 120px;
+    width: 10rem;
+    height: 8rem;
     border-radius:8% 8% 8% 45%;
     background-color: #fff;
   }

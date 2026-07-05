@@ -19,13 +19,13 @@ if (!class_exists('WooCommerce')) {
 		<div class="site-header__cart-panel-inner">
 			<div class="site-header__cart-head">
 				<h2 id="cart-drawer-title" class="site-header__cart-title">
-					<?php esc_html_e('Moja košarica', 'tersa-shop'); ?>
+					<?php echo esc_html(function_exists('tersa_translate_ui_string') ? tersa_translate_ui_string('Moja košarica') : __('Moja košarica', 'tersa-shop')); ?>
 				</h2>
 
 				<button
 					type="button"
 					class="site-header__cart-close"
-					aria-label="<?php esc_attr_e('Close cart', 'tersa-shop'); ?>"
+					aria-label="<?php echo esc_attr(function_exists('tersa_translate_ui_string') ? tersa_translate_ui_string('Close cart') : __('Close cart', 'tersa-shop')); ?>"
 					data-cart-close
 				>
 					<span></span>
@@ -44,7 +44,7 @@ if (!class_exists('WooCommerce')) {
 				} else {
 					?>
 					<div class="site-header__cart-loading" data-cart-loading-message>
-						<?php esc_html_e('Učitavanje košarice...', 'tersa-shop'); ?>
+						<?php echo esc_html(function_exists('tersa_translate_ui_string') ? tersa_translate_ui_string('Učitavanje košarice...') : __('Učitavanje košarice...', 'tersa-shop')); ?>
 					</div>
 					<?php
 				}

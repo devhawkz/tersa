@@ -33,7 +33,7 @@ $badge_items        = function_exists('tersa_get_product_tag_badges')
 
 if ($product->is_on_sale()) {
 	$badge_items[] = [
-		'label'   => function_exists('pll__') ? pll__('Na sniženju') : __('Na sniženju', 'tersa-shop'),
+		'label'   => function_exists('tersa_translate_ui_string') ? tersa_translate_ui_string('Na sniženju') : (function_exists('pll__') ? pll__('Na sniženju') : __('Na sniženju', 'tersa-shop')),
 		'primary' => false,
 	];
 }
@@ -103,6 +103,10 @@ foreach ($tersa_parent_attachment_ids as $tersa_pid) {
 		'alt'    => (string) get_post_meta($tersa_pid, '_wp_attachment_image_alt', true),
 	];
 }
+
+$tersa_variation_gallery_payload = function_exists('tersa_get_product_variation_gallery_payload')
+	? tersa_get_product_variation_gallery_payload($product, $tersa_main_image_size, 'thumbnail', $tersa_main_image_sizes)
+	: [];
 ?>
 
 <?php do_action('woocommerce_before_single_product'); ?>
@@ -114,6 +118,9 @@ foreach ($tersa_parent_attachment_ids as $tersa_pid) {
 >
 	<script type="application/json" class="tersa-product-fallback-gallery">
 	<?php echo wp_json_encode($tersa_parent_gallery_payload, JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT); ?>
+	</script>
+	<script type="application/json" class="tersa-product-variation-galleries">
+	<?php echo wp_json_encode($tersa_variation_gallery_payload, JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT); ?>
 	</script>
 	<?php
 	// Prevent WC's default image output — custom gallery is handled above.
@@ -259,8 +266,8 @@ foreach ($tersa_parent_attachment_ids as $tersa_pid) {
 						
 						<span class="product-single__stock-value<?php echo $is_in_stock ? ' is-in-stock' : ' is-out-of-stock'; ?>">
 							<?php
-					$_t_stock = function_exists('pll__') ? 'pll__' : function (string $s): string { return __($s, 'tersa-shop'); };
-					echo esc_html($is_in_stock ? $_t_stock('Na stanju') : $_t_stock('Trenutačno nedostupno'));
+					$_t_product_ui = function_exists('tersa_translate_ui_string') ? 'tersa_translate_ui_string' : (function_exists('pll__') ? 'pll__' : function (string $s): string { return __($s, 'tersa-shop'); });
+					echo esc_html($is_in_stock ? $_t_product_ui('Na stanju') : $_t_product_ui('Trenutačno nedostupno'));
 					?>
 						</span>
 					</div>
@@ -316,19 +323,19 @@ foreach ($tersa_parent_attachment_ids as $tersa_pid) {
 				<div class="product-single__meta">
 					<?php if (!empty($sku)) : ?>
 						<div class="product-single__meta-row">
-							<span class="product-single__meta-label"><?php echo esc_html__('Šifra proizvoda:', 'tersa-shop'); ?></span>
+							<span class="product-single__meta-label"><?php echo esc_html(function_exists('tersa_translate_ui_string') ? tersa_translate_ui_string('Šifra proizvoda:') : __('Šifra proizvoda:', 'tersa-shop')); ?></span>
 							<span class="product-single__meta-value"><?php echo esc_html($sku); ?></span>
 						</div>
 					<?php endif; ?>
 
 					<?php if (!empty($brand_output)) : ?>
 						<div class="product-single__meta-row">
-							<span class="product-single__meta-label"><?php echo esc_html__('Brendovi:', 'tersa-shop'); ?></span>
+							<span class="product-single__meta-label"><?php echo esc_html(function_exists('tersa_translate_ui_string') ? tersa_translate_ui_string('Brendovi:') : __('Brendovi:', 'tersa-shop')); ?></span>
 							<span class="product-single__meta-value"><?php echo esc_html($brand_output); ?></span>
 						</div>
 					<?php elseif (!empty($categories)) : ?>
 						<div class="product-single__meta-row">
-							<span class="product-single__meta-label"><?php echo esc_html__('Kategorija:', 'tersa-shop'); ?></span>
+							<span class="product-single__meta-label"><?php echo esc_html(function_exists('tersa_translate_ui_string') ? tersa_translate_ui_string('Kategorija:') : __('Kategorija:', 'tersa-shop')); ?></span>
 							<span class="product-single__meta-value"><?php echo wp_kses_post($categories); ?></span>
 						</div>
 					<?php endif; ?>
@@ -343,17 +350,18 @@ foreach ($tersa_parent_attachment_ids as $tersa_pid) {
 							?>
 							<?php
 							$tab_title_raw = wp_strip_all_tags($tab['title']);
-							if (function_exists('pll__')) {
-								if ($tab_key === 'reviews' && $product instanceof WC_Product) {
-									$tab_title = sprintf(
-										pll__('Recenzije (%d)'),
-										(int) $product->get_review_count()
-									);
-								} else {
-									$tab_title = pll__($tab_title_raw);
-								}
+							$_t_product_ui = function_exists('tersa_translate_ui_string') ? 'tersa_translate_ui_string' : (function_exists('pll__') ? 'pll__' : function (string $s): string { return __($s, 'tersa-shop'); });
+							if ($tab_key === 'description') {
+								$tab_title = $_t_product_ui('Opis');
+							} elseif ($tab_key === 'additional_information') {
+								$tab_title = $_t_product_ui('Dodatne informacije');
+							} elseif ($tab_key === 'reviews' && $product instanceof WC_Product) {
+								$tab_title = sprintf(
+									$_t_product_ui('Recenzije (%d)'),
+									(int) $product->get_review_count()
+								);
 							} else {
-								$tab_title = $tab_title_raw;
+								$tab_title = $_t_product_ui($tab_title_raw);
 							}
 							?>
 							<section class="product-single__accordion">

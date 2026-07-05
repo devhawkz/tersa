@@ -12,6 +12,10 @@ if (!defined('ABSPATH')) {
  */
 
 function tersa_product_tab_translate(string $string): string {
+	if (function_exists('tersa_translate_ui_string')) {
+		return tersa_translate_ui_string($string);
+	}
+
 	return function_exists('pll__') ? pll__($string) : __($string, 'tersa-shop');
 }
 
@@ -181,6 +185,118 @@ function tersa_woocommerce_reset_variations_link_markup(string $html): string {
 	);
 }
 add_filter('woocommerce_reset_variations_link', 'tersa_woocommerce_reset_variations_link_markup', 10, 1);
+
+/**
+ * Build image payload in the same shape used by product.js galleries.
+ */
+function tersa_build_product_gallery_image_payload(int $attachment_id, string $size = '1536x1536', string $thumb_size = 'thumbnail', string $sizes_attr = ''): ?array {
+	if ($attachment_id <= 0) {
+		return null;
+	}
+
+	$src = wp_get_attachment_image_url($attachment_id, $size);
+	if (!$src) {
+		return null;
+	}
+
+	return [
+		'id'     => $attachment_id,
+		'src'    => $src,
+		'full'   => wp_get_attachment_image_url($attachment_id, 'full') ?: $src,
+		'thumb'  => wp_get_attachment_image_url($attachment_id, $thumb_size) ?: $src,
+		'srcset' => (string) wp_get_attachment_image_srcset($attachment_id, $size),
+		'sizes'  => $sizes_attr !== '' ? $sizes_attr : (string) wp_get_attachment_image_sizes($attachment_id, $size),
+		'alt'    => (string) get_post_meta($attachment_id, '_wp_attachment_image_alt', true),
+	];
+}
+
+/**
+ * Frontend index of per-variation galleries, so selecting a partial attribute
+ * like color can immediately replace thumbnails before WC has a full variation.
+ *
+ * @return array<int, array{variation_id:int,attributes:array<string,string>,gallery:array<int,array<string,mixed>>}>
+ */
+function tersa_get_product_variation_gallery_payload(WC_Product $product, string $size = '1536x1536', string $thumb_size = 'thumbnail', string $sizes_attr = ''): array {
+	if (!$product->is_type('variable') || !method_exists($product, 'get_children')) {
+		return [];
+	}
+
+	$raw_entries         = [];
+	$all_attachment_ids = [];
+
+	foreach ((array) $product->get_children() as $variation_id) {
+		$variation_id = absint($variation_id);
+		if (!$variation_id) {
+			continue;
+		}
+
+		$variation = wc_get_product($variation_id);
+		if (!$variation instanceof WC_Product_Variation || !$variation->exists()) {
+			continue;
+		}
+
+		if (method_exists($variation, 'variation_is_visible') && !$variation->variation_is_visible()) {
+			continue;
+		}
+
+		$gallery_ids = function_exists('tvg_get_variation_gallery_ids')
+			? tvg_get_variation_gallery_ids($variation_id)
+			: [];
+
+		if (empty($gallery_ids)) {
+			$variation_image_id = (int) $variation->get_image_id();
+			if ($variation_image_id > 0) {
+				$gallery_ids = [$variation_image_id];
+			}
+		}
+
+		$gallery_ids = array_values(array_unique(array_filter(array_map('absint', $gallery_ids))));
+		if (empty($gallery_ids)) {
+			continue;
+		}
+
+		$raw_entries[] = [
+			'variation_id' => $variation_id,
+			'attributes'   => array_map('strval', $variation->get_variation_attributes()),
+			'gallery_ids'  => $gallery_ids,
+		];
+
+		$all_attachment_ids = array_merge($all_attachment_ids, $gallery_ids);
+	}
+
+	if (empty($raw_entries)) {
+		return [];
+	}
+
+	$all_attachment_ids = array_values(array_unique(array_filter(array_map('absint', $all_attachment_ids))));
+	if (!empty($all_attachment_ids)) {
+		_prime_post_caches($all_attachment_ids, true, true);
+	}
+
+	$payload = [];
+	foreach ($raw_entries as $entry) {
+		$gallery = [];
+
+		foreach ($entry['gallery_ids'] as $attachment_id) {
+			$item = tersa_build_product_gallery_image_payload((int) $attachment_id, $size, $thumb_size, $sizes_attr);
+			if ($item !== null) {
+				$gallery[] = $item;
+			}
+		}
+
+		if (empty($gallery)) {
+			continue;
+		}
+
+		$payload[] = [
+			'variation_id' => (int) $entry['variation_id'],
+			'attributes'   => $entry['attributes'],
+			'gallery'      => $gallery,
+		];
+	}
+
+	return $payload;
+}
 
 /**
  * Uklanja WooCommerce default callbacks sa woocommerce_single_product_summary hooka.

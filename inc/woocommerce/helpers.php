@@ -264,6 +264,234 @@ function tersa_get_ui_string_fallbacks(): array {
 			'en' => 'Navigation',
 			'de' => 'Navigation',
 		],
+		'Bestsellers' => [
+			'hr' => 'Najprodavanije',
+			'sr' => 'Najprodavanije',
+			'en' => 'Bestsellers',
+			'de' => 'Bestseller',
+		],
+		'Najprodavanije' => [
+			'hr' => 'Najprodavanije',
+			'sr' => 'Najprodavanije',
+			'en' => 'Bestsellers',
+			'de' => 'Bestseller',
+		],
+		'Najnovije' => [
+			'hr' => 'Najnovije',
+			'sr' => 'Najnovije',
+			'en' => 'New arrivals',
+			'de' => 'Neuheiten',
+		],
+		'Novo' => [
+			'hr' => 'Novo',
+			'sr' => 'Novo',
+			'en' => 'New',
+			'de' => 'Neu',
+		],
+		'Na sniženju' => [
+			'hr' => 'Na sniženju',
+			'sr' => 'Na sniženju',
+			'en' => 'On sale',
+			'de' => 'Im Angebot',
+		],
+		'Vidi opcije' => [
+			'hr' => 'Vidi opcije',
+			'sr' => 'Vidi opcije',
+			'en' => 'View options',
+			'de' => 'Optionen ansehen',
+		],
+		'Dodaj u košaricu' => [
+			'hr' => 'Dodaj u košaricu',
+			'sr' => 'Dodaj u korpu',
+			'en' => 'Add to cart',
+			'de' => 'In den Warenkorb',
+		],
+		'Na stanju' => [
+			'hr' => 'Na stanju',
+			'sr' => 'Na stanju',
+			'en' => 'In stock',
+			'de' => 'Auf Lager',
+		],
+		'na stanju' => [
+			'hr' => 'na stanju',
+			'sr' => 'na stanju',
+			'en' => 'in stock',
+			'de' => 'auf Lager',
+		],
+		'%s na stanju' => [
+			'hr' => '%s na stanju',
+			'sr' => '%s na stanju',
+			'en' => '%s in stock',
+			'de' => '%s auf Lager',
+		],
+		'Trenutačno nedostupno' => [
+			'hr' => 'Trenutačno nedostupno',
+			'sr' => 'Trenutno nedostupno',
+			'en' => 'Currently unavailable',
+			'de' => 'Derzeit nicht verfügbar',
+		],
+		'Ovaj proizvod trenutačno nije na stanju i nije dostupan.' => [
+			'hr' => 'Ovaj proizvod trenutačno nije na stanju i nije dostupan.',
+			'sr' => 'Ovaj proizvod trenutno nije na stanju i nije dostupan.',
+			'en' => 'This product is currently out of stock and unavailable.',
+			'de' => 'Dieses Produkt ist derzeit nicht auf Lager und nicht verfügbar.',
+		],
+		'Zalihe' => [
+			'hr' => 'Zalihe',
+			'sr' => 'Zalihe',
+			'en' => 'Stock',
+			'de' => 'Lagerbestand',
+		],
+		'Težina' => [
+			'hr' => 'Težina',
+			'sr' => 'Težina',
+			'en' => 'Weight',
+			'de' => 'Gewicht',
+		],
+		'Dimenzije' => [
+			'hr' => 'Dimenzije',
+			'sr' => 'Dimenzije',
+			'en' => 'Dimensions',
+			'de' => 'Abmessungen',
+		],
+		'Dimenzije:' => [
+			'hr' => 'Dimenzije:',
+			'sr' => 'Dimenzije:',
+			'en' => 'Dimensions:',
+			'de' => 'Abmessungen:',
+		],
+		'Moja košarica' => [
+			'hr' => 'Moja košarica',
+			'sr' => 'Moja korpa',
+			'en' => 'My cart',
+			'de' => 'Mein Warenkorb',
+		],
+		'Učitavanje košarice...' => [
+			'hr' => 'Učitavanje košarice...',
+			'sr' => 'Učitavanje korpe...',
+			'en' => 'Loading cart...',
+			'de' => 'Warenkorb wird geladen...',
+		],
+		'Close cart' => [
+			'hr' => 'Zatvori košaricu',
+			'sr' => 'Zatvori korpu',
+			'en' => 'Close cart',
+			'de' => 'Warenkorb schließen',
+		],
+		'Međuzbir' => [
+			'hr' => 'Međuzbir',
+			'sr' => 'Međuzbir',
+			'en' => 'Subtotal',
+			'de' => 'Zwischensumme',
+		],
+		'Blagajna' => [
+			'hr' => 'Blagajna',
+			'sr' => 'Plaćanje',
+			'en' => 'Checkout',
+			'de' => 'Kasse',
+		],
+		'Pogledaj košaricu' => [
+			'hr' => 'Pogledaj košaricu',
+			'sr' => 'Pogledaj korpu',
+			'en' => 'View cart',
+			'de' => 'Warenkorb ansehen',
+		],
+		'Trenutno nema proizvoda u košarici.' => [
+			'hr' => 'Trenutno nema proizvoda u košarici.',
+			'sr' => 'Trenutno nema proizvoda u korpi.',
+			'en' => 'There are currently no products in the cart.',
+			'de' => 'Derzeit befinden sich keine Produkte im Warenkorb.',
+		],
+		'Šifra proizvoda:' => [
+			'hr' => 'Šifra proizvoda:',
+			'sr' => 'Šifra proizvoda:',
+			'en' => 'SKU:',
+			'de' => 'Artikelnummer:',
+		],
+		'Brendovi:' => [
+			'hr' => 'Brendovi:',
+			'sr' => 'Brendovi:',
+			'en' => 'Brands:',
+			'de' => 'Marken:',
+		],
+		'Kategorija:' => [
+			'hr' => 'Kategorija:',
+			'sr' => 'Kategorija:',
+			'en' => 'Category:',
+			'de' => 'Kategorie:',
+		],
+		'Opis' => [
+			'hr' => 'Opis',
+			'sr' => 'Opis',
+			'en' => 'Description',
+			'de' => 'Beschreibung',
+		],
+		'Dodatne informacije' => [
+			'hr' => 'Dodatne informacije',
+			'sr' => 'Dodatne informacije',
+			'en' => 'Additional information',
+			'de' => 'Zusatzinformationen',
+		],
+		'Recenzije' => [
+			'hr' => 'Recenzije',
+			'sr' => 'Recenzije',
+			'en' => 'Reviews',
+			'de' => 'Bewertungen',
+		],
+		'Recenzije (%d)' => [
+			'hr' => 'Recenzije (%d)',
+			'sr' => 'Recenzije (%d)',
+			'en' => 'Reviews (%d)',
+			'de' => 'Bewertungen (%d)',
+		],
+		'Još nema opisa.' => [
+			'hr' => 'Još nema opisa.',
+			'sr' => 'Još nema opisa.',
+			'en' => 'No description yet.',
+			'de' => 'Noch keine Beschreibung.',
+		],
+		'Nema dodatnih informacija.' => [
+			'hr' => 'Nema dodatnih informacija.',
+			'sr' => 'Nema dodatnih informacija.',
+			'en' => 'No additional information.',
+			'de' => 'Keine zusätzlichen Informationen.',
+		],
+		'Recenzije nisu dostupne.' => [
+			'hr' => 'Recenzije nisu dostupne.',
+			'sr' => 'Recenzije nisu dostupne.',
+			'en' => 'Reviews are not available.',
+			'de' => 'Bewertungen sind nicht verfügbar.',
+		],
+		'Još nema recenzija.' => [
+			'hr' => 'Još nema recenzija.',
+			'sr' => 'Još nema recenzija.',
+			'en' => 'There are no reviews yet.',
+			'de' => 'Es gibt noch keine Bewertungen.',
+		],
+		'Označke proizvoda' => [
+			'hr' => 'Označke proizvoda',
+			'sr' => 'Oznake proizvoda',
+			'en' => 'Product badges',
+			'de' => 'Produktkennzeichnungen',
+		],
+		'Product badges' => [
+			'hr' => 'Označke proizvoda',
+			'sr' => 'Oznake proizvoda',
+			'en' => 'Product badges',
+			'de' => 'Produktkennzeichnungen',
+		],
+		'Product tags' => [
+			'hr' => 'Oznake proizvoda',
+			'sr' => 'Oznake proizvoda',
+			'en' => 'Product tags',
+			'de' => 'Produkt-Tags',
+		],
+		'Slični proizvodi' => [
+			'hr' => 'Slični proizvodi',
+			'sr' => 'Slični proizvodi',
+			'en' => 'Related products',
+			'de' => 'Ähnliche Produkte',
+		],
 		'Sortiraj po najnovijim' => [
 			'hr' => 'Sortiraj po najnovijim',
 			'sr' => 'Sortiraj po najnovijim',
@@ -494,6 +722,96 @@ function tersa_translate_ui_string(string $string): string {
 
 	return $fallbacks[$string][$lang] ?? $fallbacks[$string]['hr'] ?? $translated;
 }
+
+/**
+ * Polylang-aware label for known product tags used as visual badges.
+ */
+function tersa_translate_product_tag_label($term_or_name): string {
+	$name = $term_or_name instanceof WP_Term ? (string) $term_or_name->name : (string) $term_or_name;
+	$name = trim($name);
+
+	if ($name === '') {
+		return '';
+	}
+
+	$translated = tersa_translate_ui_string($name);
+	if ($translated !== $name) {
+		return $translated;
+	}
+
+	$known_badge_labels = [
+		'najprodavanije' => 'Najprodavanije',
+		'bestseller'     => 'Najprodavanije',
+		'bestsellers'    => 'Najprodavanije',
+		'best-sellers'   => 'Najprodavanije',
+		'najnovije'      => 'Najnovije',
+		'new-arrivals'   => 'Najnovije',
+		'novo'           => 'Novo',
+		'new'            => 'Novo',
+	];
+	$normalized = sanitize_title($name);
+
+	return isset($known_badge_labels[$normalized])
+		? tersa_translate_ui_string($known_badge_labels[$normalized])
+		: $translated;
+}
+
+/**
+ * Translates WooCommerce attribute labels that are used in variation pickers and cart item data.
+ */
+function tersa_translate_product_attribute_label($label, $name = '', $product = null): string {
+	$label = is_string($label) ? trim($label) : '';
+	if ($label === '') {
+		return '';
+	}
+
+	$source_label = rtrim($label, " \t\n\r\0\x0B:");
+	$translated   = tersa_translate_ui_string($source_label);
+
+	if ($translated !== $source_label) {
+		return substr($label, -1) === ':' ? $translated . ':' : $translated;
+	}
+
+	$name = is_string($name) ? $name : '';
+	if ($name !== '') {
+		$attribute_key = sanitize_title(str_replace(['attribute_', 'pa_'], '', $name));
+		$known_labels  = [
+			'dimenzije' => 'Dimenzije',
+			'dimensions' => 'Dimenzije',
+			'abmessungen' => 'Dimenzije',
+		];
+
+		if (isset($known_labels[$attribute_key])) {
+			return tersa_translate_ui_string($known_labels[$attribute_key]);
+		}
+	}
+
+	return $label;
+}
+add_filter('woocommerce_attribute_label', 'tersa_translate_product_attribute_label', 20, 3);
+
+/**
+ * Keeps cart/mini-cart variation labels translated even if item data is injected by a plugin.
+ */
+function tersa_translate_cart_item_data_labels(array $item_data, array $cart_item): array {
+	foreach ($item_data as $index => $data) {
+		foreach (['key', 'name'] as $label_key) {
+			if (empty($data[$label_key]) || !is_string($data[$label_key])) {
+				continue;
+			}
+
+			$source = rtrim(trim(wp_strip_all_tags($data[$label_key])), " \t\n\r\0\x0B:");
+			if ($source === '') {
+				continue;
+			}
+
+			$item_data[$index][$label_key] = tersa_translate_ui_string($source);
+		}
+	}
+
+	return $item_data;
+}
+add_filter('woocommerce_get_item_data', 'tersa_translate_cart_item_data_labels', 20, 2);
 
 /**
  * Argument za Polylang-aware WP/Woo query-je.
@@ -752,7 +1070,7 @@ function tersa_get_product_tag_badges(int $product_id, int $limit = 2): array {
 		}
 
 		$badges[] = [
-			'label'   => (string) $term->name,
+			'label'   => tersa_translate_product_tag_label($term),
 			'primary' => (bool) $badge_rules[$term_id],
 		];
 	}

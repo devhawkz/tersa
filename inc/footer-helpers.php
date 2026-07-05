@@ -28,7 +28,56 @@ function tersa_get_footer_settings_cache_base_key(): string {
  * @return string
  */
 function tersa_get_company_settings_cache_base_key(): string {
-	return 'tersa_company_settings_v4';
+	return 'tersa_company_settings_v5';
+}
+
+/**
+ * Poznati slugovi privatnih Footer Settings stranica po jeziku.
+ *
+ * Polylang veza je i dalje primarna, ali ovo pokriva slučaj kada je ACF grupa
+ * ručno vezana na prevedenu stranicu, a Polylang relacija nije dostupna.
+ *
+ * @return array<string, string[]>
+ */
+function tersa_get_footer_settings_localized_slugs(): array {
+	return [
+		'hr' => ['footer-postavke', 'footer-settings'],
+		'en' => ['footer-settings'],
+		'de' => ['footer-einstellungen', 'footer-settings'],
+	];
+}
+
+/**
+ * Pronalazi Footer Settings page ID direktno po slug kandidatima.
+ *
+ * @param string $lang Polylang slug.
+ * @return int
+ */
+function tersa_get_footer_settings_page_id_by_slug(string $lang = ''): int {
+	$lang  = sanitize_key($lang);
+	$slugs = tersa_get_footer_settings_localized_slugs();
+
+	$candidates = $lang && !empty($slugs[$lang])
+		? $slugs[$lang]
+		: [tersa_get_footer_settings_slug()];
+
+	foreach ($candidates as $slug) {
+		$page = get_page_by_path((string) $slug);
+		if ($page instanceof WP_Post) {
+			return (int) $page->ID;
+		}
+	}
+
+	foreach ($slugs as $lang_slugs) {
+		foreach ($lang_slugs as $slug) {
+			$page = get_page_by_path((string) $slug);
+			if ($page instanceof WP_Post) {
+				return (int) $page->ID;
+			}
+		}
+	}
+
+	return 0;
 }
 
 /**
@@ -129,7 +178,13 @@ function tersa_get_footer_settings_cache_key(): string {
 function tersa_get_footer_settings_base_page_id(): int {
 	$page = get_page_by_path(tersa_get_footer_settings_slug());
 
-	return $page instanceof WP_Post ? (int) $page->ID : 0;
+	if ($page instanceof WP_Post) {
+		return (int) $page->ID;
+	}
+
+	$default_lang = tersa_get_footer_default_language_slug();
+
+	return tersa_get_footer_settings_page_id_by_slug($default_lang);
 }
 
 /**
@@ -157,6 +212,15 @@ function tersa_get_footer_settings_page_id(string $lang = ''): int {
 		}
 	}
 
+	if ($lang) {
+		$localized_page_id = tersa_get_footer_settings_page_id_by_slug($lang);
+		if ($localized_page_id) {
+			if (!$page_id || (function_exists('pll_get_post_language') && pll_get_post_language($localized_page_id, 'slug') === $lang)) {
+				$page_id = $localized_page_id;
+			}
+		}
+	}
+
 	return $cached_ids[$lang_key] = $page_id;
 }
 
@@ -174,12 +238,21 @@ function tersa_get_footer_settings_page_ids(): array {
 
 	$page_ids = [$page_id];
 
-	if (function_exists('pll_languages_list') && function_exists('pll_get_post')) {
-		foreach ((array) pll_languages_list(['fields' => 'slug']) as $lang_slug) {
-			$translated_id = pll_get_post($page_id, (string) $lang_slug);
+	foreach (tersa_get_footer_settings_localized_slugs() as $lang_slug => $slugs) {
+		$localized_id = tersa_get_footer_settings_page_id_by_slug((string) $lang_slug);
+		if ($localized_id) {
+			$page_ids[] = $localized_id;
+		}
+	}
 
-			if ($translated_id) {
-				$page_ids[] = (int) $translated_id;
+	if (function_exists('pll_languages_list') && function_exists('pll_get_post')) {
+		foreach (array_values(array_unique(array_filter(array_map('intval', $page_ids)))) as $source_page_id) {
+			foreach ((array) pll_languages_list(['fields' => 'slug']) as $lang_slug) {
+				$translated_id = pll_get_post($source_page_id, (string) $lang_slug);
+
+				if ($translated_id) {
+					$page_ids[] = (int) $translated_id;
+				}
 			}
 		}
 	}
@@ -847,6 +920,24 @@ function tersa_maybe_clear_company_settings_cache(int $post_id, $post = null): v
 	}
 }
 add_action('save_post_page', 'tersa_maybe_clear_company_settings_cache', 10, 2);
+
+/**
+ * ACF snima field vrednosti kroz svoj hook; očisti cache i nakon tog koraka.
+ *
+ * @param int|string $post_id
+ * @return void
+ */
+function tersa_clear_footer_settings_cache_after_acf_save($post_id): void {
+	if (!is_numeric($post_id)) {
+		return;
+	}
+
+	$post_id = (int) $post_id;
+
+	tersa_maybe_clear_footer_settings_cache($post_id);
+	tersa_maybe_clear_company_settings_cache($post_id);
+}
+add_action('acf/save_post', 'tersa_clear_footer_settings_cache_after_acf_save', 20);
 
 /**
  * Vraća ID menija za footer lokaciju sa Polylang fallback-om.

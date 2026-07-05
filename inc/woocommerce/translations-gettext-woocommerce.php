@@ -16,19 +16,27 @@ function tersa_woocommerce_gettext_override($translated, $text, $domain) {
 		return $translated;
 	}
 
+	$translate_ui = static function (string $hr): string {
+		if (function_exists('tersa_translate_ui_string')) {
+			return tersa_translate_ui_string($hr);
+		}
+
+		return function_exists('pll__') ? pll__($hr) : __($hr, 'tersa-shop');
+	};
+
 	switch ($text) {
 		case 'No products in the cart.':
 			$hr = 'Trenutno nema proizvoda u košarici.';
-			return function_exists('pll__') ? pll__($hr) : $hr;
+			return $translate_ui($hr);
 		case 'Stock':
 			$hr = 'Zalihe';
-			return function_exists('pll__') ? pll__($hr) : $hr;
+			return $translate_ui($hr);
 		case 'Subtotal':
 			$hr = 'Međuzbir';
-			return function_exists('pll__') ? pll__($hr) : __($hr, 'tersa-shop');
+			return $translate_ui($hr);
 		case 'Checkout':
 			$hr = 'Blagajna';
-			return function_exists('pll__') ? pll__($hr) : __($hr, 'tersa-shop');
+			return $translate_ui($hr);
 		case 'Add to cart':
 			if ($translated !== $text) {
 				return $translated;
@@ -36,28 +44,31 @@ function tersa_woocommerce_gettext_override($translated, $text, $domain) {
 			return function_exists('tersa_pll_wishlist') ? tersa_pll_wishlist('add_to_cart') : $translated;
 		case 'View cart':
 			$hr = 'Pogledaj košaricu';
-			return function_exists('pll__') ? pll__($hr) : __($hr, 'tersa-shop');
+			return $translate_ui($hr);
 		case '%s in stock':
 			$hr = '%s na stanju';
-			return function_exists('pll__') ? pll__($hr) : $hr;
+			return $translate_ui($hr);
 		case 'in stock':
 			$hr = 'na stanju';
-			return function_exists('pll__') ? pll__($hr) : $hr;
+			return $translate_ui($hr);
+		case 'This product is currently out of stock and unavailable.':
+			$hr = 'Ovaj proizvod trenutačno nije na stanju i nije dostupan.';
+			return $translate_ui($hr);
 		case 'Weight':
 			$hr = 'Težina';
-			return function_exists('pll__') ? pll__($hr) : $hr;
+			return $translate_ui($hr);
 		case 'Dimensions':
 			$hr = 'Dimenzije';
-			return function_exists('pll__') ? pll__($hr) : $hr;
+			return $translate_ui($hr);
 		case 'Additional information':
 			$hr = 'Dodatne informacije';
-			return function_exists('pll__') ? pll__($hr) : $hr;
+			return $translate_ui($hr);
 		case 'Reviews (%d)':
 			$hr = 'Recenzije (%d)';
-			return function_exists('pll__') ? pll__($hr) : $hr;
+			return $translate_ui($hr);
 		case 'Reviews':
 			$hr = 'Recenzije';
-			return function_exists('pll__') ? pll__($hr) : $hr;
+			return $translate_ui($hr);
 		case 'There are no reviews yet.':
 			$hr = 'Još nema recenzija.';
 			return function_exists('pll__') ? pll__($hr) : $hr;
@@ -120,4 +131,3 @@ function tersa_woocommerce_gettext_override($translated, $text, $domain) {
 	}
 }
 add_filter('gettext', 'tersa_woocommerce_gettext_override', 10, 3);
-

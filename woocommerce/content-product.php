@@ -45,13 +45,13 @@ if (
 	$button_classes[] = 'ajax_add_to_cart';
 }
 
-$button_label_options = function_exists('pll__')
-	? pll__('Vidi opcije')
-	: __('Vidi opcije', 'tersa-shop');
+$button_label_options = function_exists('tersa_translate_ui_string')
+	? tersa_translate_ui_string('Vidi opcije')
+	: (function_exists('pll__') ? pll__('Vidi opcije') : __('Vidi opcije', 'tersa-shop'));
 
-$button_label_add_to_cart = function_exists('pll__')
-	? pll__('Dodaj u košaricu')
-	: __('Dodaj u košaricu', 'tersa-shop');
+$button_label_add_to_cart = function_exists('tersa_translate_ui_string')
+	? tersa_translate_ui_string('Dodaj u košaricu')
+	: (function_exists('pll__') ? pll__('Dodaj u košaricu') : __('Dodaj u košaricu', 'tersa-shop'));
 
 $allowed_add_to_cart_html = [
 	'a' => [
@@ -95,7 +95,7 @@ $badges = function_exists('tersa_get_product_tag_badges')
 
 if ($product->is_on_sale()) {
 	$badges[] = [
-		'label'   => function_exists('pll__') ? pll__('Na sniženju') : __('Na sniženju', 'tersa-shop'),
+		'label'   => function_exists('tersa_translate_ui_string') ? tersa_translate_ui_string('Na sniženju') : (function_exists('pll__') ? pll__('Na sniženju') : __('Na sniženju', 'tersa-shop')),
 		'primary' => false,
 	];
 }
@@ -113,7 +113,7 @@ $short_description = wp_kses_post(
 			<a class="shop-card__media-link" href="<?php echo esc_url($product_url); ?>">
 				<div class="shop-card__media">
 					<?php if (!empty($badges)) : ?>
-						<div class="shop-card__tags" aria-label="<?php echo esc_attr__('Product badges', 'tersa-shop'); ?>">
+						<div class="shop-card__tags" aria-label="<?php echo esc_attr(function_exists('tersa_translate_ui_string') ? tersa_translate_ui_string('Product badges') : __('Product badges', 'tersa-shop')); ?>">
 							<?php foreach ($badges as $badge) : ?>
 								<span class="shop-card__badge<?php echo !empty($badge['primary']) ? ' shop-card__badge--primary' : ''; ?>">
 									<?php echo esc_html($badge['label']); ?>

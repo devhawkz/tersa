@@ -57,7 +57,9 @@ if (function_exists('get_field')) {
 	$badge_color = (string) $badge_value;
 }
 
-$section_title = !empty($section_title) ? $section_title : (function_exists('pll__') ? pll__('Bestsellers') : __('Bestsellers', 'tersa-shop'));
+$section_title = !empty($section_title)
+	? (function_exists('tersa_translate_ui_string') ? tersa_translate_ui_string($section_title) : $section_title)
+	: (function_exists('tersa_translate_ui_string') ? tersa_translate_ui_string('Bestsellers') : (function_exists('pll__') ? pll__('Bestsellers') : __('Bestsellers', 'tersa-shop')));
 $badge_color   = sanitize_hex_color($badge_color) ?: '#000000';
 
 $current_lang = function_exists('tersa_get_current_language_slug') ? tersa_get_current_language_slug() : (function_exists('pll_current_language') ? sanitize_key((string) call_user_func('pll_current_language', 'slug')) : '');
@@ -151,6 +153,10 @@ $cached_post_ids  = get_transient($transient_key);
 static $request_post_ids_cache = [];
 
 $translate = static function (string $text): string {
+	if (function_exists('tersa_translate_ui_string')) {
+		return (string) call_user_func('tersa_translate_ui_string', $text);
+	}
+
 	if (function_exists('pll__')) {
 		return (string) call_user_func('pll__', $text);
 	}
@@ -238,7 +244,9 @@ if (!empty($product_ids)) {
 			});
 			$product_tags_by_id[$product_id] = array_map(
 				static function ($term) {
-					return (string) $term->name;
+					return function_exists('tersa_translate_product_tag_label')
+						? tersa_translate_product_tag_label($term)
+						: (string) $term->name;
 				},
 				array_slice($tag_terms, 0, 2)
 			);
@@ -360,7 +368,7 @@ if (!empty($product_ids)) {
 								$tag_names = $product_tags_by_id[$product_id] ?? [];
 								?>
 								<?php if (!empty($tag_names)) : ?>
-									<div class="home-bestsellers__tags" aria-label="<?php echo esc_attr__('Product tags', 'tersa-shop'); ?>">
+									<div class="home-bestsellers__tags" aria-label="<?php echo esc_attr($translate('Product tags')); ?>">
 										<?php foreach ($tag_names as $tag_name) : ?>
 											<span
 												class="home-bestsellers__badge"

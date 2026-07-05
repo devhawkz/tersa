@@ -62,13 +62,29 @@ if (!is_wp_error($rel_terms_raw) && is_array($rel_terms_raw)) {
 			return (int) $b->count <=> (int) $a->count;
 		});
 		$rel_tags_by_id[$pid] = array_map(
-			static function ($t) { return (string) $t->name; },
+			static function ($t) {
+				return function_exists('tersa_translate_product_tag_label')
+					? tersa_translate_product_tag_label($t)
+					: (string) $t->name;
+			},
 			array_slice($tag_terms, 0, 2)
 		);
 	}
 }
 
-$rel_label_options = function_exists('pll__') ? pll__('Vidi opcije') : 'Vidi opcije';
+$rel_translate = static function (string $text): string {
+	if (function_exists('tersa_translate_ui_string')) {
+		return (string) tersa_translate_ui_string($text);
+	}
+
+	if (function_exists('pll__')) {
+		return (string) pll__($text);
+	}
+
+	return $text;
+};
+
+$rel_label_options = $rel_translate('Vidi opcije');
 
 $badge_color = '#000000';
 $allowed_add_to_cart_html = [
@@ -102,7 +118,7 @@ unset($rel_products_batch, $_p);
 <section class="product-related" aria-labelledby="product-related-title">
 	<div class="product-related__inner">
 		<h2 id="product-related-title" class="product-related__title">
-			<?php echo esc_html(function_exists('pll__') ? pll__('Slični proizvodi') : __('Slični proizvodi', 'tersa-shop')); ?>
+			<?php echo esc_html($rel_translate('Slični proizvodi')); ?>
 		</h2>
 
 		<ul class="home-bestsellers__grid" role="list">
@@ -177,7 +193,7 @@ unset($rel_products_batch, $_p);
 					<a class="home-bestsellers__media-link" href="<?php echo esc_url($rel_url); ?>">
 						<div class="home-bestsellers__media">
 							<?php if (!empty($rel_tag_names)) : ?>
-								<div class="home-bestsellers__tags" aria-label="<?php echo esc_attr__('Product tags', 'tersa-shop'); ?>">
+								<div class="home-bestsellers__tags" aria-label="<?php echo esc_attr($rel_translate('Product tags')); ?>">
 									<?php foreach ($rel_tag_names as $tag_name) : ?>
 										<span
 											class="home-bestsellers__badge"

@@ -25,6 +25,19 @@ document.addEventListener('DOMContentLoaded', function () {
     }
   }
 
+  var variationGalleryIndex = [];
+  var variationGalleryScript = galleryRoot.querySelector('script.tersa-product-variation-galleries');
+  if (variationGalleryScript) {
+    try {
+      var parsedVariationGalleries = JSON.parse(variationGalleryScript.textContent || '[]');
+      if (Array.isArray(parsedVariationGalleries)) {
+        variationGalleryIndex = parsedVariationGalleries;
+      }
+    } catch (err) {
+      variationGalleryIndex = [];
+    }
+  }
+
   // ─────────────────────────────────────────────────────────────────
   // Main image setters
   // ─────────────────────────────────────────────────────────────────
@@ -100,6 +113,43 @@ document.addEventListener('DOMContentLoaded', function () {
   function tersaProductText(key, fallback) {
     var i18n = window.tersaProductI18n || {};
     return typeof i18n[key] === 'string' && i18n[key] !== '' ? i18n[key] : fallback;
+  }
+
+  function tersaGalleryItemKey(item) {
+    if (!item) {
+      return '';
+    }
+
+    return String(item.id || item.full || item.src || '');
+  }
+
+  function tersaMergeGalleries(galleries) {
+    var merged = [];
+    var seen = {};
+
+    galleries.forEach(function (gallery) {
+      if (!Array.isArray(gallery)) {
+        return;
+      }
+
+      gallery.forEach(function (item) {
+        if (!item || !item.src) {
+          return;
+        }
+
+        var key = tersaGalleryItemKey(item);
+        if (key && seen[key]) {
+          return;
+        }
+
+        if (key) {
+          seen[key] = true;
+        }
+        merged.push(item);
+      });
+    });
+
+    return merged;
   }
 
   function tersaBuildThumbsWrap(gallery) {
@@ -223,6 +273,137 @@ document.addEventListener('DOMContentLoaded', function () {
     } else {
       tersaSetMainImageFromItem(gallery[0]);
       tersaHighlightThumb(gallery[0].id);
+    }
+  }
+
+  function tersaBuildGalleryItemFromVariationImage(variation) {
+    var img = variation && variation.image ? variation.image : null;
+    if (!img || !img.src) {
+      return null;
+    }
+
+    return {
+      id: variation.image_id || img.image_id || img.id || img.src,
+      src: img.src,
+      full: img.full_src || img.url || img.src,
+      thumb: img.gallery_thumbnail_src || img.thumb_src || img.src,
+      srcset: img.srcset || '',
+      sizes: img.sizes || '',
+      alt: img.alt || ''
+    };
+  }
+
+  function tersaGalleryFromVariationImage(variation) {
+    var item = tersaBuildGalleryItemFromVariationImage(variation);
+    return item ? [item] : [];
+  }
+
+  function tersaFindIndexedGalleryByVariationId(variationId) {
+    if (!variationId || !variationGalleryIndex.length) {
+      return [];
+    }
+
+    var id = String(variationId);
+    for (var i = 0; i < variationGalleryIndex.length; i += 1) {
+      if (String(variationGalleryIndex[i].variation_id || '') === id) {
+        return Array.isArray(variationGalleryIndex[i].gallery) ? variationGalleryIndex[i].gallery : [];
+      }
+    }
+
+    return [];
+  }
+
+  function tersaGetVariationGallery(variation) {
+    if (!variation) {
+      return [];
+    }
+
+    if (Array.isArray(variation.tersa_gallery) && variation.tersa_gallery.length > 0) {
+      return variation.tersa_gallery;
+    }
+
+    var indexedGallery = tersaFindIndexedGalleryByVariationId(variation.variation_id);
+    if (indexedGallery.length > 0) {
+      return indexedGallery;
+    }
+
+    return tersaGalleryFromVariationImage(variation);
+  }
+
+  function tersaGetSelectedAttributes($form) {
+    var selected = {};
+
+    $form.find('[name^="attribute_"]').each(function () {
+      var field = this;
+      var name = field.name || '';
+      if (!name) {
+        return;
+      }
+
+      if ((field.type === 'radio' || field.type === 'checkbox') && !field.checked) {
+        return;
+      }
+
+      var value = jQuery(field).val();
+      if (Array.isArray(value)) {
+        value = value[0] || '';
+      }
+      value = value == null ? '' : String(value);
+
+      if (value !== '') {
+        selected[name] = value;
+      }
+    });
+
+    return selected;
+  }
+
+  function tersaVariationMatchesSelectedAttributes(variationEntry, selectedAttributes) {
+    var attrs = variationEntry && variationEntry.attributes ? variationEntry.attributes : {};
+    var selectedKeys = Object.keys(selectedAttributes);
+
+    if (!selectedKeys.length) {
+      return false;
+    }
+
+    return selectedKeys.every(function (name) {
+      var selectedValue = String(selectedAttributes[name] || '');
+      var variationValue = attrs[name] == null ? '' : String(attrs[name]);
+
+      return selectedValue === '' || variationValue === '' || variationValue === selectedValue;
+    });
+  }
+
+  function tersaGalleryForSelectedAttributes(selectedAttributes) {
+    if (!variationGalleryIndex.length || !Object.keys(selectedAttributes).length) {
+      return [];
+    }
+
+    var galleries = [];
+    variationGalleryIndex.forEach(function (variationEntry) {
+      if (!tersaVariationMatchesSelectedAttributes(variationEntry, selectedAttributes)) {
+        return;
+      }
+
+      if (Array.isArray(variationEntry.gallery) && variationEntry.gallery.length > 0) {
+        galleries.push(variationEntry.gallery);
+      }
+    });
+
+    return tersaMergeGalleries(galleries);
+  }
+
+  function tersaApplyGalleryForCurrentSelection($form) {
+    var selectedAttributes = tersaGetSelectedAttributes($form);
+    var gallery = tersaGalleryForSelectedAttributes(selectedAttributes);
+
+    if (gallery.length > 0) {
+      tersaApplyGallery(gallery);
+      return;
+    }
+
+    if (!Object.keys(selectedAttributes).length && parentGallery.length > 0) {
+      tersaApplyGallery(parentGallery);
     }
   }
 
@@ -383,13 +564,19 @@ document.addEventListener('DOMContentLoaded', function () {
     var $form = jQuery('form.variations_form.cart');
 
     if ($form.length) {
+      var scheduleCurrentSelectionGallery = function () {
+        window.setTimeout(function () {
+          tersaApplyGalleryForCurrentSelection($form);
+        }, 0);
+      };
+
       $form.on('found_variation.tersa', function (event, variation) {
         if (!variation) {
           tersaApplyGallery(parentGallery);
           return;
         }
 
-        var variationGallery = Array.isArray(variation.tersa_gallery) ? variation.tersa_gallery : [];
+        var variationGallery = tersaGetVariationGallery(variation);
 
         if (variationGallery.length > 0) {
           tersaApplyGallery(variationGallery, {
@@ -399,11 +586,19 @@ document.addEventListener('DOMContentLoaded', function () {
           return;
         }
 
-        // Bez vlastite galerije — fallback na parent, main image preuzimamo iz WC payload-a.
+        // Bez vlastite galerije i bez variation image-a — fallback na parent.
         tersaApplyGallery(parentGallery, {
           wcImage: variation.image && variation.image.src ? variation.image : null,
           mainImageId: variation.image_id || null
         });
+      });
+
+      $form.on('change.tersaGallery', '[name^="attribute_"]', function () {
+        scheduleCurrentSelectionGallery();
+      });
+
+      $form.on('woocommerce_variation_select_change.tersaGallery', function () {
+        scheduleCurrentSelectionGallery();
       });
 
       $form.on('reset_data.tersa reset_image.tersa', function () {
