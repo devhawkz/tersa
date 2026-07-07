@@ -426,6 +426,19 @@
     
     .site-footer__grid {
       grid-template-columns: 1fr;
+      justify-items: stretch;
+    }
+
+    .site-footer__brand-col,
+    .site-footer__nav-col,
+    .site-footer__newsletter-col {
+      width: 100%;
+      text-align: left;
+    }
+
+    .site-footer__menu {
+      justify-items: start;
+      text-align: left;
     }
 
     .site-footer__bottom-inner {
@@ -478,5 +491,4 @@
   }
   
   
-
 
