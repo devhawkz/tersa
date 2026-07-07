@@ -295,7 +295,7 @@ a.added_to_cart.wc_forward {
   }
 
   .home-bestsellers__inner {
-    padding: 0 18px;
+    padding: 0;
   }
 
   .home-bestsellers__grid {
