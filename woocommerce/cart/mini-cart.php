@@ -155,7 +155,7 @@ if (!WC()->cart->is_empty()) : ?>
 <?php else : ?>
 
 	<p class="woocommerce-mini-cart__empty-message">
-		<?php echo esc_html(function_exists('pll__') ? pll__('Trenutno nema proizvoda u košarici.') : __('Trenutno nema proizvoda u košarici.', 'tersa-shop')); ?>
+		<?php echo esc_html(function_exists('tersa_translate_ui_string') ? tersa_translate_ui_string('Trenutno nema proizvoda u košarici.') : __('Trenutno nema proizvoda u košarici.', 'tersa-shop')); ?>
 	</p>
 
 <?php endif; ?>

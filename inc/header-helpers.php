@@ -598,6 +598,11 @@ function tersa_translate_search_string(string $key): string {
 			'en' => 'Close search',
 			'de' => 'Suche schließen',
 		],
+		'view_all_results' => [
+			'hr' => 'Prikaži sve rezultate',
+			'en' => 'View all results',
+			'de' => 'Alle Ergebnisse anzeigen',
+		],
 		'toggle'      => [
 			'hr' => 'Pretraži proizvode',
 			'en' => 'Search products',

@@ -96,6 +96,28 @@ document.addEventListener('DOMContentLoaded', function () {
     }
   }
 
+  function normalizeCartDrawerContent(root) {
+    var container = root || document;
+    var emptyCartText = getHeaderText('emptyCart', '');
+    if (!emptyCartText) {
+      return;
+    }
+
+    var knownEmptyMessages = [
+      'Trenutno nema proizvoda u košarici.',
+      'Trenutno nema proizvoda u korpi.',
+      'There are currently no products in the cart.',
+      'Derzeit befinden sich keine Produkte im Warenkorb.'
+    ];
+
+    container.querySelectorAll('#cart-drawer .woocommerce-mini-cart__empty-message').forEach(function (message) {
+      var currentText = String(message.textContent || '').replace(/\s+/g, ' ').trim();
+      if (knownEmptyMessages.indexOf(currentText) !== -1 && currentText !== emptyCartText) {
+        message.textContent = emptyCartText;
+      }
+    });
+  }
+
   function getFocusableElements(container) {
     if (!container) {
       return [];
@@ -560,6 +582,23 @@ document.addEventListener('DOMContentLoaded', function () {
     }
   }
 
+  function localizeSearchResultActions(root) {
+    var label = getHeaderText('searchViewAllResults', '');
+    if (!label && window.tersaAwsSearchI18n && typeof window.tersaAwsSearchI18n.viewAllResults === 'string') {
+      label = window.tersaAwsSearchI18n.viewAllResults;
+    }
+
+    if (!label) {
+      return;
+    }
+
+    var container = root && typeof root.querySelectorAll === 'function' ? root : document;
+    container.querySelectorAll('.aws_search_more').forEach(function (link) {
+      link.textContent = label;
+      link.setAttribute('aria-label', label);
+    });
+  }
+
   var debouncedUpdateSearchTitle = debounce(updateSearchTitle, 150);
 
   function disconnectSearchObservers() {
@@ -592,7 +631,10 @@ document.addEventListener('DOMContentLoaded', function () {
       container.dataset.tersaObserved = 'true';
 
       var observer = new MutationObserver(function () {
-        requestAnimationFrame(updateSearchTitle);
+        requestAnimationFrame(function () {
+          localizeSearchResultActions(container);
+          updateSearchTitle();
+        });
       });
 
       observer.observe(container, {
@@ -604,6 +646,8 @@ document.addEventListener('DOMContentLoaded', function () {
 
       searchObservers.push(observer);
     });
+
+    localizeSearchResultActions(document);
   }
 
   function openSearch() {
@@ -748,6 +792,7 @@ document.addEventListener('DOMContentLoaded', function () {
     var cartContent = document.querySelector('#cart-drawer .widget_shopping_cart_content');
     if (cartContent && miniCartHtml) {
       cartContent.innerHTML = miniCartHtml;
+      normalizeCartDrawerContent(cartContent);
     }
 
     // Ažuriraj badge via textContent (backup za naš custom AJAX refresh).
@@ -1117,6 +1162,13 @@ document.addEventListener('DOMContentLoaded', function () {
     });
   });
 
+  document.addEventListener('awsShowingResults', function () {
+    requestAnimationFrame(function () {
+      localizeSearchResultActions(document);
+      updateSearchTitle();
+    });
+  });
+
   document.addEventListener('keydown', function (event) {
     if (event.key !== 'Escape') {
       return;
@@ -1187,6 +1239,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
     window.jQuery(document.body).on('wc_fragments_loaded wc_fragments_refreshed', function () {
       removeWooNotices();
+      normalizeCartDrawerContent(document);
     });
 
     // Osveži drawer + badge posle ažuriranja cart stranice.
@@ -1206,6 +1259,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
   bindMiniCartQtyActions();
   initCartPageDrawerSync();
+  normalizeCartDrawerContent(document);
 
   // Hover/focus prefetch na cart ikonicu:
   // AJAX fetch kreće čim korisnik pomjeri miš prema dugmetu (tipično 100-200ms

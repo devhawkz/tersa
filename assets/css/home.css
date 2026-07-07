@@ -215,15 +215,18 @@
     line-height: 1;
     letter-spacing: 0.08em;
     text-transform: uppercase;
-    color: #000000;
-    text-decoration: underline;
-    text-decoration-thickness: 1.5px;
-    text-underline-offset: 6px;
+    color: #ffffff;
+    background-color: var(--c-accent);
+    padding: 10px 15px;
+    transition: background-color 0.3s ease;
+    &:hover {
+      background-color: var(--c-accent-hover);
+    }
   }
   
   .home-hero__cta:hover,
   .home-hero__cta:focus-visible {
-    color: var(--c-primary);
+    color: #ffffff;
   }
   
   .home-hero__cta:focus-visible,

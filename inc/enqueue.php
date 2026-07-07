@@ -257,6 +257,16 @@ function tersa_enqueue_assets() {
 		'nonce'           => wp_create_nonce('tersa_cart_nonce'),
 	]);
 
+	$search_results_label = function_exists('tersa_translate_search_string')
+		? tersa_translate_search_string('results')
+		: __('Rezultati pretrage', 'tersa-shop');
+	$search_placeholder = function_exists('tersa_translate_search_string')
+		? tersa_translate_search_string('placeholder')
+		: __('Pretraga', 'tersa-shop');
+	$search_view_all_results = function_exists('tersa_translate_search_string')
+		? tersa_translate_search_string('view_all_results')
+		: __('Prikaži sve rezultate', 'tersa-shop');
+
 	wp_localize_script('tersa-header-js', 'tersaHeaderI18n', [
 		'openSubmenuFor' => function_exists('pll__')
 			? pll__('Otvori podizbornik za %s')
@@ -264,12 +274,20 @@ function tersa_enqueue_assets() {
 		'cartLoadError' => function_exists('pll__')
 			? pll__('Greška pri učitavanju košarice.')
 			: __('Greška pri učitavanju košarice.', 'tersa-shop'),
-		'searchResults' => function_exists('tersa_translate_search_string')
-			? tersa_translate_search_string('results')
-			: __('Rezultati pretrage', 'tersa-shop'),
-		'searchPlaceholder' => function_exists('tersa_translate_search_string')
-			? tersa_translate_search_string('placeholder')
-			: __('Pretraga', 'tersa-shop'),
+		'emptyCart' => function_exists('tersa_translate_ui_string')
+			? tersa_translate_ui_string('Trenutno nema proizvoda u košarici.')
+			: __('Trenutno nema proizvoda u košarici.', 'tersa-shop'),
+		'searchResults' => $search_results_label,
+		'searchPlaceholder' => $search_placeholder,
+		'searchViewAllResults' => $search_view_all_results,
 	]);
+
+	if (wp_script_is('aws-script', 'enqueued')) {
+		$aws_search_i18n_script = sprintf(
+			'window.tersaAwsSearchI18n = window.tersaAwsSearchI18n || {}; window.tersaAwsSearchI18n.viewAllResults = %s; if (window.AwsHooks && typeof window.AwsHooks.add_filter === "function") { window.AwsHooks.add_filter("aws_results_html", function (html) { var label = window.tersaAwsSearchI18n && window.tersaAwsSearchI18n.viewAllResults; if (!label || typeof document === "undefined") { return html; } var wrapper = document.createElement("div"); wrapper.innerHTML = html; wrapper.querySelectorAll(".aws_search_more").forEach(function (link) { link.textContent = label; link.setAttribute("aria-label", label); }); return wrapper.innerHTML; }, 20); }',
+			wp_json_encode($search_view_all_results)
+		);
+		wp_add_inline_script('aws-script', $aws_search_i18n_script, 'after');
+	}
 }
 add_action('wp_enqueue_scripts', 'tersa_enqueue_assets');

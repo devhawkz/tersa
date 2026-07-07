@@ -47,6 +47,12 @@ function tersa_pll_register_general_shop_strings(): void {
 	pll_register_string('tersa_cart_drawer_title', 'Moja košarica', 'Tersa – WooCommerce (košarica)', ['multiline' => false]);
 	pll_register_string('tersa_cart_drawer_loading', 'Učitavanje košarice...', 'Tersa – WooCommerce (košarica)', ['multiline' => false]);
 	pll_register_string('tersa_cart_drawer_close', 'Close cart', 'Tersa – WooCommerce (košarica)', ['multiline' => false]);
+	pll_register_string('tersa_cart_totals_title', 'Ukupni iznos košarice', 'Tersa – WooCommerce (košarica)', ['multiline' => false]);
+	pll_register_string('tersa_shipping_free', 'Free shipping', 'Tersa – WooCommerce (dostava)', ['multiline' => false]);
+	pll_register_string('tersa_checkout_shipping_options', 'Shipping options', 'Tersa – WooCommerce (checkout)', ['multiline' => false]);
+	pll_register_string('tersa_checkout_payment_options', 'Payment options', 'Tersa – WooCommerce (checkout)', ['multiline' => false]);
+	pll_register_string('tersa_corvuspay_title', 'Kartično plaćanje (CorvusPay)', 'Tersa – WooCommerce (plaćanje)', ['multiline' => false]);
+	pll_register_string('tersa_corvuspay_description', 'Procesiranje transakcija na internetu.', 'Tersa – WooCommerce (plaćanje)', ['multiline' => false]);
 
 	pll_register_string('tersa_tab_description', 'Opis', 'Tersa – proizvod (tabovi)', ['multiline' => false]);
 	pll_register_string('tersa_tab_additional_information', 'Dodatne informacije', 'Tersa – proizvod (tabovi)', ['multiline' => false]);
@@ -57,6 +63,7 @@ function tersa_pll_register_general_shop_strings(): void {
 	pll_register_string('tersa_search_results', 'Rezultati pretrage', 'Tersa – pretraga', ['multiline' => false]);
 	pll_register_string('tersa_search_placeholder', 'Pretraga', 'Tersa – pretraga', ['multiline' => false]);
 	pll_register_string('tersa_search_close', 'Zatvori pretragu', 'Tersa – pretraga', ['multiline' => false]);
+	pll_register_string('tersa_search_view_all_results', 'Prikaži sve rezultate', 'Tersa – pretraga', ['multiline' => false]);
 	pll_register_string('tersa_search_products', 'Pretraži proizvode', 'Tersa – pretraga', ['multiline' => false]);
 
 	pll_register_string('tersa_pagination_previous', 'Prethodna', 'Tersa – paginacija (arhiva)', ['multiline' => false]);

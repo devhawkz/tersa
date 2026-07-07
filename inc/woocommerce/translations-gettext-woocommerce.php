@@ -45,6 +45,15 @@ function tersa_woocommerce_gettext_override($translated, $text, $domain) {
 		case 'View cart':
 			$hr = 'Pogledaj košaricu';
 			return $translate_ui($hr);
+		case 'Cart totals':
+			$hr = 'Ukupni iznos košarice';
+			return $translate_ui($hr);
+		case 'Free shipping':
+			return $translate_ui('Free shipping');
+		case 'Shipping options':
+			return $translate_ui('Shipping options');
+		case 'Payment options':
+			return $translate_ui('Payment options');
 		case '%s in stock':
 			$hr = '%s na stanju';
 			return $translate_ui($hr);

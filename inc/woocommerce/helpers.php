@@ -396,6 +396,42 @@ function tersa_get_ui_string_fallbacks(): array {
 			'en' => 'View cart',
 			'de' => 'Warenkorb ansehen',
 		],
+		'Ukupni iznos košarice' => [
+			'hr' => 'Ukupni iznos košarice',
+			'sr' => 'Ukupan iznos korpe',
+			'en' => 'Cart totals',
+			'de' => 'Warenkorbsumme',
+		],
+		'Free shipping' => [
+			'hr' => 'Besplatna dostava',
+			'sr' => 'Besplatna dostava',
+			'en' => 'Free shipping',
+			'de' => 'Kostenloser Versand',
+		],
+		'Shipping options' => [
+			'hr' => 'Opcije dostave',
+			'sr' => 'Opcije dostave',
+			'en' => 'Shipping options',
+			'de' => 'Versandoptionen',
+		],
+		'Payment options' => [
+			'hr' => 'Opcije plaćanja',
+			'sr' => 'Opcije plaćanja',
+			'en' => 'Payment options',
+			'de' => 'Zahlungsoptionen',
+		],
+		'Kartično plaćanje (CorvusPay)' => [
+			'hr' => 'Kartično plaćanje (CorvusPay)',
+			'sr' => 'Kartično plaćanje (CorvusPay)',
+			'en' => 'Card payment (CorvusPay)',
+			'de' => 'Kartenzahlung (CorvusPay)',
+		],
+		'Procesiranje transakcija na internetu.' => [
+			'hr' => 'Procesiranje transakcija na internetu.',
+			'sr' => 'Procesiranje transakcija na internetu.',
+			'en' => 'Online transaction processing.',
+			'de' => 'Sichere Zahlungsabwicklung im Internet.',
+		],
 		'Trenutno nema proizvoda u košarici.' => [
 			'hr' => 'Trenutno nema proizvoda u košarici.',
 			'sr' => 'Trenutno nema proizvoda u korpi.',
