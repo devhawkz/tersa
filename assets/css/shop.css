@@ -1049,6 +1049,10 @@
     .shop-card__price-regular {
       font-size: 18px;
     }
+
+    .shop-archive__view-toggle{
+      display: none;
+    }
   }
   
   @media (prefers-reduced-motion: reduce) {
