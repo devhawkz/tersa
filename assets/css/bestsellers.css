@@ -334,6 +334,7 @@ a.added_to_cart.wc_forward {
 
   .home-bestsellers__product-title {
     font-size: 22px;
+    margin-top:0;
   }
 
   .home-bestsellers__price-current {
