@@ -29,6 +29,7 @@ $items_raw = [
 	$fields['home_category_item_1'] ?? null,
 	$fields['home_category_item_2'] ?? null,
 	$fields['home_category_item_3'] ?? null,
+	$fields['home_category_item_4'] ?? null,
 ];
 
 $theme_uri = get_template_directory_uri();
@@ -55,6 +56,17 @@ if (!function_exists('tersa_shop_category_icon_data')) {
 						'height' => isset($src[2]) ? absint($src[2]) : 86,
 					];
 				}
+
+				$attachment_url = wp_get_attachment_url($image_id);
+
+				if ($attachment_url) {
+					return [
+						'url'    => esc_url_raw((string) $attachment_url),
+						'alt'    => isset($image['alt']) && is_string($image['alt']) ? $image['alt'] : '',
+						'width'  => 86,
+						'height' => 86,
+					];
+				}
 			}
 
 			if (!empty($image['url']) && is_string($image['url'])) {
@@ -77,6 +89,17 @@ if (!function_exists('tersa_shop_category_icon_data')) {
 					'alt'    => (string) get_post_meta($image_id, '_wp_attachment_image_alt', true),
 					'width'  => isset($src[1]) ? absint($src[1]) : 86,
 					'height' => isset($src[2]) ? absint($src[2]) : 86,
+				];
+			}
+
+			$attachment_url = wp_get_attachment_url($image_id);
+
+			if ($attachment_url) {
+				return [
+					'url'    => esc_url_raw((string) $attachment_url),
+					'alt'    => (string) get_post_meta($image_id, '_wp_attachment_image_alt', true),
+					'width'  => 86,
+					'height' => 86,
 				];
 			}
 		}

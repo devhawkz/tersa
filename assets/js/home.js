@@ -8,10 +8,49 @@ document.addEventListener('DOMContentLoaded', () => {
     const slides = Array.from(slider.querySelectorAll('.home-hero__slide'));
     const dots = Array.from(slider.querySelectorAll('.home-hero__dot'));
 
+    const syncActiveProductData = (slide, index) => {
+      if (!slide) {
+        return;
+      }
+
+      const detail = {
+        index,
+        productSku: slide.getAttribute('data-product-sku') || '',
+        productId: slide.getAttribute('data-product-id') || '',
+        variationId: slide.getAttribute('data-variation-id') || '',
+      };
+
+      slider.dataset.activeSlideIndex = String(index);
+
+      if (detail.productSku) {
+        slider.dataset.activeProductSku = detail.productSku;
+      } else {
+        delete slider.dataset.activeProductSku;
+      }
+
+      if (detail.productId) {
+        slider.dataset.activeProductId = detail.productId;
+      } else {
+        delete slider.dataset.activeProductId;
+      }
+
+      if (detail.variationId) {
+        slider.dataset.activeVariationId = detail.variationId;
+      } else {
+        delete slider.dataset.activeVariationId;
+      }
+
+      slider.dispatchEvent(new CustomEvent('tersa:homeHeroSlideChange', {
+        bubbles: true,
+        detail,
+      }));
+    };
+
     if (!slides.length || !dots.length) {
       const firstSlide = slides[0];
       if (firstSlide) {
         firstSlide.classList.add('is-active', 'is-animating');
+        syncActiveProductData(firstSlide, 0);
       }
     } else {
       let currentIndex = slides.findIndex((slide) => slide.classList.contains('is-active'));
@@ -50,6 +89,7 @@ document.addEventListener('DOMContentLoaded', () => {
         });
 
         currentIndex = nextIndex;
+        syncActiveProductData(slides[currentIndex], currentIndex);
       };
 
       slides.forEach((slide, index) => {
@@ -62,6 +102,8 @@ document.addEventListener('DOMContentLoaded', () => {
           slide.classList.remove('is-active', 'is-animating');
         }
       });
+
+      syncActiveProductData(slides[currentIndex], currentIndex);
 
       const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
 

@@ -71,12 +71,33 @@
                     "palette_colors": ""
                 },
                 {
+                    "key": "field_69bac47ce1a42",
+                    "label": "Product Variation SKU",
+                    "name": "product_variation_sku",
+                    "aria-label": "",
+                    "type": "text",
+                    "instructions": "Unesi SKU varijacije proizvoda. Naslov, cena, kratak opis, CTA link i slika parent proizvoda se automatski povlače iz WooCommerce-a.",
+                    "required": 0,
+                    "conditional_logic": 0,
+                    "wrapper": {
+                        "width": "",
+                        "class": "",
+                        "id": ""
+                    },
+                    "default_value": "",
+                    "maxlength": "",
+                    "allow_in_bindings": 0,
+                    "placeholder": "npr. ABC-RED-M",
+                    "prepend": "SKU",
+                    "append": ""
+                },
+                {
                     "key": "field_69bac47ce1a41",
-                    "label": "Current Price",
+                    "label": "Fallback Current Price",
                     "name": "current_price",
                     "aria-label": "",
                     "type": "text",
-                    "instructions": "",
+                    "instructions": "Koristi se samo ako SKU nije unet ili proizvod nije pronađen.",
                     "required": 0,
                     "conditional_logic": 0,
                     "wrapper": {
@@ -93,11 +114,11 @@
                 },
                 {
                     "key": "field_69bac4907fbbc",
-                    "label": "Old Price",
+                    "label": "Fallback Old Price",
                     "name": "old_price",
                     "aria-label": "",
                     "type": "text",
-                    "instructions": "",
+                    "instructions": "Koristi se samo ako SKU nije unet ili proizvod nije pronađen.",
                     "required": 0,
                     "conditional_logic": 0,
                     "wrapper": {
@@ -114,11 +135,11 @@
                 },
                 {
                     "key": "field_69bac4967fbbd",
-                    "label": "Title",
+                    "label": "Fallback Title",
                     "name": "title",
                     "aria-label": "",
                     "type": "text",
-                    "instructions": "",
+                    "instructions": "Prikazuje se samo ako SKU nije unet ili proizvod nije pronađen.",
                     "required": 0,
                     "conditional_logic": 0,
                     "wrapper": {
@@ -135,11 +156,11 @@
                 },
                 {
                     "key": "field_69bac4a07fbbe",
-                    "label": "Description",
+                    "label": "Fallback Description",
                     "name": "description",
                     "aria-label": "",
                     "type": "text",
-                    "instructions": "",
+                    "instructions": "Prikazuje se samo ako varijacija nema kratak opis u WooCommerce-u.",
                     "required": 0,
                     "conditional_logic": 0,
                     "wrapper": {
@@ -177,11 +198,11 @@
                 },
                 {
                     "key": "field_69bac4c17fbc0",
-                    "label": "CTA Link",
+                    "label": "Fallback CTA Link",
                     "name": "cta_link",
                     "aria-label": "",
                     "type": "text",
-                    "instructions": "",
+                    "instructions": "Prikazuje se samo ako SKU nije unet ili proizvod nije pronađen.",
                     "required": 0,
                     "conditional_logic": 0,
                     "wrapper": {
@@ -198,11 +219,11 @@
                 },
                 {
                     "key": "field_69bac4cd7fbc1",
-                    "label": "Image Desktop",
+                    "label": "Fallback Image Desktop",
                     "name": "image_desktop",
                     "aria-label": "",
                     "type": "image",
-                    "instructions": "",
+                    "instructions": "Koristi se samo ako SKU nije unet, proizvod nije pronađen ili proizvod nema dostupnu sliku.",
                     "required": 0,
                     "conditional_logic": 0,
                     "wrapper": {
@@ -224,11 +245,11 @@
                 },
                 {
                     "key": "field_69bac4d97fbc2",
-                    "label": "Image mobile",
+                    "label": "Fallback Image Mobile",
                     "name": "image_mobile",
                     "aria-label": "",
                     "type": "image",
-                    "instructions": "",
+                    "instructions": "Koristi se samo ako SKU nije unet, proizvod nije pronađen ili proizvod nema dostupnu sliku.",
                     "required": 0,
                     "conditional_logic": 0,
                     "wrapper": {
@@ -406,12 +427,33 @@
                     "palette_colors": ""
                 },
                 {
+                    "key": "field_69bac55a7fbe3",
+                    "label": "Product Variation SKU",
+                    "name": "product_variation_sku",
+                    "aria-label": "",
+                    "type": "text",
+                    "instructions": "Unesi SKU varijacije proizvoda. Naslov, cena, kratak opis, CTA link i slika parent proizvoda se automatski povlače iz WooCommerce-a.",
+                    "required": 0,
+                    "conditional_logic": 0,
+                    "wrapper": {
+                        "width": "",
+                        "class": "",
+                        "id": ""
+                    },
+                    "default_value": "",
+                    "maxlength": "",
+                    "allow_in_bindings": 0,
+                    "placeholder": "npr. ABC-RED-M",
+                    "prepend": "SKU",
+                    "append": ""
+                },
+                {
                     "key": "field_69bac55a7fbc9",
-                    "label": "Current Price",
+                    "label": "Fallback Current Price",
                     "name": "current_price",
                     "aria-label": "",
                     "type": "text",
-                    "instructions": "",
+                    "instructions": "Koristi se samo ako SKU nije unet ili proizvod nije pronađen.",
                     "required": 0,
                     "conditional_logic": 0,
                     "wrapper": {
@@ -428,11 +470,11 @@
                 },
                 {
                     "key": "field_69bac55a7fbca",
-                    "label": "Old Price",
+                    "label": "Fallback Old Price",
                     "name": "old_price",
                     "aria-label": "",
                     "type": "text",
-                    "instructions": "",
+                    "instructions": "Koristi se samo ako SKU nije unet ili proizvod nije pronađen.",
                     "required": 0,
                     "conditional_logic": 0,
                     "wrapper": {
@@ -449,11 +491,11 @@
                 },
                 {
                     "key": "field_69bac55a7fbcb",
-                    "label": "Title",
+                    "label": "Fallback Title",
                     "name": "title",
                     "aria-label": "",
                     "type": "text",
-                    "instructions": "",
+                    "instructions": "Prikazuje se samo ako SKU nije unet ili proizvod nije pronađen.",
                     "required": 0,
                     "conditional_logic": 0,
                     "wrapper": {
@@ -470,11 +512,11 @@
                 },
                 {
                     "key": "field_69bac55a7fbcc",
-                    "label": "Description",
+                    "label": "Fallback Description",
                     "name": "description",
                     "aria-label": "",
                     "type": "text",
-                    "instructions": "",
+                    "instructions": "Prikazuje se samo ako varijacija nema kratak opis u WooCommerce-u.",
                     "required": 0,
                     "conditional_logic": 0,
                     "wrapper": {
@@ -512,11 +554,11 @@
                 },
                 {
                     "key": "field_69bac55a7fbce",
-                    "label": "CTA Link",
+                    "label": "Fallback CTA Link",
                     "name": "cta_link",
                     "aria-label": "",
                     "type": "text",
-                    "instructions": "",
+                    "instructions": "Prikazuje se samo ako SKU nije unet ili proizvod nije pronađen.",
                     "required": 0,
                     "conditional_logic": 0,
                     "wrapper": {
@@ -533,11 +575,11 @@
                 },
                 {
                     "key": "field_69bac55a7fbcf",
-                    "label": "Image Desktop",
+                    "label": "Fallback Image Desktop",
                     "name": "image_desktop",
                     "aria-label": "",
                     "type": "image",
-                    "instructions": "",
+                    "instructions": "Koristi se samo ako SKU nije unet, proizvod nije pronađen ili proizvod nema dostupnu sliku.",
                     "required": 0,
                     "conditional_logic": 0,
                     "wrapper": {
@@ -559,11 +601,11 @@
                 },
                 {
                     "key": "field_69bac55a7fbd0",
-                    "label": "Image mobile",
+                    "label": "Fallback Image Mobile",
                     "name": "image_mobile",
                     "aria-label": "",
                     "type": "image",
-                    "instructions": "",
+                    "instructions": "Koristi se samo ako SKU nije unet, proizvod nije pronađen ili proizvod nema dostupnu sliku.",
                     "required": 0,
                     "conditional_logic": 0,
                     "wrapper": {
@@ -738,12 +780,33 @@
                     "palette_colors": ""
                 },
                 {
+                    "key": "field_69bac5627fbe4",
+                    "label": "Product Variation SKU",
+                    "name": "product_variation_sku",
+                    "aria-label": "",
+                    "type": "text",
+                    "instructions": "Unesi SKU varijacije proizvoda. Naslov, cena, kratak opis, CTA link i slika parent proizvoda se automatski povlače iz WooCommerce-a.",
+                    "required": 0,
+                    "conditional_logic": 0,
+                    "wrapper": {
+                        "width": "",
+                        "class": "",
+                        "id": ""
+                    },
+                    "default_value": "",
+                    "maxlength": "",
+                    "allow_in_bindings": 0,
+                    "placeholder": "npr. ABC-RED-M",
+                    "prepend": "SKU",
+                    "append": ""
+                },
+                {
                     "key": "field_69bac5627fbd7",
-                    "label": "Current Price",
+                    "label": "Fallback Current Price",
                     "name": "current_price",
                     "aria-label": "",
                     "type": "text",
-                    "instructions": "",
+                    "instructions": "Koristi se samo ako SKU nije unet ili proizvod nije pronađen.",
                     "required": 0,
                     "conditional_logic": 0,
                     "wrapper": {
@@ -760,11 +823,11 @@
                 },
                 {
                     "key": "field_69bac5627fbd8",
-                    "label": "Old Price",
+                    "label": "Fallback Old Price",
                     "name": "old_price",
                     "aria-label": "",
                     "type": "text",
-                    "instructions": "",
+                    "instructions": "Koristi se samo ako SKU nije unet ili proizvod nije pronađen.",
                     "required": 0,
                     "conditional_logic": 0,
                     "wrapper": {
@@ -781,11 +844,11 @@
                 },
                 {
                     "key": "field_69bac5627fbd9",
-                    "label": "Title",
+                    "label": "Fallback Title",
                     "name": "title",
                     "aria-label": "",
                     "type": "text",
-                    "instructions": "",
+                    "instructions": "Prikazuje se samo ako SKU nije unet ili proizvod nije pronađen.",
                     "required": 0,
                     "conditional_logic": 0,
                     "wrapper": {
@@ -802,11 +865,11 @@
                 },
                 {
                     "key": "field_69bac5627fbda",
-                    "label": "Description",
+                    "label": "Fallback Description",
                     "name": "description",
                     "aria-label": "",
                     "type": "text",
-                    "instructions": "",
+                    "instructions": "Prikazuje se samo ako varijacija nema kratak opis u WooCommerce-u.",
                     "required": 0,
                     "conditional_logic": 0,
                     "wrapper": {
@@ -844,11 +907,11 @@
                 },
                 {
                     "key": "field_69bac5627fbdc",
-                    "label": "CTA Link",
+                    "label": "Fallback CTA Link",
                     "name": "cta_link",
                     "aria-label": "",
                     "type": "text",
-                    "instructions": "",
+                    "instructions": "Prikazuje se samo ako SKU nije unet ili proizvod nije pronađen.",
                     "required": 0,
                     "conditional_logic": 0,
                     "wrapper": {
@@ -865,11 +928,11 @@
                 },
                 {
                     "key": "field_69bac5627fbdd",
-                    "label": "Image Desktop",
+                    "label": "Fallback Image Desktop",
                     "name": "image_desktop",
                     "aria-label": "",
                     "type": "image",
-                    "instructions": "",
+                    "instructions": "Koristi se samo ako SKU nije unet, proizvod nije pronađen ili proizvod nema dostupnu sliku.",
                     "required": 0,
                     "conditional_logic": 0,
                     "wrapper": {
@@ -891,11 +954,11 @@
                 },
                 {
                     "key": "field_69bac5627fbde",
-                    "label": "Image mobile",
+                    "label": "Fallback Image Mobile",
                     "name": "image_mobile",
                     "aria-label": "",
                     "type": "image",
-                    "instructions": "",
+                    "instructions": "Koristi se samo ako SKU nije unet, proizvod nije pronađen ili proizvod nema dostupnu sliku.",
                     "required": 0,
                     "conditional_logic": 0,
                     "wrapper": {
@@ -1058,5 +1121,5 @@
     "display_title": "",
     "allow_ai_access": false,
     "ai_description": "",
-    "modified": 1782294950
+    "modified": 1783692300
 }
