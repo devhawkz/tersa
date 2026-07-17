@@ -194,6 +194,11 @@ Template-specific ACF fields are listed above (in the Croatian version — same 
 ## Custom post types
 
 - **`eu_project`** (`inc/eu-projects.php`) — projekti financirani iz EU fondova / EU-funded projects. Ima archive (`archive-eu_project.php`) i single template (`single-eu_project.php`).
+- Legacy EU projekti bez Polylang jezika dobijaju default jezik kroz one-time migraciju (`tersa_eu_project_default_language_backfilled_v1`). Budući pojedinačni save bez jezika uzima traženi Polylang jezik iz admin zahteva, a default jezik samo kao fallback. Ručno ponovno pokretanje:
+
+```bash
+wp tersa eu-projects-backfill-language --force
+```
 
 ## Custom image sizes
 
@@ -321,7 +326,15 @@ Modul `inc/debug-log.php` hvata ciljane greške iz kritičnih tokova:
 - `tersa_*` AJAX endpoint-i — fatal error-i
 - `woocommerce_checkout_order_exception` — uncaught gateway exception-i
 
-Svi zapisi idu u `/wp-content/debug.log` bez obzira na `WP_DEBUG_LOG` vrednost (koristi 3-arg `error_log()`).
+Modul je **opt-in**. Ne piše ništa dok se eksplicitno ne uključi:
+
+```php
+define('TERSA_DEBUG_LOG_ENABLED', true);
+```
+
+Alternativno se može uključiti env varijablom `TERSA_DEBUG_LOG_ENABLED=1`.
+
+Kada je uključen, zapisi idu u `/wp-content/debug.log` preko 3-arg `error_log()`. Osetljivi context ključevi poput `to`, `subject`, `email`, `phone`, `token`, `authorization`, `card` i slični se redaktuju pre upisa. Root `wp-content/.htaccess` blokira direktan pristup `debug.log` i `debug-*.log` fajlovima na Apache serverima.
 
 ### Rotacija
 
@@ -330,7 +343,7 @@ Svi zapisi idu u `/wp-content/debug.log` bez obzira na `WP_DEBUG_LOG` vrednost (
 - Retention: **7 dana** (konfigurabilno preko `TERSA_DEBUG_LOG_RETENTION_DAYS` konstante u `wp-config.php`).
 - Fajlovi `debug-*.log` stariji od retention perioda brišu se pri svakoj rotaciji.
 
-Manuelni rotate preko WP-CLI:
+Manuelni rotate preko WP-CLI kada je modul uključen:
 
 ```bash
 wp tersa debug-log-rotate

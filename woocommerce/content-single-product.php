@@ -7,6 +7,13 @@ if (!$product instanceof WC_Product) {
 	return;
 }
 
+do_action('woocommerce_before_single_product');
+
+if (post_password_required()) {
+	echo get_the_password_form(); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+	return;
+}
+
 $product_id        = $product->get_id();
 $product_name      = $product->get_name();
 
@@ -108,8 +115,6 @@ $tersa_variation_gallery_payload = function_exists('tersa_get_product_variation_
 	? tersa_get_product_variation_gallery_payload($product, $tersa_main_image_size, 'thumbnail', $tersa_main_image_sizes)
 	: [];
 ?>
-
-<?php do_action('woocommerce_before_single_product'); ?>
 
 <div
 	id="product-<?php the_ID(); ?>"

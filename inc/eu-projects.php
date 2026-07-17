@@ -124,43 +124,50 @@ add_action('pre_get_posts', 'tersa_filter_eu_project_collections_by_language', 2
 
 /**
  * Existing EU projects created before Polylang support may have no language.
- * Assign only those unlabelled posts to the default language so default-language
- * archives do not appear empty. Already translated EN/DE posts are untouched.
+ * Assign only those unlabelled posts to the default language. Already translated
+ * EN/DE posts are untouched.
  */
-function tersa_backfill_eu_project_default_language(): void {
-	if (!is_admin() || wp_doing_ajax() || (defined('REST_REQUEST') && REST_REQUEST)) {
-		return;
+function tersa_get_eu_project_language_backfill_option_key(): string {
+	return 'tersa_eu_project_default_language_backfilled_v1';
+}
+
+function tersa_get_eu_project_default_polylang_language_slug(): string {
+	if (!function_exists('pll_default_language')) {
+		return '';
 	}
 
-	if (!current_user_can('edit_posts')) {
-		return;
+	$default_lang = pll_default_language('slug');
+	if (!is_string($default_lang) || '' === $default_lang) {
+		$default_lang = pll_default_language();
 	}
 
-	if (!function_exists('pll_get_post_language') || !function_exists('pll_set_post_language')) {
-		return;
-	}
+	return is_string($default_lang) ? sanitize_key($default_lang) : '';
+}
 
-	$default_lang = '';
-	if (function_exists('pll_default_language')) {
-		$default_lang = pll_default_language('slug');
-		if (!is_string($default_lang) || '' === $default_lang) {
-			$default_lang = pll_default_language();
-		}
-	}
-
-	$default_lang = is_string($default_lang) ? sanitize_key($default_lang) : '';
-	if ('' === $default_lang) {
-		return;
+/**
+ * Finds eu_project posts that do not yet have a Polylang language.
+ *
+ * @return int[]
+ */
+function tersa_get_unlabelled_eu_project_ids(): array {
+	if (!function_exists('pll_get_post_language')) {
+		return [];
 	}
 
 	$project_ids = get_posts([
-		'post_type'        => 'eu_project',
-		'post_status'      => 'any',
-		'posts_per_page'   => -1,
-		'fields'           => 'ids',
-		'no_found_rows'    => true,
-		'suppress_filters' => true,
+		'post_type'              => 'eu_project',
+		'post_status'            => 'any',
+		'posts_per_page'         => -1,
+		'fields'                 => 'ids',
+		'no_found_rows'          => true,
+		'orderby'                => 'ID',
+		'order'                  => 'ASC',
+		'suppress_filters'       => true,
+		'update_post_meta_cache' => false,
+		'update_post_term_cache' => false,
 	]);
+
+	$unlabelled_ids = [];
 
 	foreach ($project_ids as $project_id) {
 		$project_id = absint($project_id);
@@ -173,10 +180,214 @@ function tersa_backfill_eu_project_default_language(): void {
 			continue;
 		}
 
+		$unlabelled_ids[] = $project_id;
+	}
+
+	return $unlabelled_ids;
+}
+
+function tersa_assign_default_language_to_unlabelled_eu_projects(string $default_lang = ''): int {
+	if (!function_exists('pll_set_post_language')) {
+		return 0;
+	}
+
+	$default_lang = $default_lang !== ''
+		? sanitize_key($default_lang)
+		: tersa_get_eu_project_default_polylang_language_slug();
+
+	if ('' === $default_lang) {
+		return 0;
+	}
+
+	$assigned = 0;
+
+	foreach (tersa_get_unlabelled_eu_project_ids() as $project_id) {
 		pll_set_post_language($project_id, $default_lang);
+		$assigned++;
+	}
+
+	return $assigned;
+}
+
+function tersa_get_eu_project_requested_polylang_language_slug(): string {
+	$request_keys = ['new_lang', 'lang', 'post_lang_choice', '_pll_lang'];
+
+	foreach ($request_keys as $request_key) {
+		if (empty($_REQUEST[$request_key]) || !is_scalar($_REQUEST[$request_key])) { // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+			continue;
+		}
+
+		$candidate = sanitize_key(wp_unslash((string) $_REQUEST[$request_key])); // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+		if ('' === $candidate) {
+			continue;
+		}
+
+		if (!function_exists('pll_languages_list')) {
+			return $candidate;
+		}
+
+		$allowed_langs = [];
+		foreach ((array) pll_languages_list(['fields' => 'slug']) as $lang_slug) {
+			if (is_scalar($lang_slug)) {
+				$allowed_langs[] = sanitize_key((string) $lang_slug);
+			}
+		}
+
+		if (!$allowed_langs || in_array($candidate, $allowed_langs, true)) {
+			return $candidate;
+		}
+	}
+
+	return '';
+}
+
+/**
+ * One-time migration for legacy EU projects without a Polylang language.
+ *
+ * This used to scan every admin request. It now runs only once, marks completion
+ * in wp_options, and future individual saves are handled by save_post_eu_project.
+ */
+function tersa_backfill_eu_project_default_language_once(): void {
+	if (!is_admin() || wp_doing_ajax() || (defined('REST_REQUEST') && REST_REQUEST)) {
+		return;
+	}
+
+	if (!current_user_can('edit_posts')) {
+		return;
+	}
+
+	if (!function_exists('pll_get_post_language') || !function_exists('pll_set_post_language')) {
+		return;
+	}
+
+	$option_key = tersa_get_eu_project_language_backfill_option_key();
+	if (get_option($option_key, false)) {
+		return;
+	}
+
+	$default_lang = tersa_get_eu_project_default_polylang_language_slug();
+	if ('' === $default_lang) {
+		return;
+	}
+
+	$assigned = tersa_assign_default_language_to_unlabelled_eu_projects($default_lang);
+
+	update_option($option_key, [
+		'completed_at' => time(),
+		'default_lang' => $default_lang,
+		'assigned'     => $assigned,
+	], false);
+
+	if ($assigned > 0 && function_exists('set_transient')) {
+		set_transient('tersa_eu_project_backfill_notice_count', $assigned, MINUTE_IN_SECONDS);
 	}
 }
-add_action('admin_init', 'tersa_backfill_eu_project_default_language');
+add_action('admin_init', 'tersa_backfill_eu_project_default_language_once');
+
+/**
+ * Future guard: if an EU project is saved without language, assign an intended
+ * Polylang language once. Default language is only the fallback.
+ */
+function tersa_assign_default_language_to_saved_eu_project(int $post_id, WP_Post $post, bool $update): void {
+	unset($update);
+
+	if (wp_is_post_revision($post_id) || wp_is_post_autosave($post_id)) {
+		return;
+	}
+
+	if ('eu_project' !== $post->post_type) {
+		return;
+	}
+
+	if (!function_exists('pll_get_post_language') || !function_exists('pll_set_post_language')) {
+		return;
+	}
+
+	$post_lang = pll_get_post_language($post_id, 'slug');
+	if (is_string($post_lang) && '' !== $post_lang) {
+		return;
+	}
+
+	$target_lang = tersa_get_eu_project_requested_polylang_language_slug();
+	if ('' === $target_lang) {
+		$target_lang = tersa_get_eu_project_default_polylang_language_slug();
+	}
+
+	if ('' === $target_lang) {
+		return;
+	}
+
+	pll_set_post_language($post_id, $target_lang);
+}
+add_action('save_post_eu_project', 'tersa_assign_default_language_to_saved_eu_project', 99, 3);
+
+function tersa_eu_project_backfill_admin_notice(): void {
+	if (!is_admin() || !current_user_can('edit_posts') || !function_exists('get_transient')) {
+		return;
+	}
+
+	$assigned = (int) get_transient('tersa_eu_project_backfill_notice_count');
+	if ($assigned <= 0) {
+		return;
+	}
+
+	delete_transient('tersa_eu_project_backfill_notice_count');
+
+	printf(
+		'<div class="notice notice-success is-dismissible"><p>%s</p></div>',
+		esc_html(sprintf(
+			/* translators: %d: number of EU projects */
+			_n(
+				'Dodeljen je default Polylang jezik za %d postojeći EU projekt.',
+				'Dodeljen je default Polylang jezik za %d postojeća EU projekta.',
+				$assigned,
+				'tersa-shop'
+			),
+			$assigned
+		))
+	);
+}
+add_action('admin_notices', 'tersa_eu_project_backfill_admin_notice');
+
+if (defined('WP_CLI') && WP_CLI) {
+	\WP_CLI::add_command('tersa eu-projects-backfill-language', static function ($args, $assoc_args): void {
+		unset($args);
+
+		if (!function_exists('pll_get_post_language') || !function_exists('pll_set_post_language')) {
+			\WP_CLI::error('Polylang functions are not available.');
+		}
+
+		$option_key = tersa_get_eu_project_language_backfill_option_key();
+		$force      = !empty($assoc_args['force']);
+
+		if ($force) {
+			delete_option($option_key);
+		} elseif (get_option($option_key, false)) {
+			\WP_CLI::success('EU project language backfill was already completed. Use --force to run it again.');
+			return;
+		}
+
+		$default_lang = tersa_get_eu_project_default_polylang_language_slug();
+		if ('' === $default_lang) {
+			\WP_CLI::error('Default Polylang language could not be resolved.');
+		}
+
+		$assigned = tersa_assign_default_language_to_unlabelled_eu_projects($default_lang);
+
+		update_option($option_key, [
+			'completed_at' => time(),
+			'default_lang' => $default_lang,
+			'assigned'     => $assigned,
+			'via'          => 'wp-cli',
+		], false);
+
+		\WP_CLI::success(sprintf(
+			'Assigned default language "%s" to %d EU project(s).',
+			$default_lang,
+			$assigned
+		));
+	});
+}
 
 /**
  * Normalize a Polylang/WP locale to the language set supported by this theme.

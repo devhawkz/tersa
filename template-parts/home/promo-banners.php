@@ -40,10 +40,18 @@ foreach ($banners_raw as $banner) {
 		continue;
 	}
 
+	$link = function_exists('tersa_sanitize_marketing_link_url')
+		? tersa_sanitize_marketing_link_url((string) $banner['link'])
+		: esc_url_raw((string) $banner['link']);
+
+	if ($link === '') {
+		continue;
+	}
+
 	$banners[] = [
 		'eyebrow'     => !empty($banner['eyebrow']) ? $banner['eyebrow'] : '',
 		'title'       => $banner['title'],
-		'link'        => $banner['link'],
+		'link'        => $link,
 		'image_id'    => (int) $banner['image'],
 	];
 }

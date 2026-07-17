@@ -14,6 +14,7 @@ require_once TERSA_THEME_DIR . '/inc/enqueue.php';
 require_once TERSA_THEME_DIR . '/inc/eu-projects.php';
 
 // Helpers
+require_once TERSA_THEME_DIR . '/inc/url-helpers.php';
 require_once TERSA_THEME_DIR . '/inc/header-helpers.php';
 require_once TERSA_THEME_DIR . '/inc/footer-helpers.php';
 require_once TERSA_THEME_DIR . '/inc/shortcodes.php';
@@ -31,5 +32,5 @@ require_once TERSA_THEME_DIR . '/inc/performance.php';
 // Security
 require_once TERSA_THEME_DIR . '/inc/security.php';
 
-// Debug logging (targeted: mail, WC gateway, tersa AJAX) — always on, /wp-content/debug.log
+// Debug logging (targeted: mail, WC gateway, tersa AJAX) — opt-in via TERSA_DEBUG_LOG_ENABLED.
 require_once TERSA_THEME_DIR . '/inc/debug-log.php';

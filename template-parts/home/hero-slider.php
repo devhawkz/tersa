@@ -205,10 +205,13 @@ foreach ($slides_raw as $slide) {
 		: (isset($slide['old_price']) ? (string) $slide['old_price'] : '');
 	$price_is_html     = $has_product_price;
 
-	$cta_text = isset($slide['cta_text']) ? trim((string) $slide['cta_text']) : '';
-	$cta_url  = $product_url !== ''
+	$cta_text    = isset($slide['cta_text']) ? trim((string) $slide['cta_text']) : '';
+	$raw_cta_url = $product_url !== ''
 		? $product_url
 		: (!empty($slide['cta_link']) ? (string) $slide['cta_link'] : '');
+	$cta_url = function_exists('tersa_sanitize_marketing_link_url')
+		? tersa_sanitize_marketing_link_url($raw_cta_url)
+		: esc_url_raw($raw_cta_url);
 
 	if ($title === '' || $description === '' || $cta_text === '' || $cta_url === '') {
 		continue;

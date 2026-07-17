@@ -221,6 +221,20 @@ function tersa_get_product_variation_gallery_payload(WC_Product $product, string
 		return [];
 	}
 
+	$product_id = (int) $product->get_id();
+	$args_hash  = md5($size . '|' . $thumb_size . '|' . $sizes_attr);
+	$cache_key  = 'tersa_variation_gallery_payload_' . $product_id;
+	$cached     = get_transient($cache_key);
+
+	if (
+		is_array($cached)
+		&& isset($cached['args_hash'], $cached['payload'])
+		&& $cached['args_hash'] === $args_hash
+		&& is_array($cached['payload'])
+	) {
+		return $cached['payload'];
+	}
+
 	$raw_entries         = [];
 	$all_attachment_ids = [];
 
@@ -265,6 +279,14 @@ function tersa_get_product_variation_gallery_payload(WC_Product $product, string
 	}
 
 	if (empty($raw_entries)) {
+		set_transient(
+			$cache_key,
+			[
+				'args_hash' => $args_hash,
+				'payload'   => [],
+			],
+			DAY_IN_SECONDS
+		);
 		return [];
 	}
 
@@ -295,6 +317,15 @@ function tersa_get_product_variation_gallery_payload(WC_Product $product, string
 		];
 	}
 
+	set_transient(
+		$cache_key,
+		[
+			'args_hash' => $args_hash,
+			'payload'   => $payload,
+		],
+		DAY_IN_SECONDS
+	);
+
 	return $payload;
 }
 
@@ -319,18 +350,11 @@ function tersa_remove_default_single_product_summary_hooks(): void {
 add_action('woocommerce_before_single_product', 'tersa_remove_default_single_product_summary_hooks', 1);
 
 /**
- * Preload glavne slike proizvoda i prvih par dodatnih za brže prebacivanje
- * između thumb-ova.
+ * Preload samo glavne slike proizvoda.
  *
- * Strategija:
- * - Glavna slika: visok prioritet (LCP target) — preload sa srcset/sizes
- *   identičnim onome u <img>, da browser bira istu varijantu i ne duplira fetch.
- * - Sledeće 1–2 slike u galeriji: niski prioritet (fetchpriority="low")
- *   da ne otimaju propusni opseg LCP-u.
- *
- * Vrednosti se računaju identično šablonu (content-single-product.php),
- * uključujući plugin filtere — tako preload uvek pogađa istu sliku koja
- * će se renderovati.
+ * Strategija: glavna slika je LCP target i dobija visok prioritet. Ostale
+ * gallery slike ostaju lazy kako mobilni browser ne bi skidao nekoliko velikih
+ * 1536px varijanti pre nego što korisnik uopšte klikne thumbnail.
  */
 function tersa_preload_product_gallery(): void {
 	if (!function_exists('is_product') || !is_product()) {
@@ -346,12 +370,6 @@ function tersa_preload_product_gallery(): void {
 	if ($main_image_id <= 0) {
 		return;
 	}
-
-	$gallery_ids = (array) apply_filters('tersa_product_gallery_image_ids', $product->get_gallery_image_ids(), $product);
-	$attachment_ids = array_values(array_unique(array_filter(array_map(
-		'absint',
-		array_merge([$main_image_id], $gallery_ids)
-	))));
 
 	// Mora biti identično vrednostima u šablonu da browser ne duplira fetch.
 	$size  = '1536x1536';
@@ -370,30 +388,5 @@ function tersa_preload_product_gallery(): void {
 		esc_attr($main_srcset),
 		esc_attr($sizes)
 	);
-
-	// Prve 2 sledeće slike u galeriji — nisko prioritetne, warm-up za brze
-	// klikove na thumb. Preskačemo glavnu (već je preload-ovana).
-	$count = 0;
-	foreach ($attachment_ids as $att_id) {
-		if ($att_id === $main_image_id) {
-			continue;
-		}
-		if ($count >= 2) {
-			break;
-		}
-		$next_src = wp_get_attachment_image_url($att_id, $size);
-		if (!$next_src) {
-			continue;
-		}
-		$next_srcset = (string) wp_get_attachment_image_srcset($att_id, $size);
-
-		printf(
-			'<link rel="preload" as="image" href="%s" imagesrcset="%s" imagesizes="%s" fetchpriority="low" />' . "\n",
-			esc_url($next_src),
-			esc_attr($next_srcset),
-			esc_attr($sizes)
-		);
-		$count++;
-	}
 }
 add_action('wp_head', 'tersa_preload_product_gallery', 5);

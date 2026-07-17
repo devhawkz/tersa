@@ -79,11 +79,51 @@ add_filter(
 	}
 );
 
+function tersa_get_content_security_policy(): string {
+	$directives = [
+		'default-src'               => ["'self'"],
+		'base-uri'                  => ["'self'"],
+		'object-src'                => ["'none'"],
+		'frame-ancestors'           => ["'self'"],
+		'form-action'               => ["'self'", 'https://corvuspay.com', 'https://*.corvuspay.com', 'https://www.paypal.com', 'https://*.paypal.com'],
+		'img-src'                   => ["'self'", 'data:', 'blob:', 'https:'],
+		'font-src'                  => ["'self'", 'data:', 'https:'],
+		'style-src'                 => ["'self'", "'unsafe-inline'", 'https:'],
+		'script-src'                => ["'self'", "'unsafe-inline'", "'unsafe-eval'", 'https:'],
+		'connect-src'               => ["'self'", 'https:'],
+		'frame-src'                 => ["'self'", 'https://www.google.com', 'https://maps.google.com', 'https://www.youtube.com', 'https://corvuspay.com', 'https://*.corvuspay.com', 'https://www.paypal.com', 'https://*.paypal.com'],
+		'upgrade-insecure-requests' => [],
+	];
+
+	/**
+	 * Tune CSP before switching TERSA_CSP_ENFORCE on.
+	 *
+	 * @param array<string, array<int, string>> $directives
+	 */
+	$directives = apply_filters('tersa_content_security_policy_directives', $directives);
+
+	$parts = [];
+	foreach ($directives as $directive => $sources) {
+		$directive = sanitize_key((string) $directive);
+		if ($directive === '') {
+			continue;
+		}
+
+		$sources = is_array($sources) ? array_filter(array_map('trim', array_map('strval', $sources))) : [];
+		$parts[] = trim($directive . ' ' . implode(' ', $sources));
+	}
+
+	return implode('; ', $parts);
+}
+
+function tersa_should_enforce_content_security_policy(): bool {
+	$enforce = defined('TERSA_CSP_ENFORCE') && TERSA_CSP_ENFORCE;
+
+	return (bool) apply_filters('tersa_csp_enforce', $enforce);
+}
+
 /**
  * Sigurnosna HTTP zaglavlja.
- *
- * CSP nije dodat iz teme jer lako lomi WooCommerce/payment/plugin flow.
- * To se uvodi tek posle punog QA-a i report-only faze.
  */
 add_action(
 	'send_headers',
@@ -96,6 +136,15 @@ add_action(
 		header('X-Frame-Options: SAMEORIGIN');
 		header('Referrer-Policy: strict-origin-when-cross-origin');
 		header('Permissions-Policy: geolocation=(), microphone=(), camera=(), usb=()');
+
+		$csp = tersa_get_content_security_policy();
+		if ($csp !== '') {
+			$header_name = tersa_should_enforce_content_security_policy()
+				? 'Content-Security-Policy'
+				: 'Content-Security-Policy-Report-Only';
+
+			header($header_name . ': ' . $csp);
+		}
 
 		if (is_ssl()) {
 			header('Strict-Transport-Security: max-age=31536000; includeSubDomains');

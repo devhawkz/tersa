@@ -66,6 +66,38 @@ function tersa_is_sale_filter_active(): bool {
 	return isset($_GET['on_sale']) && absint(wp_unslash($_GET['on_sale'])) === 1;
 }
 
+function tersa_get_sale_product_ids_for_current_language(): array {
+	static $request_cache = [];
+
+	if (!function_exists('wc_get_product_ids_on_sale')) {
+		return [];
+	}
+
+	$lang = function_exists('tersa_get_current_language_slug')
+		? sanitize_key(tersa_get_current_language_slug())
+		: '';
+
+	$cache_key = 'tersa_sale_product_ids' . ($lang !== '' ? '_' . $lang : '');
+	if (isset($request_cache[$cache_key])) {
+		return $request_cache[$cache_key];
+	}
+
+	$cached = get_transient($cache_key);
+	if (is_array($cached)) {
+		return $request_cache[$cache_key] = array_values(array_filter(array_map('absint', $cached)));
+	}
+
+	$sale_ids = array_map('absint', (array) wc_get_product_ids_on_sale());
+	if (function_exists('tersa_filter_product_ids_for_current_language')) {
+		$sale_ids = tersa_filter_product_ids_for_current_language($sale_ids);
+	}
+
+	$sale_ids = array_values(array_unique(array_filter(array_map('absint', $sale_ids))));
+	set_transient($cache_key, $sale_ids, 6 * HOUR_IN_SECONDS);
+
+	return $request_cache[$cache_key] = $sale_ids;
+}
+
 function tersa_get_active_filter_values(string $taxonomy): array {
 	$key = 'filter_' . $taxonomy;
 	if (!isset($_GET[$key])) {
@@ -186,11 +218,8 @@ function tersa_modify_archive_query(WP_Query $query) {
 		$tax_query['relation'] = 'AND';
 	}
 
-	if (tersa_is_sale_filter_active() && function_exists('wc_get_product_ids_on_sale')) {
-		$sale_ids = wc_get_product_ids_on_sale();
-		if (function_exists('tersa_filter_product_ids_for_current_language')) {
-			$sale_ids = tersa_filter_product_ids_for_current_language(array_map('absint', (array) $sale_ids));
-		}
+	if (tersa_is_sale_filter_active()) {
+		$sale_ids = tersa_get_sale_product_ids_for_current_language();
 		$query->set('post__in', !empty($sale_ids) ? $sale_ids : [0]);
 	}
 

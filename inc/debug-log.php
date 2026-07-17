@@ -4,12 +4,12 @@
  *
  * Cilj: sve "soft" greške koje WP ne tretira kao PHP error (mail failure,
  * WC_Logger poruke iz payment gateway-a, tersa AJAX endpoint exception-i)
- * forsirano završe u /wp-content/debug.log.
+ * forsirano završe u namenski debug log.
  *
- * Destinacija je uvek fiksna (/wp-content/debug.log) bez obzira na
- * WP_DEBUG_LOG vrednost — modul radi "always on" kao što je traženo.
- * Ako je WP_DEBUG_LOG aktivan, PHP native error_log() takođe piše tamo,
- * pa su svi log trag-ovi na jednom mestu.
+ * Modul je opt-in: aktivira se samo kad je eksplicitno omogućen konstantom
+ * TERSA_DEBUG_LOG_ENABLED ili env varijablom TERSA_DEBUG_LOG_ENABLED=1.
+ * Tako produkcija ne piše PII/payment dijagnostiku osim kada to namerno
+ * uključimo za troubleshooting.
  *
  * Pokriva:
  *   1. wp_mail_failed               — WP PHPMailer greške (SMTP, invalid To, ...)
@@ -31,13 +31,108 @@ if (!defined('TERSA_DEBUG_LOG_RETENTION_DAYS')) {
 }
 
 /**
- * Fiksna destinacija za sve tema-level log poruke.
+ * Tema-level debug log mora biti eksplicitno omogućen.
+ */
+function tersa_debug_log_enabled(): bool {
+	if (defined('TERSA_DEBUG_LOG_ENABLED')) {
+		return (bool) TERSA_DEBUG_LOG_ENABLED;
+	}
+
+	$env_value = getenv('TERSA_DEBUG_LOG_ENABLED');
+	if (false === $env_value) {
+		return false;
+	}
+
+	return in_array(strtolower(trim((string) $env_value)), ['1', 'true', 'yes', 'on'], true);
+}
+
+if (!tersa_debug_log_enabled()) {
+	return;
+}
+
+/**
+ * Destinacija za sve tema-level log poruke.
+ *
+ * Za produkciju postavi TERSA_DEBUG_LOG_PATH ili env varijablu istog imena na
+ * putanju van webroot-a, npr. /var/log/tersa/debug.log.
  */
 function tersa_debug_log_path(): string {
+	$configured_path = defined('TERSA_DEBUG_LOG_PATH') ? TERSA_DEBUG_LOG_PATH : getenv('TERSA_DEBUG_LOG_PATH');
+	if (is_string($configured_path) && trim($configured_path) !== '') {
+		return trim($configured_path);
+	}
+
 	if (defined('WP_CONTENT_DIR') && WP_CONTENT_DIR) {
 		return rtrim(WP_CONTENT_DIR, '/\\') . '/debug.log';
 	}
 	return ABSPATH . 'wp-content/debug.log';
+}
+
+function tersa_debug_log_ensure_target(string $path): void {
+	$dir = dirname($path);
+
+	if (!is_dir($dir) && function_exists('wp_mkdir_p')) {
+		wp_mkdir_p($dir);
+	}
+
+	if (is_file($path)) {
+		@chmod($path, 0600);
+	}
+}
+
+/**
+ * Redaktuje najčešće PII/tajne vrednosti iz stringova pre upisa u log.
+ */
+function tersa_debug_log_redact_string(string $value): string {
+	$value = preg_replace('/[A-Z0-9._%+\-]+@[A-Z0-9.\-]+\.[A-Z]{2,}/i', '[redacted-email]', $value) ?? $value;
+	$value = preg_replace('/\b(?:\d[ -]*?){13,19}\b/', '[redacted-number]', $value) ?? $value;
+	$value = preg_replace('/\b(Bearer|Basic)\s+[A-Za-z0-9._~+\/=-]+/i', '$1 [redacted-token]', $value) ?? $value;
+
+	return $value;
+}
+
+/**
+ * Redaktuje osetljive context ključeve, rekurzivno.
+ *
+ * @param mixed $value
+ * @return mixed
+ */
+function tersa_debug_log_redact_context_value($value, string $key = '') {
+	$sensitive_keys = [
+		'address',
+		'authorization',
+		'billing_address',
+		'billing_email',
+		'billing_phone',
+		'card',
+		'card_number',
+		'cookie',
+		'email',
+		'password',
+		'phone',
+		'subject',
+		'to',
+		'token',
+	];
+
+	$normalized_key = strtolower(str_replace(['-', ' '], '_', $key));
+	if ($normalized_key !== '' && in_array($normalized_key, $sensitive_keys, true)) {
+		return '[redacted]';
+	}
+
+	if (is_array($value)) {
+		$redacted = [];
+		foreach ($value as $child_key => $child_value) {
+			$redacted[$child_key] = tersa_debug_log_redact_context_value($child_value, is_scalar($child_key) ? (string) $child_key : '');
+		}
+		return $redacted;
+	}
+
+	if (is_string($value)) {
+		return tersa_debug_log_redact_string($value);
+	}
+
+	return $value;
 }
 
 /**
@@ -52,11 +147,11 @@ function tersa_debug_log(string $category, string $message, array $context = [])
 		'[%s] [TERSA:%s] %s',
 		gmdate('Y-m-d H:i:s'),
 		$category,
-		$message
+		tersa_debug_log_redact_string($message)
 	);
 
 	if (!empty($context)) {
-		$json = wp_json_encode($context, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
+		$json = wp_json_encode(tersa_debug_log_redact_context_value($context), JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
 		if (is_string($json)) {
 			$line .= ' | context=' . $json;
 		}
@@ -64,8 +159,15 @@ function tersa_debug_log(string $category, string $message, array $context = [])
 
 	$line .= PHP_EOL;
 
+	$path = tersa_debug_log_path();
+	tersa_debug_log_ensure_target($path);
+
 	// phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_error_log
-	@error_log($line, 3, tersa_debug_log_path());
+	@error_log($line, 3, $path);
+
+	if (is_file($path)) {
+		@chmod($path, 0600);
+	}
 }
 
 /* ------------------------------------------------------------------------ */
@@ -253,7 +355,7 @@ add_action('woocommerce_add_error', static function ($error): void {
 });
 
 /* ------------------------------------------------------------------------ */
-/* 5. Dnevna rotacija — /wp-content/debug-YYYY-MM-DD.log, retention 7 dana   */
+/* 5. Dnevna rotacija — debug-YYYY-MM-DD.log, retention 7 dana               */
 /* ------------------------------------------------------------------------ */
 
 /**
@@ -288,7 +390,7 @@ function tersa_debug_log_rotate_run(): void {
 
 		if (@rename($main, $rotated)) {
 			@touch($main);
-			@chmod($main, 0664);
+			@chmod($main, 0600);
 		}
 	}
 

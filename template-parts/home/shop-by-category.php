@@ -134,10 +134,17 @@ foreach ($items_raw as $item) {
 	}
 
 	$icon = tersa_shop_category_icon_data($item['image'] ?? null, $fallback_icon_url);
+	$url  = function_exists('tersa_sanitize_marketing_link_url')
+		? tersa_sanitize_marketing_link_url((string) $item['link'])
+		: esc_url_raw((string) $item['link']);
+
+	if ($url === '') {
+		continue;
+	}
 
 	$items[] = [
 		'title'       => $item['title'],
-		'url'         => $item['link'],
+		'url'         => $url,
 		'icon_url'    => $icon['url'],
 		'icon_alt'    => $icon['alt'],
 		'icon_width'  => $icon['width'],

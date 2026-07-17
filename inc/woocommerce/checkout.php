@@ -248,6 +248,17 @@ function tersa_enqueue_cart_checkout_blocks_i18n_fix(): void {
 	var skipTags = { SCRIPT: true, STYLE: true, NOSCRIPT: true, TEXTAREA: true };
 	var attrs = ["aria-label", "title", "placeholder", "value"];
 	var queued = false;
+	var rootSelector = [
+		".wp-block-woocommerce-cart",
+		".wp-block-woocommerce-checkout",
+		".wc-block-cart",
+		".wc-block-checkout",
+		".woocommerce-cart-form",
+		".cart_totals",
+		"form.checkout",
+		"#order_review",
+		"#payment"
+	].join(", ");
 
 	function normalize(value) {
 		return String(value || "").replace(/\s+/g, " ").trim();
@@ -310,32 +321,37 @@ function tersa_enqueue_cart_checkout_blocks_i18n_fix(): void {
 		}
 	}
 
+	function getRoots() {
+		return Array.prototype.slice.call(document.querySelectorAll(rootSelector));
+	}
+
 	function run() {
-		if (document.body) {
-			walk(document.body);
-		}
+		getRoots().forEach(walk);
 	}
 
 	function observe() {
-		if (!document.body || !window.MutationObserver) {
+		if (!window.MutationObserver) {
 			return;
 		}
-		new MutationObserver(function (mutations) {
-			if (queued) {
-				return;
-			}
-			queued = true;
-			window.requestAnimationFrame(function () {
-				queued = false;
-				mutations.forEach(function (mutation) {
-					if (mutation.type === "characterData") {
-						walk(mutation.target);
-						return;
-					}
-					mutation.addedNodes.forEach(walk);
+
+		getRoots().forEach(function (root) {
+			new MutationObserver(function (mutations) {
+				if (queued) {
+					return;
+				}
+				queued = true;
+				window.requestAnimationFrame(function () {
+					queued = false;
+					mutations.forEach(function (mutation) {
+						if (mutation.type === "characterData") {
+							walk(mutation.target);
+							return;
+						}
+						mutation.addedNodes.forEach(walk);
+					});
 				});
-			});
-		}).observe(document.body, { childList: true, subtree: true, characterData: true });
+			}).observe(root, { childList: true, subtree: true, characterData: true });
+		});
 	}
 
 	if (document.readyState === "loading") {

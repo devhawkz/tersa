@@ -49,9 +49,12 @@ $button_label_options = function_exists('tersa_translate_ui_string')
 	? tersa_translate_ui_string('Vidi opcije')
 	: (function_exists('pll__') ? pll__('Vidi opcije') : __('Vidi opcije', 'tersa-shop'));
 
-$button_label_add_to_cart = function_exists('tersa_translate_ui_string')
-	? tersa_translate_ui_string('Dodaj u košaricu')
-	: (function_exists('pll__') ? pll__('Dodaj u košaricu') : __('Dodaj u košaricu', 'tersa-shop'));
+$button_label_add_to_cart = $product->add_to_cart_text();
+if ($button_label_add_to_cart === '') {
+	$button_label_add_to_cart = function_exists('tersa_translate_ui_string')
+		? tersa_translate_ui_string('Dodaj u košaricu')
+		: (function_exists('pll__') ? pll__('Dodaj u košaricu') : __('Dodaj u košaricu', 'tersa-shop'));
+}
 
 $allowed_add_to_cart_html = [
 	'a' => [
